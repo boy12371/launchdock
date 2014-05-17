@@ -254,11 +254,11 @@ if (Meteor.isServer) {
   
     // Listen for docker events
     var docker = getDocker();
-    docker.getEvents({since: ((new Date().getTime()/1000) - 60).toFixed(0)}, function(err, stream) {
+    docker.getEvents({since: ((new Date().getTime()/1000) - 60).toFixed(0)}, Meteor.bindEnvironment(function(err, stream) {
       if(err) {
         console.log("docker event error:", err);
       } else {
-        stream.on('data', function (data) {
+        stream.on('data', Meteor.bindEnvironment(function (data) {
           var evt = JSON.parse(data.toString());
           var status;
           if (evt.status === "create") {
@@ -267,17 +267,19 @@ if (Meteor.isServer) {
             status = "running";
           } else if (evt.status === "die") {
             status = "stopped";
+          } else if (evt.status === "stop") {
+            status = "stopped";
           } else {
             status = evt.status;
           }
           // Update app instance status
           AppInstances.update({containerId: evt.id}, {$set: {status: status}});
-        });
+        }, 'docker.getEvents stream data'));
         stream.on('error', function (error) {
           console.log("docker event stream error:", error);
         });
       }
-    });
+    }, 'docker.getEvents'));
   });
 
 }
