@@ -1,0 +1,34 @@
+<head>
+  <title>meteor-launcher</title>
+</head>
+
+<body>
+	<div class="container">
+		{{> appInstances}}
+	</div>
+</body>
+
+<template name="appInstances">
+	<table class="table table-bordered table-striped">
+		<tr>
+			<th>Instance ID</th>
+			<th>Container ID</th>
+			<th>Container Mapped To</th>
+			<th>Hostnames That Route To This Container</th>
+			<th>Status</th>
+		</tr>
+		{{#each instances}}
+		<tr>
+			<td>{{_id}}</td>
+			<td>{{shortContainerId}}...</td>
+			<td>{{host}}:{{port}}</td>
+			<td>
+				{{#each hostnames}}
+				{{this}}<br>
+				{{/each}}
+			</td>
+			<td>{{status}}</td>
+		</tr>
+		{{/each}}
+	</table>
+</template>

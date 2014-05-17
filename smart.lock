@@ -1,0 +1,33 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "http-proxy": {
+        "git": "https://github.com/ongoworks/meteor-http-proxy.git",
+        "branch": "master"
+      },
+      "dockerode": {
+        "git": "https://github.com/ongoworks/meteor-dockerode.git",
+        "branch": "master"
+      },
+      "bootstrap-3": {}
+    },
+    "packages": {
+      "http-proxy": {
+        "git": "https://github.com/ongoworks/meteor-http-proxy.git",
+        "branch": "master",
+        "commit": "224edfb58fc030a62963cd12f2fed2bc19290d17"
+      },
+      "dockerode": {
+        "git": "https://github.com/ongoworks/meteor-dockerode.git",
+        "branch": "master",
+        "commit": "fced813ed02652d15b4390c094ceb3f51bd4dd3f"
+      },
+      "bootstrap-3": {
+        "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
+        "tag": "v3.1.1-1",
+        "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
+      }
+    }
+  }
+}
