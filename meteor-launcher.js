@@ -265,6 +265,8 @@ if (Meteor.isServer) {
             status = "stopped";
           } else if (evt.status === "start") {
             status = "running";
+          } else if (evt.status === "restart") {
+            status = "running";
           } else if (evt.status === "die") {
             status = "stopped";
           } else if (evt.status === "stop") {
