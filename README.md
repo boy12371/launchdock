@@ -30,7 +30,7 @@ Once you are logged into the new instance over SSH, run the following commands (
 $ sudo apt-get update
 $ sudo apt-get install docker.io
 $ sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
-$ sudo chmod 777 /var/run/docker.sock.
+$ sudo chmod 777 /var/run/docker.sock
 ```
 
 We have now launched the server instance and installed Docker on it. To deploy the meteor-launcher app to it, we will use [meteor-up](https://github.com/arunoda/meteor-up). If you don't already have this installed on your workstation, install it now:
@@ -66,7 +66,7 @@ Refer to the [meteor-up](https://github.com/arunoda/meteor-up) documentation for
 
 The launcher runs the other Meteor apps in docker containers. You'll need a docker image for each release of each app that you want to run. The launcher can create the docker images for you, but you need to prep the app bundles.
 
-1. Bundle the Meteor app as you normally would, giving it the name "bundle.tar.gz".
+1. Bundle the Meteor app you are deploying as you normally would, giving it the name "bundle.tar.gz".
 2. Copy the Dockerfile from this repo into your Meteor app's folder (alongside the bundle archive you just created).
 3. Change to that directory in Terminal and enter `tar -cvzf <release_name>.tar.gz Dockerfile bundle.tar.gz`. The release name can be anything you want that identifies which app and which release you bundled for your later reference.
 4. Make `<release_name>.tar.gz` available somewhere on the Internet. (For Reaction, upload to the `reaction-bundles` bucket in S3 and then make it public.)
