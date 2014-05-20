@@ -15,23 +15,22 @@ Before you can deploy the launcher app, you must have a properly configured serv
 
 1. In AWS Management Console, launch a new EC2 instance.
 2. Choose 64-bit Ubuntu.
-3. Choose micro or whatever size you want. Should be powerful enough to serve all the Meteor apps and the launcher app. (NEXT)
-4. Accept defaults for instance settings (NEXT)
-5. Accept defaults for storage. (NEXT)
-6. Skip tags. (NEXT)
-7. Select or create a security group with TCP access on port 80 and port 8000, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8000 should be limited to be accessible only from the IP address of the app or users that will control the launcher (TODO maybe we could require user login to manage the launcher; not sure how well that works server-to-server).
+3. Choose micro or whatever size you want. Should be powerful enough to serve all the Meteor apps and the launcher app. (NEXT-CONFIGURE INSTANCE DETAILS)
+4. Open Advanced Details -> User Data -> As file
+5. Upload ec2-ubuntu-data-script.sh (REVIEW AND LAUNCH)
+6. Accept defaults for instance settings (NEXT)
+7. Accept defaults for storage. (NEXT)
+8. Skip tags. (NEXT)
+9. Select or create a security group with TCP access on port 80 and port 8000, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8000 should be limited to be accessible only from the IP address of the app or users that will control the launcher (TODO maybe we could require user login to manage the launcher; not sure how well that works server-to-server).
 8. Review and click Launch.
-9. Create a .pem or select one you already have on your workstation. If you create one, be sure to `chmod 400` it.
-10. ssh -i ~/key.pem ubuntu@54.187.229.4 (replace correct key file path and correct IP address of new EC2 instance)
-
-Once you are logged into the new instance over SSH, run the following commands (TODO we can script these using cloud init):
+9. Create a .pem or select one you already have on your workstation. If you create one, be sure  save it, and to `chmod 400` it locally.
+10. ssh -i ~/key.pem ubuntu@54.187.229.4 (replace correct key file path and correct IP address of new EC2 instance) and verify Docker installation:
 
 ```bash
-$ sudo apt-get update
-$ sudo apt-get install docker.io
-$ sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
-$ sudo chmod 777 /var/run/docker.sock
+$ docker info
+$ docker version
 ```
+
 
 We have now launched the server instance and installed Docker on it. To deploy the meteor-launcher app to it, we will use [meteor-up](https://github.com/arunoda/meteor-up). If you don't already have this installed on your workstation, install it now:
 

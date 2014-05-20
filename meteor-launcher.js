@@ -10,13 +10,13 @@ if (Meteor.isServer) {
 
   function getDocker() {
     // For now we connect on the same server instance
-    return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux
-    //return new Docker({host: 'http://127.0.0.1', port: 4243}); // Use this one on Mac OSX
+    //return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux
+    return new Docker({host: 'http://127.0.0.1', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
 
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
     //return new Docker({host: 'http://192.168.1.10', port: 3000});
   }
-  
+
   Meteor.methods({
     launchAppInstance: function (options) {
       options = options || {};
@@ -27,7 +27,7 @@ if (Meteor.isServer) {
         throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
       }
 
-      // For now we'll put all containers on the same instance as the launcher; this could be 
+      // For now we'll put all containers on the same instance as the launcher; this could be
       // passed in or we could use some kind of logic to figure out which instances can handle
       // more containers or if we need to create a new server instance
       var host = options.host || '127.0.0.1';
@@ -218,7 +218,7 @@ if (Meteor.isServer) {
       });
 
       if (exists) return true;
-      
+
       // stream tar file to buildImage
       var tarStream = request(archiveUrl);
       if (!tarStream) {
@@ -227,7 +227,7 @@ if (Meteor.isServer) {
 
       try {
         tarStream.on('error', function (error) { throw error; });
-        Meteor._wrapAsync(docker.buildImage.bind(docker))(tarStream, {t: imageName, rm: true});
+        Meteor._wrapAsync(docker.buildImage.bind(docker))(tarStream, {t: imageName, rm: 1});
       } catch (error) {
         throw new Meteor.Error(500, 'Internal server error', "Error reading " + archiveUrl + ' or building image: ' + (error && error.message ? error.message : 'Unknown'));
       }
@@ -251,7 +251,7 @@ if (Meteor.isServer) {
 
   Meteor.startup(function () {
     HTTPProxy.start({port: Meteor.settings.proxyPort, fallbackTarget: Meteor.settings.proxyFallbackTarget});
-  
+
     // Listen for docker events
     var docker = getDocker();
     docker.getEvents({since: ((new Date().getTime()/1000) - 60).toFixed(0)}, Meteor.bindEnvironment(function(err, stream) {
