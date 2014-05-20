@@ -9,26 +9,65 @@
 </body>
 
 <template name="appInstances">
+	<h2>App Instances</h2>
 	<table class="table table-bordered table-striped">
 		<tr>
 			<th>Instance ID</th>
+			<th>From Image</th>
 			<th>Container ID</th>
 			<th>Container Mapped To</th>
 			<th>Hostnames That Route To This Container</th>
 			<th>Status</th>
+			<th></th>
 		</tr>
 		{{#each instances}}
-		<tr>
-			<td>{{_id}}</td>
-			<td>{{shortContainerId}}...</td>
-			<td>{{host}}:{{port}}</td>
-			<td>
-				{{#each hostnames}}
-				{{this}}<br>
-				{{/each}}
-			</td>
-			<td>{{status}}</td>
-		</tr>
+		{{> instanceRow}}
 		{{/each}}
 	</table>
+	<h2>Images</h2>
+	<table class="table table-bordered table-striped">
+		<tr>
+			<th>Image ID</th>
+			<th>Image Name</th>
+			<th>Built From</th>
+			<th></th>
+		</tr>
+		{{#each images}}
+		{{> imageRow}}
+		{{/each}}
+	</table>
+</template>
+
+<template name="instanceRow">
+	<tr>
+		<td>{{_id}}</td>
+		<td>{{imageName}}</td>
+		<td>{{shortContainerId}}...</td>
+		<td>{{host}}:{{port}}</td>
+		<td>
+			{{#each hostnames}}
+			{{this}}<br>
+			{{/each}}
+		</td>
+		<td>{{status}}</td>
+		<td>
+			<button class="btn btn-default btn-xs stop">Stop</button>
+			<button class="btn btn-default btn-xs start">Start</button>
+			<button class="btn btn-default btn-xs restart">Restart</button>
+			<button class="btn btn-default btn-xs kill">Kill</button>
+			<button class="btn btn-default btn-xs remove">Delete</button>
+			<button class="btn btn-default btn-xs info">Get Info</button>
+		</td>
+	</tr>
+</template>
+
+<template name="imageRow">
+	<tr>
+		<td>{{imageId}}</td>
+		<td>{{name}}</td>
+		<td>{{sourceUrl}}</td>
+		<td>
+			<button class="btn btn-default btn-xs remove">Delete</button>
+		</td>
+	</tr>
 </template>
