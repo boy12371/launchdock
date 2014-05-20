@@ -1,4 +1,5 @@
 AppInstances = new Meteor.Collection("AppInstances");
+DockerImages = new Meteor.Collection("DockerImages");
 
 if (Meteor.isServer) {
   var fs = Npm.require('fs');
@@ -6,6 +7,10 @@ if (Meteor.isServer) {
 
   Meteor.publish("appInstances", function () {
     return AppInstances.find();
+  });
+
+  Meteor.publish("dockerImages", function () {
+    return DockerImages.find();
   });
 
   function getDocker() {
@@ -27,14 +32,22 @@ if (Meteor.isServer) {
         throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
       }
 
-      // For now we'll put all containers on the same instance as the launcher; this could be
+      if (typeof options.mongoUrl !== "string") {
+        throw new Meteor.Error(400, 'Bad request', "You must pass the mongoUrl option set to the MongoDB URL for the app instance's database.");
+      }
+
+      if (typeof options.rootUrl !== "string") {
+        throw new Meteor.Error(400, 'Bad request', "You must pass the rootUrl option set to the desired root URL for the app instance.");
+      }
+
+      // For now we'll put all containers on the same instance as the launcher; this could be 
       // passed in or we could use some kind of logic to figure out which instances can handle
       // more containers or if we need to create a new server instance
       var host = options.host || '127.0.0.1';
       // Should be passed in; maybe have a separate method that launches mongo instances; or let caller do that
-      var mongoUrl = options.mongoUrl || 'mongodb://test:abcd2Fire@oceanic.mongohq.com:10061/reaction_eric_test';
-      // TODO set this properly and also make a method for changing it
-      var rootUrl = options.rootUrl || 'http://reaction.meteor.com';
+      var mongoUrl = options.mongoUrl;
+      // TODO make this changeable with a separate method that selects from assigned hostnames
+      var rootUrl = options.rootUrl;
 
       var docker = getDocker();
 
@@ -68,12 +81,11 @@ if (Meteor.isServer) {
       var newInstance = AppInstances.insert({
         host: host,
         port: port,
+        image: appImage,
         containerId: containerId,
         createdAt: new Date,
         running: containerInfo.State.Running ? "running" : "stopped"
       });
-
-      // TODO get container status and set initial status in AppInstance here because the events probably already came in
 
       // Return the app instance ID for use in future calls; calling app should store this somewhere
       return newInstance;
@@ -251,7 +263,7 @@ if (Meteor.isServer) {
 
   Meteor.startup(function () {
     HTTPProxy.start({port: Meteor.settings.proxyPort, fallbackTarget: Meteor.settings.proxyFallbackTarget});
-
+  
     // Listen for docker events
     var docker = getDocker();
     docker.getEvents({since: ((new Date().getTime()/1000) - 60).toFixed(0)}, Meteor.bindEnvironment(function(err, stream) {
@@ -259,6 +271,7 @@ if (Meteor.isServer) {
         console.log("docker event error:", err);
       } else {
         stream.on('data', Meteor.bindEnvironment(function (data) {
+          console.log("docker event:", data.toString());
           var evt = JSON.parse(data.toString());
           var status;
           if (evt.status === "create") {
@@ -270,6 +283,8 @@ if (Meteor.isServer) {
           } else if (evt.status === "die") {
             status = "stopped";
           } else if (evt.status === "stop") {
+            status = "stopped";
+          } else if (evt.status === "kill") {
             status = "stopped";
           } else {
             status = evt.status;
@@ -288,12 +303,63 @@ if (Meteor.isServer) {
 
 if (Meteor.isClient) {
   Meteor.subscribe("appInstances");
+  Meteor.subscribe("dockerImages");
 
   Template.appInstances.instances = function () {
     return AppInstances.find({}, {sort: {createdAt: -1}});
   };
 
-  Template.appInstances.shortContainerId = function () {
-    return this.containerId.slice(0, 10);
+  Template.appInstances.images = function () {
+    return DockerImages.find({}, {sort: {name: 1}});
+  };
+
+  Template.instanceRow.shortContainerId = function () {
+    return (this.containerId || "").slice(0, 10);
+  };
+
+  Template.instanceRow.events = {
+    'click .start': function (event, template) {
+      Meteor.call("startAppInstance", this._id, function () {
+        console.log("startAppInstance result:", arguments);
+      });
+    },
+    'click .stop': function (event, template) {
+      Meteor.call("stopAppInstance", this._id, function () {
+        console.log("stopAppInstance result:", arguments);
+      });
+    },
+    'click .restart': function (event, template) {
+      Meteor.call("restartAppInstance", this._id, function () {
+        console.log("restartAppInstance result:", arguments);
+      });
+    },
+    'click .kill': function (event, template) {
+      Meteor.call("killAppInstance", this._id, function () {
+        console.log("killAppInstance result:", arguments);
+      });
+    },
+    'click .remove': function (event, template) {
+      Meteor.call("removeAppInstance", this._id, function () {
+        console.log("removeAppInstance result:", arguments);
+      });
+    },
+    'click .info': function (event, template) {
+      Meteor.call("getContainerInfo", this._id, function () {
+        console.log("getContainerInfo result:", arguments);
+      });
+    }
+  };
+
+  Template.imageRow.events = {
+    'click .remove': function (event, template) {
+      Meteor.call("removeImage", this._id, function () {
+        console.log("removeImage result:", arguments);
+      });
+    },
+    'click .info': function (event, template) {
+      Meteor.call("getImageInfo", this._id, function () {
+        console.log("getImageInfo result:", arguments);
+      });
+    }
   };
 }
