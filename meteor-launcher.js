@@ -44,20 +44,25 @@ if (Meteor.isServer) {
       // passed in or we could use some kind of logic to figure out which instances can handle
       // more containers or if we need to create a new server instance
       var host = options.host || '127.0.0.1';
-      // Should be passed in; maybe have a separate method that launches mongo instances; or let caller do that
-      var mongoUrl = options.mongoUrl;
-      // TODO make this changeable with a separate method that selects from assigned hostnames
-      var rootUrl = options.rootUrl;
+
+      // Prepare environment variables
+      var env = {
+        'MONGO_URL': options.mongoUrl,
+        'ROOT_URL': options.rootUrl // TODO make this changeable with a separate method that selects from assigned hostnames
+      };
+      if (_.isObject(options.env)) {
+        _.extend(env, options.env);
+      }
+      var dockerEnv = _.map(env, function (val, key) {
+        return key + '=' + val;
+      });
 
       var docker = getDocker();
 
       // Create a new container
       var container = Meteor._wrapAsync(docker.createContainer.bind(docker))({
         Image: options.appImage,
-        Env: [
-          'MONGO_URL=' + mongoUrl,
-          'ROOT_URL=' + rootUrl
-        ],
+        Env: dockerEnv,
         ExposedPorts: {
           "8080/tcp": {} // docker will auto-assign the host port this is mapped to
         },
@@ -84,7 +89,8 @@ if (Meteor.isServer) {
         image: options.appImage,
         containerId: containerId,
         createdAt: new Date,
-        status: containerInfo.State.Running ? "running" : "stopped"
+        status: containerInfo.State.Running ? "running" : "stopped",
+        env: env
       });
 
       // Return the app instance ID for use in future calls; calling app should store this somewhere
@@ -186,6 +192,11 @@ if (Meteor.isServer) {
       }
 
       return true;
+    },
+    getEnvironmentVariables: function (instanceId) {
+      this.unblock();
+      var ai = AppInstances.findOne({_id: instanceId});
+      return ai && ai.env;
     },
     addHostname: function (instanceId, hostname) {
       this.unblock();

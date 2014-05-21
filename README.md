@@ -111,6 +111,7 @@ TODO Expand on these eventually, but for now here's a list:
 * killAppInstance(instanceId)
 * removeAppInstance(instanceId)
 * getContainerInfo(instanceId)
+* getEnvironmentVariables(instanceId)
 * addHostname(instanceId, hostname)
 * removeHostname(instanceId, hostname)
 
