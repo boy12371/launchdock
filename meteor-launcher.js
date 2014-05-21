@@ -84,7 +84,7 @@ if (Meteor.isServer) {
         image: appImage,
         containerId: containerId,
         createdAt: new Date,
-        running: containerInfo.State.Running ? "running" : "stopped"
+        status: containerInfo.State.Running ? "running" : "stopped"
       });
 
       // Return the app instance ID for use in future calls; calling app should store this somewhere
