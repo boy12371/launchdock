@@ -81,7 +81,7 @@ if (Meteor.isServer) {
       var newInstance = AppInstances.insert({
         host: host,
         port: port,
-        image: appImage,
+        image: options.appImage,
         containerId: containerId,
         createdAt: new Date,
         status: containerInfo.State.Running ? "running" : "stopped"
