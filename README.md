@@ -41,8 +41,10 @@ $ docker version
 
 We have now launched the server instance and installed Docker on it. The ec2-user-data script should have automatically pulled and installed the meteor-launcher app. 
 
-To access go to: http:<your server address>:8000
-
+To access go to:  
+```
+http://<your server address>:8000
+```
 ## Preparing the Meteor Apps
 
 The launcher runs the other Meteor apps in docker containers as well. You'll need a docker image for each release of each app that you want to run. The launcher can create the docker images for you, but you need to prep the app images.
@@ -50,7 +52,7 @@ The launcher runs the other Meteor apps in docker containers as well. You'll nee
 You need a Dockerfile in the root of your project.  If your project is on github, you can use [Docker.io Trusted Builds](https://index.docker.io/help/docs/#trustedbuilds) to automatically make updated project builds. 
 Goto to docker.io, register, and go to Trusted Builds and point to your repo.
 
-In the root of your meteor project, and commit this Dockerfile to your project:
+In the root of your meteor project, add, then commit this Dockerfile to your project:
 ```bash
 curl -O https://raw.githubusercontent.com/ongoworks/meteor-launcher/master/Dockerfile
 ```
