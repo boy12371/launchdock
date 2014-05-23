@@ -9,15 +9,22 @@ There is a browser interface (TODO the beginnings of one), but you can also remo
 
 TODO Eventually there will be a small launcher package that simplifies remote calls from a separate Meteor app.
 
-## Server Setup
+## Amazon Web Services Setup
 
 Before you can deploy the launcher app, you must have a properly configured server instance on which to deploy it. Here are instructions for creating an EC2 server with AWS:
+
+### Configure ec2-user-data
+Download the [ec2-ubuntu-data-script.sh](https://github.com/ongoworks/meteor-launcher/blob/master/ec2-ubuntu-data-script.sh)
+
+Edit ec2-ubuntu-data-script.sh, and update the Meteor MONGO_URL variables with appropriate information. Suggest setting up a hosted mongo db somewhere besides this cluster (Mongohq?).
+
+### Server Setup
 
 1. In AWS Management Console, launch a new EC2 instance.
 2. Choose 64-bit Ubuntu.
 3. Choose micro or whatever size you want. Should be powerful enough to serve all the Meteor apps and the launcher app. (NEXT-CONFIGURE INSTANCE DETAILS)
 4. Open Advanced Details -> User Data -> As file
-5. Upload ec2-ubuntu-data-script.sh (REVIEW AND LAUNCH)
+5. Upload (the previously edited) ec2-ubuntu-data-script.sh (REVIEW AND LAUNCH)
 6. Accept defaults for instance settings (NEXT)
 7. Accept defaults for storage. (NEXT)
 8. Skip tags. (NEXT)
@@ -32,49 +39,41 @@ $ docker version
 ```
 
 
-We have now launched the server instance and installed Docker on it. To deploy the meteor-launcher app to it, we will use [meteor-up](https://github.com/arunoda/meteor-up). If you don't already have this installed on your workstation, install it now:
+We have now launched the server instance and installed Docker on it. The ec2-user-data script should have automatically pulled and installed the meteor-launcher app. 
 
-```bash
-$ (sudo) npm install -g mup
-```
-
-Then configure the launcher deployment:
-
-1. Create a new folder for this deployment. Let's say `~/deployments/launcher`.
-2. Copy `mup.json` and `settings.json` from this repo into the new folder.
-3. Edit `mup.json`:
-    * Change "host" and "pem" to the correct info for the EC2 instance you just launched.
-    * Change "app" to the full local path to your clone of this repo.
-    * Change the "env" variables to the correct variables for the launcher app to use. By default, the proxy server will run on port 80, so you should not use port 80 for the launcher app. But if you want to use port 80 for the launcher app, simply change the "proxyPort" setting in `settings.json` to whatever you want the proxy port to run on (and then be sure to route all your app hostnames to this port with DNS).
-4. Save any changes to the JSON files.
-5. `cd ~/deployments/launcher`
-6. `mup setup`
-
-## Deploy the Launcher App
-
-Once all the inital setup is done, deploying the launcher is easy:
-
-```bash
-$ cd ~/deployments/launcher
-$ mup deploy
-```
-
-Refer to the [meteor-up](https://github.com/arunoda/meteor-up) documentation for instructions for viewing the launcher app logs, restarting it, or changing its configuration.
+To access go to: http:<your server address>:8000
 
 ## Preparing the Meteor Apps
 
-The launcher runs the other Meteor apps in docker containers. You'll need a docker image for each release of each app that you want to run. The launcher can create the docker images for you, but you need to prep the app bundles.
+The launcher runs the other Meteor apps in docker containers as well. You'll need a docker image for each release of each app that you want to run. The launcher can create the docker images for you, but you need to prep the app images.
 
-1. Bundle the Meteor app you are deploying as you normally would, giving it the name "bundle.tar.gz".
-2. Copy the Dockerfile from this repo into your Meteor app's folder (alongside the bundle archive you just created).
-3. Change to that directory in Terminal and enter `tar -cvzf <release_name>.tar.gz Dockerfile bundle.tar.gz`. The release name can be anything you want that identifies which app and which release you bundled for your later reference.
-4. Make `<release_name>.tar.gz` available somewhere on the Internet. (For Reaction, upload to the `reaction-bundles` bucket in S3 and then make it public.)
+You need a Dockerfile in the root of your project.  If your project is on github, you can use [Docker.io Trusted Builds](https://index.docker.io/help/docs/#trustedbuilds) to automatically make updated project builds. 
+Goto to docker.io, register, and go to Trusted Builds and point to your repo.
+
+In the root of your meteor project, and commit this Dockerfile to your project:
+```bash
+curl -O https://raw.githubusercontent.com/ongoworks/meteor-launcher/master/Dockerfile
+```
+
+You can also manually create builds locally.
+
+Install Docker. See: [Getting started with Docker](https://www.docker.io/gettingstarted/)
+
+```bash
+cd <yourprojectroot>
+docker build --tag="<yourcompanyname>/<yourapp>" .
+```
+
+To push to docker.io (or elsewhere)
+```bash
+docker push <yourcompanyname>/<yourapp>
+```
 
 ## Using the Launcher
 
 Once all the prepwork is done, you can use the launcher.
 
-There are two ways to interact with the launcher. You can access it directly in a browser (using the EC2 instance's IP address plus the PORT environment variable you specified in `mup.json`, 8000 by default) or you can connect to it through DDP from another Meteor app. To connect from another app, call `var conn = DDP.connect(launcherUrl)` and then `conn.call` the available launcher methods.
+There are two ways to interact with the launcher. You can access it directly in a browser (using the EC2 instance's IP address plus the PORT environment variable specifed in the ec2-user-data script, 8000 by default) or you can connect to it through DDP from another Meteor app. To connect from another app, call `var conn = DDP.connect(launcherUrl)` and then `conn.call` the available launcher methods.
 
 ### Build an Image
 
