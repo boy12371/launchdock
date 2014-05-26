@@ -1,7 +1,7 @@
 meteor-launcher
 ===============
 
-TODO Change name? It's more than just a launcher.
+TODO Change name? It's more than just a launcher. rocker-docker?
 
 This is a Meteor app (not a package) that allows you to manage multiple instances of other Meteor apps running on the same server instance (TODO eventually on other server instances, too). In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the launcher server in DNS.
 
@@ -28,14 +28,15 @@ Edit ec2-ubuntu-data-script.sh, and update the Meteor MONGO_URL variables with a
 6. Accept defaults for instance settings (NEXT)
 7. Accept defaults for storage. (NEXT)
 8. Skip tags. (NEXT)
-9. Select or create a security group with TCP access on port 80 and port 8000, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8000 should be limited to be accessible only from the IP address of the app or users that will control the launcher (TODO maybe we could require user login to manage the launcher; not sure how well that works server-to-server).
+9. Select or create a security group with TCP access on port 80 and port 8080, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8080 should be limited to be accessible only from the IP address of the app or users that will control the launcher (TODO maybe we could require user login to manage the launcher; not sure how well that works server-to-server).
 8. Review and click Launch.
 9. Create a .pem or select one you already have on your workstation. If you create one, be sure  save it, and to `chmod 400` it locally.
 10. ssh -i ~/key.pem ubuntu@54.187.229.4 (replace correct key file path and correct IP address of new EC2 instance) and verify Docker installation:
 
 ```bash
-$ docker info
-$ docker version
+$ docker run -d --name hipache -P hipache
+$ docker run  -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache:hipache -e MONGO_URL="<mongo connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/meteor-launcher 
+$ docker pull <reponame>/<app>
 ```
 
 
@@ -63,12 +64,12 @@ Install Docker. See: [Getting started with Docker](https://www.docker.io/getting
 
 ```bash
 cd <yourprojectroot>
-docker build --tag="<yourcompanyname>/<yourapp>" .
+docker build --tag="<reponame>/<app>" .
 ```
 
 To push to docker.io (or elsewhere)
 ```bash
-docker push <yourcompanyname>/<yourapp>
+docker push <reponame>/<app>
 ```
 
 ## Using the Launcher
@@ -77,30 +78,32 @@ Once all the prepwork is done, you can use the launcher.
 
 There are two ways to interact with the launcher. You can access it directly in a browser (using the EC2 instance's IP address plus the PORT environment variable specifed in the ec2-user-data script, 8000 by default) or you can connect to it through DDP from another Meteor app. To connect from another app, call `var conn = DDP.connect(launcherUrl)` and then `conn.call` the available launcher methods.
 
-### Build an Image
+### Build an Image through API
 
-Before you can launch instances of an app, you need to make sure the app's docker image is present on the EC2 server:
+Before you can launch instances of an app, you need to make sure the app's docker image is present on the EC2 server. You can use the Docker.io repo ("Preparing the Meteor Apps"), or you can have one created from a remote Meteor bundle.
 
 ```js
-Meteor.call("buildImageIfNotExist", "reaction/v0.1.0", "https://s3-us-west-2.amazonaws.com/reaction-bundles/reaction_0.1.0.tar.gz", function () { console.log(arguments); });
+Meteor.call("buildImageIfNotExist", "<reponame>/<app>", "http://url-to-your-meteor-bundle/bundle.tar.gz", function () { console.log(arguments); });
 ```
 
 If an image with that name already exists, nothing happens. Otherwise it will build an image with that name from the tar file URL you provide (which is the one you created in the "Preparing the Meteor Apps" section).
 
-TODO Building the image takes some time (a few minutes?) and currently this method will return before the building is actually done. Need to figure out a good solution for notifying that the image is built.
+TODO: Building the image takes some time (a few minutes?) and currently this method will return before the building is actually done. Need to figure out a good solution for notifying that the image is built.
 
 ### Launch an App Instance
 
 ```js
 Meteor.call("launchAppInstance", {
-    appImage: "reaction/v0.1.0",
-    mongoUrl: "",
-    rootUrl: "",
-    host: "" //NOTE: For future use. Don't pass this option right now
+    appImage: "<reponame>/<app>",
+    mongoUrl: "mongodb://<dbuser>:<dbpass>@oceanic.mongohq.com:10077/reaction_demo",
+    hostname:"<www.domain.com>",
+    rootUrl: "http://localhost"
   }, function () { console.log(arguments); });
 ```
 
-The new app instance's ID is returned. If calling from another app, you will want to save this somewhere and use it whenever calling any of the other available methods.
+Note: If the repo/appname doesn't exist, it will attempt to download from the Docker.io public repo.
+
+The new app instance's ID is returned. If calling from another app, you will want to save this somewhere and use it whenever calling any of the other available methods. This method will add the Hipache/redis entry if the optional hostname is provided.
 
 ### Other Methods
 

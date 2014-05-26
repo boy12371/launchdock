@@ -1,13 +1,10 @@
 {
   "packages": {
-    "http-proxy": {
-      "git": "https://github.com/ongoworks/meteor-http-proxy.git",
-      "branch": "master"
-    },
     "dockerode": {
       "git": "https://github.com/ongoworks/meteor-dockerode.git",
       "branch": "master"
     },
-    "bootstrap-3": {}
+    "bootstrap-3": {},
+    "redis": {}
   }
 }

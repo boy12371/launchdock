@@ -15,12 +15,20 @@ if (Meteor.isServer) {
 
   function getDocker() {
     // For now we connect on the same server instance
-    //return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux
-    return new Docker({host: 'http://127.0.0.1', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
+    return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
+    //return new Docker({host: 'http://localhost', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
 
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
     //return new Docker({host: 'http://192.168.1.10', port: 3000});
   }
+
+  // Find hipache redis port and create client
+  var docker = getDocker();
+  var container = docker.getContainer('launcher/hipache');
+  var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+  var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
+  Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress);
+  //Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local development
 
   Meteor.methods({
     launchAppInstance: function (options) {
@@ -40,7 +48,7 @@ if (Meteor.isServer) {
         throw new Meteor.Error(400, 'Bad request', "You must pass the rootUrl option set to the desired root URL for the app instance.");
       }
 
-      // For now we'll put all containers on the same instance as the launcher; this could be 
+      // For now we'll put all containers on the same instance as the launcher; this could be
       // passed in or we could use some kind of logic to figure out which instances can handle
       // more containers or if we need to create a new server instance
       var host = options.host || '127.0.0.1';
@@ -92,7 +100,11 @@ if (Meteor.isServer) {
         status: containerInfo.State.Running ? "running" : "stopped",
         env: env
       });
-
+      if (options.hostname) {
+        //if hostname is provided, add domain to hipache as a group.
+        // new: domain.reactioncommerce.com  domain
+        Meteor.call("addHostname", newInstance, options.hostname);
+      }
       // Return the app instance ID for use in future calls; calling app should store this somewhere
       return newInstance;
     },
@@ -183,7 +195,8 @@ if (Meteor.isServer) {
 
       // Unregister all hostnames from the proxy server
       _.each(ai.hostnames, function (hostname) {
-        HTTPProxy.HostNameMap.remove({hostname: hostname});
+        //HTTPProxy.HostNameMap.remove({hostname: hostname});
+        //TODO : redis hipache
       });
 
       // Remove app instance from collection
@@ -214,18 +227,22 @@ if (Meteor.isServer) {
       // Note this hostname in the AppInstance info
       AppInstances.update({_id: instanceId}, {$push: {hostnames: hostname}});
       // Inform the proxy server that it needs to route the provided hostname to the provided instance
-      HTTPProxy.HostNameMap.insert({hostname: hostname, target: {host: ai.host, port: ai.port}});
-      return true;
+      //HTTPProxy.HostNameMap.insert({hostname: hostname, target: {host: ai.host, port: ai.port}});
+      Hipache.rpush('frontend:'+hostname, hostname );
+      return Hipache.rpush('frontend:'+hostname, "http://"+ai.host+":"+ai.port);
+      //return true
     },
     removeHostname: function (instanceId, hostname) {
       this.unblock();
       check(instanceId, String);
       check(hostname, String);
+      var ai = AppInstances.findOne({_id: instanceId});
 
       // Remove this hostname from the AppInstance info
       AppInstances.update({_id: instanceId}, {$pull: {hostnames: hostname}});
+
       // Inform the proxy server that it no longer needs to route the provided hostname to the provided instance
-      HTTPProxy.HostNameMap.remove({hostname: hostname});
+      Hipache.rpop("hostname", "http://"+ai.host+":"+ai.port)
       return true;
     },
     buildImageIfNotExist: function (imageName, archiveUrl) {
@@ -272,9 +289,8 @@ if (Meteor.isServer) {
     }
   });
 
+
   Meteor.startup(function () {
-    HTTPProxy.start({port: Meteor.settings.proxyPort, fallbackTarget: Meteor.settings.proxyFallbackTarget});
-  
     // Listen for docker events
     var docker = getDocker();
     docker.getEvents({since: ((new Date().getTime()/1000) - 60).toFixed(0)}, Meteor.bindEnvironment(function(err, stream) {

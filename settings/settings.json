@@ -1,0 +1,5 @@
+{
+  "proxyPort": 80,
+  "proxyFallbackTarget": null,
+  "mode" : "production"
+}
