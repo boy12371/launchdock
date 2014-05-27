@@ -34,8 +34,8 @@ Edit ec2-ubuntu-data-script.sh, and update the Meteor MONGO_URL variables with a
 10. ssh -i ~/key.pem ubuntu@54.187.229.4 (replace correct key file path and correct IP address of new EC2 instance) and verify Docker installation:
 
 ```bash
-$ docker run -d --name hipache -P hipache
-$ docker run  -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache:hipache -e MONGO_URL="<mongo connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/meteor-launcher 
+$ docker run --name hipache -p ::6379 -p 80:80 -d ongoworks/hipache-npm
+$ docker run  -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache:hipache -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/meteor-launcher 
 $ docker pull <reponame>/<app>
 ```
 
@@ -44,7 +44,7 @@ We have now launched the server instance and installed Docker on it. The ec2-use
 
 To access go to:  
 ```
-http://<your server address>:8000
+http://<your server address>:8080
 ```
 ## Preparing the Meteor Apps
 
@@ -96,6 +96,7 @@ TODO: Building the image takes some time (a few minutes?) and currently this met
 Meteor.call("launchAppInstance", {
     appImage: "<reponame>/<app>",
     mongoUrl: "mongodb://<dbuser>:<dbpass>@oceanic.mongohq.com:10077/reaction_demo",
+    host: "<host server ip>",
     hostname:"<www.domain.com>",
     rootUrl: "http://localhost"
   }, function () { console.log(arguments); });
