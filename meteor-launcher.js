@@ -243,7 +243,7 @@ if (Meteor.isServer) {
       AppInstances.update({_id: instanceId}, {$pull: {hostnames: hostname}});
 
       // Inform the proxy server that it no longer needs to route the provided hostname to the provided instance
-      Hipache.rpop("hostname", "http://"+ai.host+":"+ai.port)
+      Hipache.del("hostname", "http://"+ai.host+":"+ai.port)
       return true;
     },
     buildImageIfNotExist: function (imageName, archiveUrl) {
