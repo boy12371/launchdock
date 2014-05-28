@@ -230,7 +230,12 @@ if (Meteor.isServer) {
       // Inform the proxy server that it needs to route the provided hostname to the provided instance
       //HTTPProxy.HostNameMap.insert({hostname: hostname, target: {host: ai.host, port: ai.port}});
       // use domain prefix as unique identifier
-      var domainId = hostname.split(".")[0];
+      if (hostname.split(".").length > 2) {
+        var domainId = hostname.split(".")[0];
+      } else {
+        var domainId = Random.id(8);
+      }
+
       Hipache.rpush('frontend:'+hostname, domainId );
       Hipache.rpush('frontend:'+hostname, "http://"+ai.host+":"+ai.port);
       return true
