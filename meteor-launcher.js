@@ -66,8 +66,6 @@ if (Meteor.isServer) {
         return key + '=' + val;
       });
 
-      var docker = getDocker();
-
       // Create a new container
       var container = Meteor._wrapAsync(docker.createContainer.bind(docker))({
         Image: options.appImage,
@@ -114,7 +112,6 @@ if (Meteor.isServer) {
       var ai = AppInstances.findOne({_id: instanceId});
 
       // Get the container
-      var docker = getDocker();
       var container = docker.getContainer(ai.containerId);
 
       // Restart container
@@ -127,7 +124,6 @@ if (Meteor.isServer) {
       var ai = AppInstances.findOne({_id: instanceId});
 
       // Get the container
-      var docker = getDocker();
       var container = docker.getContainer(ai.containerId);
 
       // Start container
@@ -142,7 +138,6 @@ if (Meteor.isServer) {
       var ai = AppInstances.findOne({_id: instanceId});
 
       // Get the container
-      var docker = getDocker();
       var container = docker.getContainer(ai.containerId);
 
       // Stop container
@@ -155,7 +150,6 @@ if (Meteor.isServer) {
       var ai = AppInstances.findOne({_id: instanceId});
 
       // Get the container
-      var docker = getDocker();
       var container = docker.getContainer(ai.containerId);
 
       // Kill container
@@ -175,7 +169,6 @@ if (Meteor.isServer) {
 
       var containerId = ai.containerId;
 
-      var docker = getDocker();
       var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))();
 
       var exists = _.any(containers, function (container) {
@@ -253,7 +246,6 @@ if (Meteor.isServer) {
       check(imageName, String);
       check(archiveUrl, String);
 
-      var docker = getDocker();
       var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
 
       var exists = _.any(images, function (image) {
@@ -284,7 +276,6 @@ if (Meteor.isServer) {
       var ai = AppInstances.findOne({_id: instanceId});
 
       // Get the container
-      var docker = getDocker();
       var container = docker.getContainer(ai.containerId);
 
       // Return container info
@@ -295,7 +286,6 @@ if (Meteor.isServer) {
 
   Meteor.startup(function () {
     // Listen for docker events
-    var docker = getDocker();
     docker.getEvents({since: ((new Date().getTime()/1000) - 60).toFixed(0)}, Meteor.bindEnvironment(function(err, stream) {
       if(err) {
         console.log("docker event error:", err);
