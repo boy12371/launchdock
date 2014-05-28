@@ -7,3 +7,5 @@ standard-app-packages
 dockerode
 bootstrap-3
 redis
+accounts-password
+accounts-ui-bootstrap-3

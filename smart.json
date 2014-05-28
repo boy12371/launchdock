@@ -5,6 +5,7 @@
       "branch": "master"
     },
     "bootstrap-3": {},
-    "redis": {}
+    "redis": {},
+    "accounts-ui-bootstrap-3": {}
   }
 }

@@ -3,6 +3,22 @@
 </head>
 
 <body>
+	<div class="navbar navbar-default" role="navigation">
+	  <div class="navbar-header">
+	    <a class="navbar-brand" href="#">Meteor Launcher</a>
+	  </div>
+	  <div class="navbar-collapse collapse">
+	    <ul class="nav navbar-nav">
+	      <li class="active"><a href="#">App Instances</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav">
+	      <li class="active"><a href="#">Images</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav navbar-right">
+	      {{> loginButtons}}
+	    </ul>
+	  </div>
+	</div>
 	<div class="container">
 		{{> appInstances}}
 	</div>
