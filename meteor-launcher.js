@@ -56,7 +56,8 @@ if (Meteor.isServer) {
       // Prepare environment variables
       var env = {
         'MONGO_URL': options.mongoUrl,
-        'ROOT_URL': options.rootUrl // TODO make this changeable with a separate method that selects from assigned hostnames
+        'ROOT_URL': options.rootUrl,// TODO make this changeable with a separate method that selects from assigned hostnames
+        'METEOR_EMAIL': options.email
       };
       if (_.isObject(options.env)) {
         _.extend(env, options.env);
