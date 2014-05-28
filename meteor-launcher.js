@@ -197,7 +197,7 @@ if (Meteor.isServer) {
       // Unregister all hostnames from the proxy server
       _.each(ai.hostnames, function (hostname) {
         //HTTPProxy.HostNameMap.remove({hostname: hostname});
-        //TODO : redis hipache
+        Meteor.call("removeHostname", instanceId, hostname);
       });
 
       // Remove app instance from collection
