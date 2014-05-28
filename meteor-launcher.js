@@ -229,10 +229,11 @@ if (Meteor.isServer) {
       AppInstances.update({_id: instanceId}, {$push: {hostnames: hostname}});
       // Inform the proxy server that it needs to route the provided hostname to the provided instance
       //HTTPProxy.HostNameMap.insert({hostname: hostname, target: {host: ai.host, port: ai.port}});
-
-      // Hipache.rpush('frontend:'+hostname, hostname );
-      return Hipache.rpush('frontend:'+hostname, "http://"+ai.host+":"+ai.port);
-      //return true
+      // use domain prefix as unique identifier
+      var domainId = hostname.split(".")[0];
+      Hipache.rpush('frontend:'+hostname, domainId );
+      Hipache.rpush('frontend:'+hostname, "http://"+ai.host+":"+ai.port);
+      return true
     },
     removeHostname: function (instanceId, hostname) {
       this.unblock();
