@@ -24,7 +24,7 @@ if (Meteor.isServer) {
 
   // Find hipache redis port and create client
   var docker = getDocker();
-  var container = docker.getContainer('hipache');
+  var container = docker.getContainer('launcher/hipache');
   try {
     var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
   } catch (e) {
