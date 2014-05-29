@@ -16,7 +16,7 @@ if (Meteor.isServer) {
   function getDocker() {
     // For now we connect on the same server instance
     return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
-    //return new Docker({host: 'http://localhost', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
+    //return new Docker({host: 'http://127.0.01', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
 
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
     //return new Docker({host: 'http://192.168.1.10', port: 3000});
@@ -37,6 +37,24 @@ if (Meteor.isServer) {
   //Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local development
 
   Meteor.methods({
+    rebuildAppInstance: function (instanceId) {
+      var options = options || {};
+      this.unblock();
+
+      var ai = AppInstances.findOne({_id: instanceId});
+      options.email = ai.env.METEOR_EMAIL;
+      options.rootUrl = ai.env.ROOT_URL;
+      options.mongoUrl = ai.env.MONGO_URL;
+      options.host = ai.host;
+      options.appImage = ai.image;
+
+      Meteor.call("removeHostname", instanceId, ai.hostname);
+      Meteor.call("killAppInstance", instanceId);
+      newInstanceId = Meteor.call("launchAppInstance", options);
+      AppInstances.update({_id: newInstanceId});
+      // TODO DELETE ORIGINAL instance
+      //TODO loop through hostnames and add additional hostnames from original
+    },
     launchAppInstance: function (options) {
       options = options || {};
 
@@ -371,7 +389,15 @@ if (Meteor.isClient) {
     },
     'click .remove': function (event, template) {
       Meteor.call("removeAppInstance", this._id, function () {
-        console.log("removeAppInstance result:", arguments);
+        var result = confirm("Want to delete?");
+        if (result==true) {
+          console.log("removeAppInstance result:", arguments);
+        }
+      });
+    },
+    'click .rebuild': function (event, template) {
+      Meteor.call("rebuildAppInstance", this._id, function () {
+        console.log("rebuildAppInstance result:", arguments);
       });
     },
     'click .info': function (event, template) {
