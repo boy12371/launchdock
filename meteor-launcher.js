@@ -52,6 +52,7 @@ if (Meteor.isServer) {
       // Stop any existing container and start new.
       try {
         Meteor.call("killAppInstance", instanceId);
+        Meteor.call("removeAppInstance", instanceId);
       }
       catch(err) {
         console.log ("No existing instance. launching new container: "+options.appImage)
@@ -59,14 +60,12 @@ if (Meteor.isServer) {
 
       cloneId = Meteor.call("launchAppInstance", options);
 
-      // remove existing hostname, could maybe just swap them after new container is started
+      // TODO loop through hostnames and add additional hostnames from original
       if(ai.hostnames) {
         options.hostname = ai.hostnames[0];
-        Meteor.call("removeHostname", instanceId, options.hostname);
         Meteor.call("addHostname", cloneId, options.hostname);
       }
-      // TODO DELETE ORIGINAL instance
-      // TODO loop through hostnames and add additional hostnames from original
+
       console.log("created: "+cloneId);
       return cloneId
 
