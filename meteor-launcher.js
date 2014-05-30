@@ -15,8 +15,8 @@ if (Meteor.isServer) {
 
   function getDocker() {
     // For now we connect on the same server instance
-    return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
-    //return new Docker({host: 'http://127.0.01', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
+    //return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
+    return new Docker({host: 'http://127.0.01', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
 
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
     //return new Docker({host: 'http://192.168.1.10', port: 3000});
@@ -33,7 +33,7 @@ if (Meteor.isServer) {
     throw new Error('You must start a hipache container named "hipache" before running the launcher app. Use the command: docker run --name hipache -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
   }
   var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
-  Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress);
+  Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
   //Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local development
 
   Meteor.methods({
@@ -48,12 +48,28 @@ if (Meteor.isServer) {
       options.host = ai.host;
       options.appImage = ai.image;
 
-      Meteor.call("removeHostname", instanceId, ai.hostname);
-      Meteor.call("killAppInstance", instanceId);
-      newInstanceId = Meteor.call("launchAppInstance", options);
-      AppInstances.update({_id: newInstanceId});
+      console.log("rebuilding instance: "+instanceId);
+      // Stop any existing container and start new.
+      try {
+        Meteor.call("killAppInstance", instanceId);
+      }
+      catch(err) {
+        console.log ("No existing instance. launching new container: "+options.appImage)
+      }
+
+      cloneId = Meteor.call("launchAppInstance", options);
+
+      // remove existing hostname, could maybe just swap them after new container is started
+      if(ai.hostnames) {
+        options.hostname = ai.hostnames[0];
+        Meteor.call("removeHostname", instanceId, options.hostname);
+        Meteor.call("addHostname", cloneId, options.hostname);
+      }
       // TODO DELETE ORIGINAL instance
-      //TODO loop through hostnames and add additional hostnames from original
+      // TODO loop through hostnames and add additional hostnames from original
+      console.log("created: "+cloneId);
+      return cloneId
+
     },
     launchAppInstance: function (options) {
       options = options || {};
@@ -388,12 +404,12 @@ if (Meteor.isClient) {
       });
     },
     'click .remove': function (event, template) {
-      Meteor.call("removeAppInstance", this._id, function () {
-        var result = confirm("Want to delete?");
-        if (result==true) {
-          console.log("removeAppInstance result:", arguments);
-        }
-      });
+      var result = confirm("Are you sure you want to delete this site??");
+      if (result == true) {
+        Meteor.call("removeAppInstance", this._id, function () {
+            console.log("removeAppInstance result:", arguments);
+        });
+      }
     },
     'click .rebuild': function (event, template) {
       Meteor.call("rebuildAppInstance", this._id, function () {
