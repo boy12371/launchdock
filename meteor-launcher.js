@@ -15,8 +15,8 @@ if (Meteor.isServer) {
 
   function getDocker() {
     // For now we connect on the same server instance
-    //return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
-    return new Docker({host: 'http://127.0.01', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
+    return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
+    //return new Docker({host: 'http://127.0.01', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
 
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
     //return new Docker({host: 'http://192.168.1.10', port: 3000});
