@@ -1,7 +1,3 @@
-Template.appInstances.instances = function () {
-	return AppInstances.find({}, {sort: {createdAt: -1}});
-};
-
 Template.instanceRow.shortContainerId = function () {
 	return (this.containerId || "").slice(0, 10);
 };

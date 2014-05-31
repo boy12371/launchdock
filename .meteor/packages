@@ -10,3 +10,4 @@ redis
 accounts-password
 accounts-ui-bootstrap-3
 random
+iron-router

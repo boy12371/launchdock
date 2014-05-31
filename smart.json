@@ -6,6 +6,7 @@
     },
     "bootstrap-3": {},
     "redis": {},
-    "accounts-ui-bootstrap-3": {}
+    "accounts-ui-bootstrap-3": {},
+    "iron-router": {}
   }
 }

@@ -1,7 +1,3 @@
-Template.images.images = function () {
-  return DockerImages.find({}, {sort: {name: 1}});
-};
-
 Template.imageRow.events = {
   'click .remove': function (event, template) {
     Meteor.call("removeImage", this._id, function () {

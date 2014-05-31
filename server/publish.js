@@ -1,7 +1,17 @@
 Meteor.publish("appInstances", function () {
-	return AppInstances.find();
+	if (this.userId) {
+		return AppInstances.find();
+	}
 });
 
 Meteor.publish("dockerImages", function () {
-	return DockerImages.find();
+	if (this.userId) {
+		return DockerImages.find();
+	}
+});
+
+Meteor.publish("hosts", function () {
+	if (this.userId) {
+		return Hosts.find();
+	}
 });
