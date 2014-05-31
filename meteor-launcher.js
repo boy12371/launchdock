@@ -4,6 +4,14 @@ DockerImages = new Meteor.Collection("DockerImages");
 if (Meteor.isServer) {
   var fs = Npm.require('fs');
   var request = Npm.require('request');
+  var os = Npm.require('os');
+  var platform = os.platform();
+
+  // Get server dir
+  var serverDir = __meteor_bootstrap__ && __meteor_bootstrap__.serverDir;
+  if (!serverDir) {
+    throw new Error("Unable to determine the server directory");
+  }
 
   Meteor.publish("appInstances", function () {
     return AppInstances.find();
@@ -13,10 +21,37 @@ if (Meteor.isServer) {
     return DockerImages.find();
   });
 
+  function ensureDir(dir) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, 0777);
+    }
+  }
+
+  function buildImageFromGitRepo(gitUrl) {
+    // Create a temp directory for this bundle
+    var tempBundleDir = path.join(os.tmpdir(), Random.id());
+    ensureDir(tempBundleDir);
+
+    // Git clone into the temp dir
+    // TODO use git-node pkg?
+
+    // Copy the Dockerfile into the bundle temp dir
+    fs.writeFileSync(path.join(tempBundleDir, 'Dockerfile'), fs.readFileSync(path.join(serverDir, 'assets/app/Dockerfile')));
+
+    // Build image from local path
+    // var tarFile = ? // TODO need to bundle local path into tar.gz
+    //Meteor._wrapAsync(docker.buildImage.bind(docker))(tarFile, {t: imageName, rm: 1});
+  }
+
   function getDocker() {
     // For now we connect on the same server instance
-    return new Docker({socketPath: '/var/run/docker.sock'}); // Use this one on Linux/Docker
-    //return new Docker({host: 'http://127.0.01', port: 4243}); // Use this one on Mac OSX, or linux where docker is configured to use port
+    if (platform === "darwin") {
+      // We are on OSX; need to connect slightly differently
+      return new Docker({host: 'http://127.0.0.1', port: 4243});
+    } else {
+      // We are on linux
+      return new Docker({socketPath: '/var/run/docker.sock'}); 
+    }
 
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
     //return new Docker({host: 'http://192.168.1.10', port: 3000});
@@ -30,7 +65,7 @@ if (Meteor.isServer) {
   } catch (e) {
     // TODO we could actually create and start the hipache container here
     // if not already started
-    throw new Error('You must start a hipache container named "hipache" before running the launcher app. Use the command: docker run --name hipache -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
+    throw new Error('You must start a hipache container named "launcher/hipache" before running the launcher app. Use the command: docker run --name hipache -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
   }
   var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
   Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances

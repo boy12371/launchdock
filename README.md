@@ -32,7 +32,7 @@ To connect to the server, `ssh -i ~/key.pem ubuntu@54.187.229.4` (replace correc
 Continue with the necessary docker commands:
 
 ```bash
-$ docker run --name hipache -p ::6379 -p 80:80 -d ongoworks/hipache-npm
+$ docker run --name launcher/hipache -p ::6379 -p 80:80 -d ongoworks/hipache-npm
 $ docker run -d -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache:hipache -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/meteor-launcher 
 $ docker pull <reponame>/<app>
 ```
