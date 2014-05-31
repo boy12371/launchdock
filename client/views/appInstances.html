@@ -1,29 +1,3 @@
-<head>
-  <title>meteor-launcher</title>
-</head>
-
-<body>
-	<div class="navbar navbar-default" role="navigation">
-	  <div class="navbar-header">
-	    <a class="navbar-brand" href="#">Meteor Launcher</a>
-	  </div>
-	  <div class="navbar-collapse collapse">
-	    <ul class="nav navbar-nav">
-	      <li class="active"><a href="#">App Instances</a></li>
-	    </ul>
-	    <ul class="nav navbar-nav">
-	      <li class="active"><a href="#">Images</a></li>
-	    </ul>
-	    <ul class="nav navbar-nav navbar-right">
-	      {{> loginButtons}}
-	    </ul>
-	  </div>
-	</div>
-	<div class="container-fluid">
-		{{> appInstances}}
-	</div>
-</body>
-
 <template name="appInstances">
 	<h2>App Instances</h2>
 	<table class="table table-bordered table-striped">
@@ -38,18 +12,6 @@
 		</tr>
 		{{#each instances}}
 		{{> instanceRow}}
-		{{/each}}
-	</table>
-	<h2>Images</h2>
-	<table class="table table-bordered table-striped">
-		<tr>
-			<th>Image ID</th>
-			<th>Image Name</th>
-			<th>Built From</th>
-			<th></th>
-		</tr>
-		{{#each images}}
-		{{> imageRow}}
 		{{/each}}
 	</table>
 </template>
@@ -74,17 +36,6 @@
 			<button class="btn btn-default btn-xs remove">Delete</button>
 			<button class="btn btn-default btn-xs rebuild">Rebuild</button>
 			<button class="btn btn-default btn-xs info">Get Info</button>
-		</td>
-	</tr>
-</template>
-
-<template name="imageRow">
-	<tr>
-		<td>{{imageId}}</td>
-		<td>{{name}}</td>
-		<td>{{sourceUrl}}</td>
-		<td>
-			<button class="btn btn-default btn-xs remove">Delete</button>
 		</td>
 	</tr>
 </template>

@@ -1,0 +1,25 @@
+<template name="images">
+	<h2>Images</h2>
+	<table class="table table-bordered table-striped">
+		<tr>
+			<th>Image ID</th>
+			<th>Image Name</th>
+			<th>Built From</th>
+			<th></th>
+		</tr>
+		{{#each images}}
+		{{> imageRow}}
+		{{/each}}
+	</table>
+</template>
+
+<template name="imageRow">
+	<tr>
+		<td>{{imageId}}</td>
+		<td>{{name}}</td>
+		<td>{{sourceUrl}}</td>
+		<td>
+			<button class="btn btn-default btn-xs remove">Delete</button>
+		</td>
+	</tr>
+</template>
