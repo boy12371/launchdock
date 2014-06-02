@@ -43,6 +43,6 @@ var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
 
 try {
 	Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp);
-} catch {
+} catch (e) {
 	Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
 }
