@@ -1,9 +1,7 @@
-meteor-launcher
+rocker-docker
 ===============
 
-TODO Change name? It's more than just a launcher. rocker-docker?
-
-This is a Meteor app (not a package) that allows you to manage multiple instances of other Meteor apps running on the same server instance (TODO eventually on other server instances, too). In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the launcher server in DNS.
+This is a Meteor app (not a package) that allows you to manage multiple instances of other Meteor app/Docker containers running on the same server instance (TODO eventually on other server instances, too). In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the launcher server in DNS.
 
 There is a browser interface (TODO the beginnings of one), but you can also remotely call the launcher API over DDP from another Meteor app (or anything that can use DDP).
 
@@ -19,13 +17,13 @@ Before you can deploy the launcher app, you must have a properly configured serv
 2. Choose 64-bit Ubuntu.
 3. Choose micro or whatever size you want. Should be powerful enough to serve all the Meteor apps and the launcher app. (NEXT-CONFIGURE INSTANCE DETAILS)
 4. Open Advanced Details -> User Data -> As text
-5. In the text box, enter `#include https://raw.githubusercontent.com/ongoworks/meteor-launcher/master/ec2-ubuntu-data-script.sh` (REVIEW AND LAUNCH)
+5. In the text box, enter `#include https://raw.githubusercontent.com/ongoworks/rocker-docker/master/ec2-ubuntu-data-script.sh` (REVIEW AND LAUNCH)
 6. Click "Edit security groups" in the warning message.
 7. Select or create a security group with TCP access on port 80 and port 8080, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8080 should be limited to be accessible only from the IP address of the app or users that will control the launcher (TODO maybe we could require user login to manage the launcher; not sure how well that works server-to-server).
 8. Review and click Launch.
 9. Create a .pem or select one you already have on your workstation. If you create one, be sure to save it, and to `chmod 400` it locally.
 
-We have now launched the server instance and installed Docker on it. The ec2-user-data script should have automatically pulled and installed the meteor-launcher app. This takes a few minutes and may be still happening the first time you log in. If you have any trouble with commands, log off the server, wait a few minutes, and then SSH to the server and try again.
+We have now launched the server instance and installed Docker on it. The ec2-user-data script should have automatically pulled and installed the rocker-docker app. This takes a few minutes and may be still happening the first time you log in. If you have any trouble with commands, log off the server, wait a few minutes, and then SSH to the server and try again.
 
 To connect to the server, `ssh -i ~/key.pem ubuntu@54.187.229.4` (replace correct key file path and correct IP address of new EC2 instance).
 
@@ -33,7 +31,7 @@ Continue with the necessary docker commands:
 
 ```bash
 $ docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm
-$ docker run -d -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache-npm:hipache -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/meteor-launcher 
+$ docker run -d -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache-npm:hipache -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/rocker-docker 
 $ docker pull <reponame>/<app>
 ```
 
@@ -53,7 +51,7 @@ Go to docker.io, register, and go to Trusted Builds and point to your repo.
 In the root of your meteor project, add and commit this Dockerfile to your project:
 
 ```bash
-curl -O https://raw.githubusercontent.com/ongoworks/meteor-launcher/master/Dockerfile
+curl -O https://raw.githubusercontent.com/ongoworks/rocker-docker/master/Dockerfile
 ```
 
 You can also manually create builds locally.
