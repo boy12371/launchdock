@@ -12,17 +12,20 @@ if (!serverDir) {
 
 function getDocker() {
 	// For now we connect on the same server instance
-	var platform = os.platform();
+	var platform = os.platform(), d;
 	if (platform === "darwin") {
 	  // We are on OSX; need to connect slightly differently
-	  return new Docker({host: 'http://127.0.0.1', port: 4243});
+	  d = new Docker({host: 'http://127.0.0.1', port: 4243});
 	} else {
 	  // We are on linux
-	  return new Docker({socketPath: '/var/run/docker.sock'});
+	  d = new Docker({socketPath: '/var/run/docker.sock'});
 	}
 
+	listenToDockerEvents(d);
+
 	// To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
-	//return new Docker({host: 'http://192.168.1.10', port: 3000});
+	//d = new Docker({host: 'http://192.168.1.10', port: 3000});
+	return d;
 }
 
 // Create global `docker` for use everywhere
