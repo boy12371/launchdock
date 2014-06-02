@@ -36,8 +36,13 @@ var container = docker.getContainer('hipache-npm'), containerInfo;
 try {
 	containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
 } catch (e) {
-	throw new Error('You must start a hipache container named "hipache" before running the launcher app. Use the command: docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
+	throw new Error('You must start a hipache container named "hipache-npm" before running the launcher app. Use the command: docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
 }
 
 var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
-Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp);
+
+try {
+	Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp);
+} catch (e) {
+	Hipache = redis.createClient(hostConfig.HostPort, containerInfo.NetworkSettings.IPAddress); //docker instances
+}

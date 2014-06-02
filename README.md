@@ -41,6 +41,8 @@ If all commands are successful, you can see the launcher in your browser by goin
 http://<your server address>:8080
 ```
 
+*Note: Default login is admin/admin*
+
 ## Preparing the Meteor Apps
 
 The launcher runs the other Meteor apps in docker containers as well. You'll need a docker image for each release of each app that you want to run. The launcher can create the docker images for you, but you need to prep the app images.
