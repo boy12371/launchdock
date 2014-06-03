@@ -10,11 +10,12 @@ Template.hosts.helpers({
 Template.hosts.events({
   'submit form': function (event,template) {
     event.preventDefault();
-    host = $('#container-host').val() || "http://127.0.0.1";
+    privateHost = $('#container-private-host').val() || "http://127.0.0.1";
+    publicHost = $('#container-public-host').val() || "http://127.0.0.1";
     max = $('#container-max').val() || 100;
     port = $('#container-port').val() || 4243;
 
-    Hosts.insert({host:host, port:port, max: max, active: true})
+    Hosts.insert({privateHost:privateHost, publicHost: publicHost, port:port, max: max, active: true})
   },
   'click #pause-host': function (event,template) {
     Hosts.update(this._id, {$set:{active: false}})

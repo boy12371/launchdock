@@ -23,7 +23,7 @@ Meteor.methods({
     Meteor.call("updateHostDetails");
     target = Hosts.findOne({}, {sort: {'details.Containers': 1}});
     if (target) {
-      return Meteor.call("getDocker",target.host,target.port);
+      return Meteor.call("getDocker",target.privateHost,target.port);
     } else {
       return Meteor.call("getDocker");
     }
@@ -32,7 +32,7 @@ Meteor.methods({
   updateHostDetails: function() {
     var hosts = Hosts.find().fetch();
     for (index = 0; index < hosts.length; ++index) {
-      Meteor.call("getHostDetail", hosts[index].host, hosts[index].port,hosts[index]._id);
+      Meteor.call("getHostDetail", hosts[index].privateHost, hosts[index].port,hosts[index]._id);
     }
     return hosts;
   },
@@ -103,7 +103,7 @@ Meteor.methods({
     // For now we'll put all containers on the same instance as the launcher; this could be
     // passed in or we could use some kind of logic to figure out which instances can handle
     // more containers or if we need to create a new server instance
-    var host = docker.modem.host || '127.0.0.1';
+    var host = Hosts.findOne({privateHost:docker.modem.host}).publicHost || '127.0.0.1';
 
     // Prepare environment variables
     var env = {
