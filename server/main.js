@@ -10,29 +10,11 @@ if (!serverDir) {
     throw new Error("Unable to determine the server directory");
 }
 
-function getDocker() {
-	// For now we connect on the same server instance
-	var platform = os.platform(), d;
-	if (platform === "darwin") {
-	  // We are on OSX; need to connect slightly differently
-	  d = new Docker({host: 'http://127.0.0.1', port: 4243});
-	} else {
-	  // We are on linux
-	  d = new Docker({socketPath: '/var/run/docker.sock'});
-	}
-
-	listenToDockerEvents(d);
-
-	// To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
-	//d = new Docker({host: 'http://192.168.1.10', port: 3000});
-	return d;
-}
-
-// Create global `docker` for use everywhere
-docker = getDocker();
+// dockerProxy = the docker server running the proxy
+dockerProxy = Meteor.call("getDocker");
 
 // Find hipache redis port and create global `Hipache` client for use everywhere
-var container = docker.getContainer('hipache-npm'), containerInfo;
+var container = dockerProxy.getContainer('hipache-npm'), containerInfo;
 try {
 	containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
 } catch (e) {
@@ -40,9 +22,10 @@ try {
 }
 
 var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
+var platform = os.platform(), d;
 
-try {
-	Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
-} catch (e) {
+if (platform === "darwin") {
 	Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local
+} else {
+	Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
 }

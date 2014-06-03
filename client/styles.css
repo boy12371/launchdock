@@ -1,3 +1,7 @@
 .btn {
   margin: 2px;
 }
+.active-hosts span {
+  padding-left: 5px;
+  padding-right: 5px;
+}
