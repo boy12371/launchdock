@@ -50,7 +50,11 @@ Meteor.methods({
     this.unblock();
 
     var ai = AppInstances.findOne({_id: instanceId});
-    var docker = Meteor.call("getDocker",ai.docker.host,ai.docker.port);
+    if (ai.docker.host) {
+      var docker = Meteor.call("getDocker",ai.docker.host,ai.docker.port);
+    } else {
+      var docker = Meteor.call("getDocker",ai.host,ai.docker.port);
+    }
 
     options.email = ai.env.METEOR_EMAIL;
     options.rootUrl = ai.env.ROOT_URL;
@@ -100,9 +104,7 @@ Meteor.methods({
       throw new Meteor.Error(400, 'Bad request', "You must pass the rootUrl option set to the desired root URL for the app instance.");
     }
 
-    // For now we'll put all containers on the same instance as the launcher; this could be
-    // passed in or we could use some kind of logic to figure out which instances can handle
-    // more containers or if we need to create a new server instance
+    // public host for sites
     var host = Hosts.findOne({privateHost:docker.modem.host}).publicHost || '127.0.0.1';
 
     // Prepare environment variables
