@@ -286,7 +286,7 @@ Meteor.methods({
     }
 
     Hipache.rpush('frontend:'+hostname, domainId );
-    Hipache.rpush('frontend:'+hostname, "http://"+ai.host+":"+ai.port);
+    Hipache.rpush('frontend:'+hostname, ai.host+":"+ai.port);
     return true
   },
   removeHostname: function (instanceId, hostname) {
