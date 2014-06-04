@@ -1,4 +1,12 @@
 Meteor.methods({
+  addHost: function(privateHost, publicHost, port, max, active) {
+    check(privateHost, String);
+    check(publicHost, String);
+    port = port || 4243;
+    max = max || 100;
+    active = active || true;
+    Hosts.insert({privateHost:privateHost, publicHost: publicHost, port:port, max: max, active: active});
+  },
   //get docker connection
   getDocker: function (host, port) {
     // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
