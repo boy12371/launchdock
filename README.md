@@ -46,8 +46,8 @@ http://<your server address>:8080
 On the hosts screen, you can manage additional hosts.
 For a single server example, where docker apps are launched on the same docker server that is running rocker-docker you can add:
 
-    private host: 127.0.0.1
-    public host: 127.0.0.1
+    private host: http://127.0.0.1
+    public host: http://127.0.0.1
     port: 4243
     max containers: 100
 
