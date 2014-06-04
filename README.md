@@ -1,7 +1,7 @@
 rocker-docker
 ===============
 
-This is a Meteor app (not a package) that allows you to manage multiple instances of other Meteor app/Docker containers running on the same server instance (TODO eventually on other server instances, too). In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the launcher server in DNS.
+This is a Meteor app (not a package) that allows you to manage multiple instances of other Meteor app/Docker containers, either on a single server or multiple. In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the docker servers in DNS.
 
 There is a browser interface (TODO the beginnings of one), but you can also remotely call the launcher API over DDP from another Meteor app (or anything that can use DDP).
 
@@ -42,6 +42,17 @@ http://<your server address>:8080
 ```
 
 *Note: Default login is admin/admin*
+## Add docker hosts
+On the hosts screen, you can manage additional hosts.
+For a single server example, where docker apps are launched on the same docker server that is running rocker-docker you can add:
+
+    private host: 127.0.0.1
+    public host: 127.0.0.1
+    port: 4243
+    max containers: 100
+
+The private host is the address of the docker server you wish to launch apps on. The public host is the publicly accessible address that will be assigned to hipache - proxy (site) entries. You should always lock down port 4243 on your servers. On AWS, with security groups you can do this by adding the security group id to the custom ip field of a tcp/4243 entry.
+
 
 ## Preparing the Meteor Apps
 
@@ -70,11 +81,27 @@ To push to docker.io (or elsewhere)
 docker push <reponame>/<app>
 ```
 
-## Using the Launcher
+## Using Rocker-Docker launcher
 
-Once all the prepwork is done, you can use the launcher.
+Once all the prepwork is done, you can use rocker-docker to launch apps.
 
-There are two ways to interact with the launcher. You can access it directly in a browser (using the EC2 instance's IP address plus the port, 8080 by default) or you can connect to it through DDP from another Meteor app. To connect from another app, call `var conn = DDP.connect(launcherUrl)` and then `conn.call` the available launcher methods.
+There are two ways to interact with rocker-docker. You can access it directly in a browser (using the EC2 instance's IP address plus the port, 8080 by default) or you can connect to it through DDP from another Meteor app. To connect from another app, call `var conn = DDP.connect(launcherUrl)` and then `conn.call` the available launcher methods.
+
+    var conn = DDP.connect("http://<rocker-docker-address>:8080")
+    var MONGO_URL = "<app mongo url>"
+    var hostname =  "<site url>"
+
+    conn.call "launchAppInstance",
+        appImage: "<reponame>/<app>",
+        mongoUrl: "mongodb://<dbuser>:<dbpass>@<dbhost>:<dbport>/<dbname>",
+        hostname:"<www.domain.com>",
+        rootUrl: "<site absoluteUrl>"
+      env:
+        MAIL_URL: "<smtp credentials>"
+    , (error, result) ->
+      console.log "error in launchAppInstance: " + error if error
+      return result
+
 
 ### Build an Image through API
 
@@ -93,8 +120,7 @@ TODO: Building the image takes some time (a few minutes?) and currently this met
 ```js
 Meteor.call("launchAppInstance", {
     appImage: "<reponame>/<app>",
-    mongoUrl: "mongodb://<dbuser>:<dbpass>@oceanic.mongohq.com:10077/reaction_demo",
-    host: "<host server ip>",
+    mongoUrl: "mongodb://<dbuser>:<dbpass>@<dbhost>:<dbport>/<dbname>",
     hostname:"<www.domain.com>",
     rootUrl: "http://localhost"
   }, function () { console.log(arguments); });
@@ -117,13 +143,15 @@ TODO Expand on these eventually, but for now here's a list:
 * getEnvironmentVariables(instanceId)
 * addHostname(instanceId, hostname)
 * removeHostname(instanceId, hostname)
+* rebuildAppInstance(instanceId)
+* addHost(privateHost,publicHost,port,maxContainers,active)
 
 ### TODO
 
 * Buttons and better design on launcher app client
 * Dynamic changing of root URL
-* Load balancing
-* Multiple EC2 instances/scaling
+* Load balancing (currently distributes instantiation)
+* Auto scaling hooks to automatically update hosts
 * SSL handling
 * Support for SSH into docker container
 * app instance logs
