@@ -2,52 +2,38 @@
   <h2>Hosts</h2>
   <div class="container-fluid">
     <div class="col-md-4">
-      <form class="form-horizontal" role="form">
+      {{#autoForm id="hostInsertForm" role="form" collection="Hosts" class="form-horizontal" type="insert"}}
+        {{> afQuickField name="privateHost" placeholder="xx.xx.xx.xx" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+        {{> afQuickField name="publicHost" placeholder="xx.xx.xx.xx" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         <div class="form-group">
-          <label for="container-host" class="col-sm-2 control-label">Private Host</label>
-          <div class="col-sm-10">
-            <input type="url" class="form-control" id="container-private-host" placeholder="http://xx.xx.xx.xx">
+          <div class="col-sm-offset-3 col-sm-9">
+            <p>Use the same host for public/private if you aren't using a secure VPC</p>
           </div>
         </div>
+        {{> afQuickField name="port" placeholder="4243" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+        {{> afQuickField name="max" placeholder="100" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         <div class="form-group">
-          <label for="container-host" class="col-sm-2 control-label">Public Host</label>
-          <div class="col-sm-10">
-            <input type="url" class="form-control" id="container-public-host" placeholder="http://xx.xx.xx.xx">Use the same host for public/private if you aren't using a secure VPC
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="container-port" class="col-sm-2 control-label">Port</label>
-          <div class="col-sm-10">
-            <input type="number" class="form-control" id="container-port" placeholder="4243">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="container-max" class="col-sm-2 control-label">Max #</label>
-          <div class="col-sm-10">
-            <input type="number" class="form-control" id="container-max" placeholder="100">
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
+          <div class="col-sm-offset-3 col-sm-9">
             <button type="submit" class="btn btn-default">Add to pool</button>
           </div>
         </div>
-      </form>
+      {{/autoForm}}
     </div>
-    <div class="col-md-4">
+    <div class="col-md-8">
       <ul class="list-group active-hosts">
         <li class="list-group-item list-group-item-info">
           <span>Active Hosts</span>
           <span class="pull-right">Max.Containers</span>
           <span class="pull-right">Current |</span>
         </li>
-        {{#each hosts}}
+        {{#each this}}
           <li class="list-group-item">
-            <span>{{privateHost}} || {{publicHost}}:{{port}}</span>
+            <span>{{privateHost}}:{{port}} (<em>Public: {{publicHost}}:{{port}}</em>)</span>
+            <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
             {{#if active}}
-            <span class="pull-right glyphicon glyphicon-pause" id="pause-host" data-id={{_id}}></span>
+            <span class="pull-right glyphicon glyphicon-pause" id="pause-host"></span>
             {{else}}
-            <span class="pull-right glyphicon glyphicon-play" id="start-host" data-id={{_id}}></span>
+            <span class="pull-right glyphicon glyphicon-play" id="start-host"></span>
             {{/if}}
             <span class="pull-right">{{max}}</span>
             <span class="badge pull-right">{{details.Containers}}</span>

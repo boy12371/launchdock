@@ -7,6 +7,8 @@
     "bootstrap-3": {},
     "redis": {},
     "accounts-ui-bootstrap-3": {},
-    "iron-router": {}
+    "iron-router": {},
+    "collection2": {},
+    "autoform": {}
   }
 }

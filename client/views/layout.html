@@ -6,16 +6,16 @@
 	  <div class="navbar-collapse collapse">
 	  	{{#if currentUser}}
 	    <ul class="nav navbar-nav">
-	      <li class="active"><a href="{{pathFor 'apps'}}">App Instances</a></li>
+	      <li class="{{#if currentPageIs 'apps'}}active{{/if}}"><a href="{{pathFor 'apps'}}">App Instances</a></li>
 	    </ul>
 	    <ul class="nav navbar-nav">
-	      <li><a href="{{pathFor 'images'}}">Images</a></li>
+	      <li class="{{#if currentPageIs 'images'}}active{{/if}}"><a href="{{pathFor 'images'}}">Images</a></li>
 	    </ul>
 	    <ul class="nav navbar-nav">
-	      <li><a href="{{pathFor 'hosts'}}">Hosts</a></li>
+	      <li class="{{#if currentPageIs 'hosts'}}active{{/if}}"><a href="{{pathFor 'hosts'}}">Hosts</a></li>
 	    </ul>
 	    <ul class="nav navbar-nav">
-	      <li><a href="{{pathFor 'settings'}}">Settings</a></li>
+	      <li class="{{#if currentPageIs 'settings'}}active{{/if}}"><a href="{{pathFor 'settings'}}">Settings</a></li>
 	    </ul>
 	    {{/if}}
 	    <ul class="nav navbar-nav navbar-right">

@@ -1,8 +1,24 @@
-listenToDockerEvents = function listenToDockerEvents(dockr) {
+var listeningTo = {};
+
+// Call this to begin listening to docker events from a docker daemon at host/port,
+// unless already listening.
+listenToDockerEvents = function listenToDockerEvents(host, port) {
+  if (host.indexOf("http://") === 0) {
+    host = host.replace("http://", "");
+  }
+
+  var hostPort = host + ":" + port;
+  if (listeningTo[hostPort]) {
+    // already listening to this docker server
+    return;
+  }
+  listeningTo[hostPort] = true;
+
+  var docker = new Docker({host: "http://" + host, port: port});
   Meteor.startup(function () {
     // Listen for docker events
     var now = ((new Date().getTime()/1000) - 60).toFixed(0);
-    dockr.getEvents({since: now}, Meteor.bindEnvironment(function(err, stream) {
+    docker.getEvents({since: now}, Meteor.bindEnvironment(function(err, stream) {
       if(err) {
         console.warn("docker event error:", err);
       } else {
@@ -39,3 +55,11 @@ listenToDockerEvents = function listenToDockerEvents(dockr) {
     }, 'docker.getEvents'));
   });
 };
+
+// And at startup, we want to restart event listening for all defined hosts.
+// TODO we probably want to explicitly update the status of all app instances, too
+Meteor.startup(function () {
+  Hosts.find().forEach(function (host) {
+    listenToDockerEvents(host.privateHost, host.port);
+  });
+});

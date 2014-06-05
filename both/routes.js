@@ -55,9 +55,19 @@ Router.map(function() {
       ];
     },
     data: function () {
-      return Hosts.find({}, {sort: {name: 1}});
+      return Hosts.find({}, {sort: {'details.Containers': -1}});
+    },
+    onAfterAction: function () {
+      Meteor.call("updateHostDetails");
     }
   });
 
   this.route('settings');
 });
+
+if (Meteor.isClient) {
+  UI.registerHelper("currentPageIs", function (name) {
+    var current = Router.current();
+    return current && current.route.name === name;
+  });
+}

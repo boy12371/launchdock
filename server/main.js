@@ -10,8 +10,31 @@ if (!serverDir) {
     throw new Error("Unable to determine the server directory");
 }
 
+// Get docker connection
+getDocker = function getDocker(host, port) {
+  var d;
+  // To connect to another instance: (but careful because exposing on host gives root access, so that port should not be public to the Internet)
+  if (host) {
+    if (host.indexOf("http://") === 0) {
+      host = host.replace("http://", "");
+    }
+    port = port || 4243;
+    d = new Docker({host: "http://" + host, port: port});
+  } else {
+    var platform = os.platform();
+    if (platform === "darwin") {
+      // We are on OSX; need to connect slightly differently
+      d = new Docker({host: 'http://127.0.0.1', port: 4243});
+    } else {
+      // We are on linux
+      d = new Docker({socketPath: '/var/run/docker.sock'});
+    }
+  }
+  return d;
+};
+
 // dockerProxy = the docker server running the proxy
-dockerProxy = Meteor.call("getDocker");
+dockerProxy = getDocker();
 
 // Find hipache redis port and create global `Hipache` client for use everywhere
 var container = dockerProxy.getContainer('hipache-npm'), containerInfo;

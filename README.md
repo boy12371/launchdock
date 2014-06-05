@@ -108,7 +108,7 @@ There are two ways to interact with rocker-docker. You can access it directly in
 Before you can launch instances of an app, you need to make sure the app's docker image is present on the EC2 server. You can use the Docker.io repo ("Preparing the Meteor Apps"), or you can have one created from a remote Meteor bundle.
 
 ```js
-Meteor.call("buildImageIfNotExist", "<reponame>/<app>", "http://url-to-your-meteor-bundle/bundle.tar.gz", function () { console.log(arguments); });
+Meteor.call("buildImageIfNotExist", "hostId", "<reponame>/<app>", "http://url-to-your-meteor-bundle/bundle.tar.gz", function () { console.log(arguments); });
 ```
 
 If an image with that name already exists, nothing happens. Otherwise it will build an image with that name from the tar file URL you provide (which is the one you created in the "Preparing the Meteor Apps" section).
