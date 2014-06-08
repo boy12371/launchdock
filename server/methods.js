@@ -61,7 +61,7 @@ Meteor.methods({
     }
 
     console.log("created: "+cloneId);
-    return cloneId
+    return cloneId;
   },
   // create new app container, setup proxy
   launchAppInstance: function (options) {
@@ -133,8 +133,13 @@ Meteor.methods({
       createdAt: new Date,
       status: containerInfo.State.Running ? "running" : "stopped",
       env: env,
-      docker: docker.modem,
-      dockerHosts: [hostDoc._id]
+      docker: {
+        socketPath: docker.modem.socketPath,
+        host: docker.modem.host,
+        port: docker.modem.port,
+        version: docker.modem.version
+      },
+      dockerHosts: hostDoc && [hostDoc._id]
     });
     if (options.hostname) {
       //if hostname is provided, add domain to hipache as a group.
@@ -142,6 +147,7 @@ Meteor.methods({
       Meteor.call("addHostname", newInstance, options.hostname);
     }
     updateHostDetails();
+    getContainerInfo(newInstance);
     // Return the app instance ID for use in future calls; calling app should store this somewhere
     return newInstance;
   },
@@ -155,6 +161,7 @@ Meteor.methods({
     // Restart container
     Meteor._wrapAsync(container.restart.bind(container))();
 
+    getContainerInfo(instanceId);
     return true;
   },
   startAppInstance: function (instanceId) {
@@ -169,6 +176,7 @@ Meteor.methods({
       "PortBindings": { "8080/tcp": [{ "HostIp": "0.0.0.0" }] }
     });
 
+    getContainerInfo(instanceId);
     return true;
   },
   stopAppInstance: function (instanceId) {
@@ -179,7 +187,10 @@ Meteor.methods({
     var container = getContainerForAppInstance(instanceId);
 
     // Stop container
-    return Meteor._wrapAsync(container.stop.bind(container))();
+    Meteor._wrapAsync(container.stop.bind(container))();
+
+    getContainerInfo(instanceId);
+    return true;
   },
   killAppInstance: function (instanceId) {
     this.unblock();
@@ -189,7 +200,10 @@ Meteor.methods({
     var container = getContainerForAppInstance(instanceId);
 
     // Kill container
-    return Meteor._wrapAsync(container.kill.bind(container))();
+    Meteor._wrapAsync(container.kill.bind(container))();
+
+    getContainerInfo(instanceId);
+    return true;
   },
   removeAppInstance: function (instanceId) {
     this.unblock();
@@ -349,10 +363,7 @@ Meteor.methods({
     checkLoggedIn(this.userId);
     check(instanceId, String);
 
-    var container = getContainerForAppInstance(instanceId);
-
-    // Return container info
-    return Meteor._wrapAsync(container.inspect.bind(container))();
+    return getContainerInfo(instanceId);
   }
 });
 
@@ -378,13 +389,6 @@ function buildImageFromGitRepo(gitUrl) {
 function pullImageOnHost(host, port, repoTag) {
   var docker = getDocker(host, port);
 
-  // If it already exists, no need to pull
-  var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
-  var exists = _.any(images, function (image) {
-    return image.RepoTags && _.contains(image.RepoTags, repoTag);
-  });
-  if (exists) return;
-
   try {
     Meteor._wrapAsync(docker.pull.bind(docker))(repoTag);
   } catch (error) {
@@ -392,17 +396,16 @@ function pullImageOnHost(host, port, repoTag) {
   }
 }
 
-// Build a docker image from a tar on a single host, if an image with that name
-// does not already exist on that host.
+// Build a docker image from a tar on a single host.
 function buildImageOnHost(host, port, imageName, archiveUrl) {
   var docker = getDocker(host, port);
 
-  // If it already exists, no need to pull
-  var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
-  var exists = _.any(images, function (image) {
-    return image.RepoTags && _.contains(image.RepoTags, imageName + ":latest");
-  });
-  if (exists) return;
+  // XXX Do we want to build always, even if already present? Could be an updated archive.
+  // var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
+  // var exists = _.any(images, function (image) {
+  //   return image.RepoTags && _.contains(image.RepoTags, imageName + ":latest");
+  // });
+  // if (exists) return;
 
   // stream tar file to buildImage
   var tarStream = request(archiveUrl);
@@ -460,6 +463,8 @@ function removeImageOnAllHosts(imageId) {
       Meteor._wrapAsync(dockerImage.remove.bind(dockerImage))();
     }
   });
+
+  updateHostDetails();
 }
 
 function getHostInfo(host) {
@@ -474,6 +479,7 @@ function getHostInfo(host) {
 function updateHostDetails() {
   Hosts.find().forEach(function (host) {
     getHostInfo(host);
+    Meteor.call("getImageListForHost", host._id);
   });
 }
 
@@ -508,10 +514,39 @@ function getDockerForAppInstance(instanceId) {
 // given app instance
 function getContainerForAppInstance(instanceId, docker) {
   docker = docker || getDockerForAppInstance(instanceId);
+  var ai = AppInstances.findOne({_id: instanceId});
   return docker.getContainer(ai.containerId);
+}
+
+function getContainerInfo(instanceId) {
+  var container = getContainerForAppInstance(instanceId);
+  var info = Meteor._wrapAsync(container.inspect.bind(container))();
+
+  // Update app instance doc with some actual container info
+  AppInstances.update({_id: instanceId}, {$set: {
+    actualEnv: info.Config && info.Config.Env,
+    status: (info.State && info.State.Running) ? "running" : "stopped"
+  }});
+
+  // Return container info
+  return Meteor._wrapAsync(container.inspect.bind(container))();
+}
+
+function updateContainerInfoForAllAppInstances() {
+  AppInstances.find().forEach(function (appInstance) {
+    getContainerInfo(appInstance._id);
+  });
 }
 
 function checkLoggedIn(userId) {
   if (!userId)
     throw new Meteor.Error(401, "Access Denied");
 }
+
+// Do 10 second polling of host and app instance details
+Meteor.startup(function () {
+  Meteor.setInterval(function () {
+    updateHostDetails();
+    updateContainerInfoForAllAppInstances();
+  }, 10000);
+});

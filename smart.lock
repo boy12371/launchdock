@@ -12,7 +12,8 @@
       "iron-router": {},
       "collection2": {},
       "autoform": {},
-      "collection-helpers": {}
+      "collection-helpers": {},
+      "numeral": {}
     },
     "packages": {
       "dockerode": {
@@ -54,6 +55,11 @@
         "git": "https://github.com/dburles/meteor-collection-helpers.git",
         "tag": "v0.2.9",
         "commit": "912be6d15a59b9ee4519bf73000be70dd141b655"
+      },
+      "numeral": {
+        "git": "https://github.com/vsivsi/meteor-numeral.git",
+        "tag": "v1.5.3",
+        "commit": "bdc97fc69bee7dadae1fc0f97fa6d9d76a03e73d"
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",

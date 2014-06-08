@@ -10,6 +10,7 @@
     "iron-router": {},
     "collection2": {},
     "autoform": {},
-    "collection-helpers": {}
+    "collection-helpers": {},
+    "numeral": {}
   }
 }

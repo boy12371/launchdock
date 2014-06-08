@@ -1,33 +1,55 @@
 <template name="appInstances">
 	<h2>App Instances</h2>
 	<table class="table table-bordered table-striped">
-		<tr>
-			<th>Instance ID</th>
-			<th>From Image</th>
-			<th>Container ID</th>
-			<th>Container Mapped To</th>
-			<th>Hostnames That Route To This Container</th>
-			<th>Status</th>
-			<th></th>
-		</tr>
+		<thead>
+			<tr>
+				<th>From Image</th>
+				<th>Info</th>
+				<th>Environment Variables</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
 		{{#each this}}
 		{{> instanceRow}}
 		{{/each}}
+		</tbody>
 	</table>
+	<h2>Launch a New Instance</h2>
+	{{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form"}}
+	{{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}
+	{{> afQuickField name="mongoUrl"}}
+	{{> afQuickField name="rootUrl"}}
+	{{> afQuickField name="hostname"}}
+	{{> afQuickField name="env"}}
+	<button type="submit" class="btn btn-primary">Launch</button>
+	{{/autoForm}}
 </template>
 
 <template name="instanceRow">
 	<tr>
-		<td>{{_id}}</td>
-		<td>{{imageName}}</td>
-		<td>{{shortContainerId}}...</td>
-		<td>{{host}}:{{port}}</td>
+		<td>{{image}}</td>
 		<td>
-			{{#each hostnames}}
+			<div><strong>ID:</strong> {{_id}}</div>
+			<div><strong>Container ID:</strong> {{shortContainerId}}...</div>
+			<div><strong>Container Mapped To:</strong> {{host}}:{{port}}</div>
+			<div><strong>Hostnames That Route To This Container:</strong> {{#each hostnames}}{{this}},{{/each}}</div>
+			<div><strong>Status:</strong> {{status}}</div>
+		</td>
+		<td>
+			{{#if this.env}}
+			<strong>Defined:</strong>
+			{{#each definedEnv}}
 			{{this}}<br>
 			{{/each}}
+			{{/if}}
+			{{#if this.actualEnv}}
+			<strong>Actual:</strong><br>
+			{{#each this.actualEnv}}
+			{{this}}<br>
+			{{/each}}
+			{{/if}}
 		</td>
-		<td>{{status}}</td>
 		<td>
 			<button class="btn btn-default btn-xs stop">Stop</button>
 			<button class="btn btn-default btn-xs start">Start</button>
@@ -35,7 +57,7 @@
 			<button class="btn btn-default btn-xs kill">Kill</button>
 			<button class="btn btn-default btn-xs remove">Delete</button>
 			<button class="btn btn-default btn-xs rebuild">Rebuild</button>
-			<button class="btn btn-default btn-xs info">Get Info</button>
+			<button class="btn btn-default btn-xs info">Log Info In Console</button>
 		</td>
 	</tr>
 </template>

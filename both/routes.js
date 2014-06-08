@@ -29,7 +29,8 @@ Router.map(function() {
   	template: 'appInstances',
     waitOn: function() {
       return [
-        Meteor.subscribe("appInstances")
+        Meteor.subscribe("appInstances"),
+        Meteor.subscribe("dockerImages")
       ];
     },
     data: function () {

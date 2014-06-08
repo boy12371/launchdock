@@ -1,4 +1,5 @@
 Schemas = {};
+UI.registerHelper("Schemas", Schemas);
 
 Schemas.Host = new SimpleSchema({
 	privateHost: {
@@ -67,6 +68,10 @@ Schemas.AppInstance = new SimpleSchema({
 		type: Object,
 		blackbox: true
 	},
+	actualEnv: {
+		type: [String],
+		optional: true
+	},
 	docker: {
 		type: Object,
 		blackbox: true
@@ -95,5 +100,35 @@ Schemas.DockerImage = new SimpleSchema({
 	inRepo: {
 		type: Boolean,
 		defaultValue: true
+	}
+});
+
+Schemas.LaunchInstance = new SimpleSchema({
+	dockerImage: {
+		type: String
+	},
+	mongoUrl: {
+		type: String,
+		label: "MongoDB URL"
+	},
+	rootUrl: {
+		type: String,
+		label: "Root URL",
+		regEx: SimpleSchema.RegEx.Url
+	},
+	hostname: {
+		type: String,
+		optional: true
+	},
+	env: {
+		type: [Object],
+		label: "Additional Environment Variables",
+		optional: true
+	},
+	'env.$.name': {
+		type: String
+	},
+	'env.$.value': {
+		type: String
 	}
 });

@@ -1,8 +1,10 @@
 Template.imageRow.events = {
   'click .remove': function (event, template) {
-    Meteor.call("removeImage", this._id, function () {
-      console.log("removeImage result:", arguments);
-    });
+    if (confirm("Really delete this image from this list and from all hosts?")) {
+      Meteor.call("removeImage", this._id, function () {
+        console.log("removeImage result:", arguments);
+      });
+    }
   },
   'click .create': function () {
     Meteor.call("createImageOnAllHosts", this._id, function () {

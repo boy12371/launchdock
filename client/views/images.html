@@ -51,7 +51,7 @@
 		<td>{{name}}</td>
 		<td>{{#if inRepo}}Pull From Repo{{else}}Build From {{tarUrl}}{{/if}}</td>
 		<td>
-			<button class="btn btn-default btn-xs create">Create On All Hosts</button>
+			<button class="btn btn-default btn-xs create">{{#if inRepo}}Pull{{else}}Build{{/if}} On All Hosts</button>
 			<button class="btn btn-default btn-xs remove">Delete</button>
 		</td>
 	</tr>

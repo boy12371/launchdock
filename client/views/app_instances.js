@@ -1,3 +1,39 @@
+AutoForm.addHooks("launchAppInstanceForm", {
+	onSubmit: function (insertDoc, updateDoc, currentDoc) {
+		var doc = insertDoc;
+		var options = {
+			appImage: doc.dockerImage,
+			mongoUrl: doc.mongoUrl,
+			rootUrl: doc.rootUrl,
+			hostname: doc.hostname,
+			env: {}
+		};
+		_.each(doc.env, function (obj) {
+			options.env[obj.name] = obj.value;
+		});
+		Meteor.call("launchAppInstance", options, function (error, result) {
+			if (error) {
+				console.log(error);
+			} else {
+				AutoForm.resetForm("launchAppInstanceForm");
+			}
+		});
+		return false; // prevent browser form submission
+	}
+});
+
+Template.appInstances.dockerImageOptions = function () {
+	return DockerImages.find().map(function (image) {
+		return {label: image.name, value: image.name};
+	});
+};
+
+Template.instanceRow.definedEnv = function () {
+	return _.map(this.env, function (val, name) {
+		return name + "=" + val;
+	});
+};
+
 Template.instanceRow.shortContainerId = function () {
 	return (this.containerId || "").slice(0, 10);
 };
@@ -24,6 +60,10 @@ Template.instanceRow.events = {
 	  });
 	},
 	'click .remove': function (event, template) {
+	  if (this.status !== "stopped") {
+	  	alert("Stop or kill it before deleting it.");
+	  	return;
+	  }
 	  var result = confirm("Are you sure you want to delete this site??");
 	  if (result == true) {
 	    Meteor.call("removeAppInstance", this._id, function () {
@@ -37,8 +77,8 @@ Template.instanceRow.events = {
 	  });
 	},
 	'click .info': function (event, template) {
-	  Meteor.call("getContainerInfo", this._id, function () {
-	    console.log("getContainerInfo result:", arguments);
+	  Meteor.call("getContainerInfo", this._id, function (error, result) {
+	    console.log("getContainerInfo result:", result);
 	  });
 	}
 };
