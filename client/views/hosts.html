@@ -22,21 +22,42 @@
     <div class="col-md-8">
       <ul class="list-group active-hosts">
         <li class="list-group-item list-group-item-info">
-          <span>Active Hosts</span>
-          <span class="pull-right">Max.Containers</span>
-          <span class="pull-right">Current |</span>
+          <span>Hosts</span>
         </li>
         {{#each this}}
           <li class="list-group-item">
-            <span>{{privateHost}}:{{port}} (<em>Public: {{publicHost}}:{{port}}</em>)</span>
             <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
             {{#if active}}
             <span class="pull-right glyphicon glyphicon-pause" id="pause-host"></span>
             {{else}}
             <span class="pull-right glyphicon glyphicon-play" id="start-host"></span>
             {{/if}}
-            <span class="pull-right">{{max}}</span>
-            <span class="badge pull-right">{{details.Containers}}</span>
+            <div>{{privateHost}}:{{port}} (<em>Public: {{publicHost}}:{{port}}</em>)</div>
+            <div>{{#if active}}<strong style="color: green">Active</strong>{{else}}<strong style="color: gray">Inactive</strong>{{/if}}</div>
+            <div><strong>Containers:</strong> {{details.Containers}}/{{max}}</div>
+            <div><strong>Images:</strong></div>
+            {{#if dockerImages}}
+            <table class="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>ID</th>
+                  <th>Virtual Size</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each dockerImages}}
+                <tr>
+                  <th>{{name}}</th>
+                  <th><span title="{{id}}">{{shortId}}</span></th>
+                  <th>{{virtualSize}}</th>
+                  <th>{{createdAtFormatted}}</th>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+            {{/if}}
           </li>
         {{/each}}
       </ul>

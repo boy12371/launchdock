@@ -15,14 +15,12 @@ Meteor.methods({
     return updateHostDetails();
   },
   // get host details
-  getHostDetail: function (host, port, id) {
+  getHostDetail: function (hostId) {
     this.unblock();
     checkLoggedIn(this.userId);
 
-    var docker = getDocker(host, port);
-    var hostInfo = Meteor._wrapAsync(docker.info.bind(docker))();
-    if (id) Hosts.update(id,{$set:{details:hostInfo}});
-    return hostInfo;
+    var host = Hosts.findOne(hostId);
+    return getHostInfo(host);
   },
   // kill and rebuild app container
   rebuildAppInstance: function (instanceId) {
@@ -284,37 +282,67 @@ Meteor.methods({
 
     return true;
   },
-  buildImageIfNotExist: function (hostId, imageName, archiveUrl) {
-    //TODO auto update images across cluster/hosts
+  addImage: function (imageName) {
     this.unblock();
     checkLoggedIn(this.userId);
-    check(hostId, String);
-    check(imageName, String);
-    check(archiveUrl, String);
-
-    var docker = getDockerForHost(hostId);
-
-    var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
-
-    var exists = _.any(images, function (image) {
-      return image.RepoTags && _.contains(image.RepoTags, imageName + ":latest");
-    });
-
-    if (exists) return true;
-
-    // stream tar file to buildImage
-    var tarStream = request(archiveUrl);
-    if (!tarStream) {
-      throw new Meteor.Error(500, 'Internal server error', "Unable to get build context archive from " + archiveUrl);
-    }
 
     try {
-      tarStream.on('error', function (error) { throw error; });
-      Meteor._wrapAsync(docker.buildImage.bind(docker))(tarStream, {t: imageName, rm: 1});
-    } catch (error) {
-      throw new Meteor.Error(500, 'Internal server error', "Error reading " + archiveUrl + ' or building image: ' + (error && error.message ? error.message : 'Unknown'));
+      var imageId = DockerImages.insert({
+        name: imageName,
+        inRepo: true
+      });
+    } catch (e) {
+      throw new Meteor.Error(400, 'Bad Request', 'An image with that name already exists.');
     }
+
+    createImageOnAllHosts(imageId);
     return true;
+  },
+  removeImage: function (imageId) {
+    this.unblock();
+    checkLoggedIn(this.userId);
+
+    removeImageOnAllHosts(imageId);
+    DockerImages.remove({_id: imageId});
+    
+    return true;
+  },
+  addImageFromArchive: function (imageName, archiveUrl) {
+    this.unblock();
+    checkLoggedIn(this.userId);
+
+    try {
+      var imageId = DockerImages.insert({
+        name: imageName,
+        inRepo: false,
+        tarUrl: archiveUrl
+      });
+    } catch (e) {
+      throw new Meteor.Error(400, 'Bad Request', 'An image with that name already exists.');
+    }
+
+    createImageOnAllHosts(imageId);
+    return true;
+  },
+  createImageOnAllHosts: function (imageId) {
+    createImageOnAllHosts(imageId);
+    return true;
+  },
+  getImageListForHost: function (hostId) {
+    var docker = getDockerForHost(hostId);
+    var imageList = Meteor._wrapAsync(docker.listImages.bind(docker))();
+    var dockerImages = _.map(imageList, function (image) {
+      return {
+        name: image.RepoTags && image.RepoTags[0] && image.RepoTags[0].split(":")[0] || "None",
+        id: image.Id,
+        createdAt: new Date(image.Created * 1000),
+        virtualSize: image.VirtualSize
+      };
+    });
+    Hosts.update({_id: hostId}, {$set: {
+      dockerImages: dockerImages
+    }});
+    return imageList;
   },
   getContainerInfo: function (instanceId) {
     this.unblock();
@@ -345,10 +373,107 @@ function buildImageFromGitRepo(gitUrl) {
   //Meteor._wrapAsync(docker.buildImage.bind(docker))(tarFile, {t: imageName, rm: 1});
 }
 
+// Pull a docker image from repo on a single host, if an image with that name
+// does not already exist on that host.
+function pullImageOnHost(host, port, repoTag) {
+  var docker = getDocker(host, port);
+
+  // If it already exists, no need to pull
+  var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
+  var exists = _.any(images, function (image) {
+    return image.RepoTags && _.contains(image.RepoTags, repoTag);
+  });
+  if (exists) return;
+
+  try {
+    Meteor._wrapAsync(docker.pull.bind(docker))(repoTag);
+  } catch (error) {
+    throw new Meteor.Error(500, 'Internal server error', "Error pulling image: " + (error && error.message ? error.message : 'Unknown'));
+  }
+}
+
+// Build a docker image from a tar on a single host, if an image with that name
+// does not already exist on that host.
+function buildImageOnHost(host, port, imageName, archiveUrl) {
+  var docker = getDocker(host, port);
+
+  // If it already exists, no need to pull
+  var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
+  var exists = _.any(images, function (image) {
+    return image.RepoTags && _.contains(image.RepoTags, imageName + ":latest");
+  });
+  if (exists) return;
+
+  // stream tar file to buildImage
+  var tarStream = request(archiveUrl);
+  if (!tarStream) {
+    throw new Meteor.Error(500, 'Internal server error', "Unable to get build context archive from " + archiveUrl);
+  }
+
+  try {
+    tarStream.on('error', function (error) { throw error; });
+    Meteor._wrapAsync(docker.buildImage.bind(docker))(tarStream, {t: imageName, rm: 1});
+  } catch (error) {
+    throw new Meteor.Error(500, 'Internal server error', "Error reading " + archiveUrl + ' or building image: ' + (error && error.message ? error.message : 'Unknown'));
+  }
+}
+
+// Create (pull or build) the docker image on all hosts if not already existing
+function createImageOnAllHosts(imageId) {
+  var image = DockerImages.findOne(imageId);
+  if (!image)
+    throw new Meteor.Error(500, 'Internal server error', "Invalid image ID");
+
+  if (!image.inRepo && image.tarUrl) {
+    var imageName = image.name;
+    var archiveUrl = image.tarUrl;
+    Hosts.find().forEach(function (host) {
+      buildImageOnHost(host.privateHost, host.port, imageName, archiveUrl);
+    });
+  } else if (image.inRepo) {
+    var repoTag = image.name + ":latest";
+    Hosts.find().forEach(function (host) {
+      pullImageOnHost(host.privateHost, host.port, repoTag);
+    });
+  }
+}
+
+// Remove the docker image from all hosts
+function removeImageOnAllHosts(imageId) {
+  var image = DockerImages.findOne(imageId);
+  if (!image)
+    throw new Meteor.Error(500, 'Internal server error', "Invalid image ID");
+
+  var imageName = image.name;
+  Hosts.find().forEach(function (host) {
+    var docker = getDocker(host.privateHost, host.port);
+    var dockerImage;
+    var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
+    _.every(images, function (image) {
+      if (image.RepoTags && _.contains(image.RepoTags, imageName + ":latest")) {
+        dockerImage = docker.getImage(image.Id);
+        return false;
+      }
+    });
+
+    if (dockerImage) {
+      Meteor._wrapAsync(dockerImage.remove.bind(dockerImage))();
+    }
+  });
+}
+
+function getHostInfo(host) {
+  var docker = getDocker(host.privateHost, host.port);
+  var info = Meteor._wrapAsync(docker.info.bind(docker))();
+  // Update in Hosts document while we have it
+  Hosts.update(host._id, {$set:{details:info}});
+  return info;
+}
+
 // Check live docker host information and save to hosts db
 function updateHostDetails() {
   Hosts.find().forEach(function (host) {
-    Meteor.call("getHostDetail", host.privateHost, host.port, host._id);
+    getHostInfo(host);
   });
 }
 

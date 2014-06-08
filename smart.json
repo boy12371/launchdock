@@ -9,6 +9,7 @@
     "accounts-ui-bootstrap-3": {},
     "iron-router": {},
     "collection2": {},
-    "autoform": {}
+    "autoform": {},
+    "collection-helpers": {}
   }
 }

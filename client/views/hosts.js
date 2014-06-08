@@ -11,3 +11,12 @@ Template.hosts.events({
     }
   }
 });
+
+Template.hosts.helpers({
+  createdAtFormatted: function () {
+    return moment(this.createdAt).format("LLL");
+  },
+  shortId: function () {
+    return this.id.slice(0, 8) + "...";
+  }
+});

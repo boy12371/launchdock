@@ -6,3 +6,5 @@ DockerImages.attachSchema(Schemas.DockerImage);
 
 Hosts = new Meteor.Collection("Hosts");
 Hosts.attachSchema(Schemas.Host);
+
+// COLLECTION HELPERS

@@ -4,9 +4,25 @@ Template.imageRow.events = {
       console.log("removeImage result:", arguments);
     });
   },
-  'click .info': function (event, template) {
-    Meteor.call("getImageInfo", this._id, function () {
-      console.log("getImageInfo result:", arguments);
+  'click .create': function () {
+    Meteor.call("createImageOnAllHosts", this._id, function () {
+      console.log("createImageOnAllHosts result:", arguments);
     });
   }
 };
+
+AutoForm.addHooks("addDockerImageForm", {
+  onSubmit: function (insertDoc, updateDoc, currentDoc) {
+    var d = insertDoc;
+    if (d.inRepo) {
+      Meteor.call("addImage", d.name, function () {
+        console.log("addImage result:", arguments);
+      });
+    } else {
+      Meteor.call("addImageFromArchive", d.name, d.tarUrl, function () {
+        console.log("addImageFromArchive result:", arguments);
+      });
+    }
+    return false; // prevent browser form submission
+  }
+});

@@ -24,6 +24,22 @@ Schemas.Host = new SimpleSchema({
 		type: Object,
 		blackbox: true,
 		optional: true
+	},
+	dockerImages: {
+		type: [Object],
+		optional: true
+	},
+	'dockerImages.$.name': {
+		type: String
+	},
+	'dockerImages.$.id': {
+		type: String
+	},
+	'dockerImages.$.createdAt': {
+		type: Date
+	},
+	'dockerImages.$.virtualSize': {
+		type: Number
 	}
 });
 
@@ -67,7 +83,9 @@ Schemas.AppInstance = new SimpleSchema({
 
 Schemas.DockerImage = new SimpleSchema({
 	name: {
-		type: String
+		type: String,
+		index: 1,
+		unique: true
 	},
 	tarUrl: {
 		type: String,
