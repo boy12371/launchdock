@@ -119,7 +119,7 @@ Router.map(function() {
       return Hosts.find({}, {sort: {'details.Containers': -1}});
     },
     onAfterAction: function () {
-      Meteor.call("updateHostDetails");
+      Meteor.call("host/refreshDetails");
     }
   });
 

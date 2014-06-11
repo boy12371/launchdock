@@ -11,7 +11,7 @@ Template.hosts.events({
     }
   },
   'click #refresh-hosts': function (event, template) {
-    Meteor.call("updateHostDetails");
+    Meteor.call("host/refreshDetails");
   }
 });
 

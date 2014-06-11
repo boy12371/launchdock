@@ -11,7 +11,7 @@ AutoForm.addHooks("launchAppInstanceForm", {
 		_.each(doc.env, function (obj) {
 			options.env[obj.name] = obj.value;
 		});
-		Meteor.call("launchAppInstance", options, function (error, result) {
+		Meteor.call("ai/launch", options, function (error, result) {
 			if (error) {
 				console.log(error);
 			} else {
@@ -44,23 +44,23 @@ Template.instanceRow.shortContainerId = function () {
 
 Template.instanceRow.events = {
 	'click .start': function (event, template) {
-	  Meteor.call("startAppInstance", this._id, function () {
-	    console.log("startAppInstance result:", arguments);
+	  Meteor.call("ai/start", this._id, function () {
+	    console.log("ai/start result:", arguments);
 	  });
 	},
 	'click .stop': function (event, template) {
-	  Meteor.call("stopAppInstance", this._id, function () {
-	    console.log("stopAppInstance result:", arguments);
+	  Meteor.call("ai/stop", this._id, function () {
+	    console.log("ai/stop result:", arguments);
 	  });
 	},
 	'click .restart': function (event, template) {
-	  Meteor.call("restartAppInstance", this._id, function () {
-	    console.log("restartAppInstance result:", arguments);
+	  Meteor.call("ai/restart", this._id, function () {
+	    console.log("ai/restart result:", arguments);
 	  });
 	},
 	'click .kill': function (event, template) {
-	  Meteor.call("killAppInstance", this._id, function () {
-	    console.log("killAppInstance result:", arguments);
+	  Meteor.call("ai/kill", this._id, function () {
+	    console.log("ai/kill result:", arguments);
 	  });
 	},
 	'click .remove': function (event, template) {
@@ -70,19 +70,19 @@ Template.instanceRow.events = {
 	  }
 	  var result = confirm("Are you sure you want to delete this site??");
 	  if (result == true) {
-	    Meteor.call("removeAppInstance", this._id, function () {
-	        console.log("removeAppInstance result:", arguments);
+	    Meteor.call("ai/remove", this._id, function () {
+	        console.log("ai/remove result:", arguments);
 	    });
 	  }
 	},
 	'click .rebuild': function (event, template) {
-	  Meteor.call("rebuildAppInstance", this._id, function () {
-	    console.log("rebuildAppInstance result:", arguments);
+	  Meteor.call("ai/rebuild", this._id, function () {
+	    console.log("ai/rebuild result:", arguments);
 	  });
 	},
 	'click .info': function (event, template) {
-	  Meteor.call("getContainerInfo", this._id, function (error, result) {
-	    console.log("getContainerInfo result:", result);
+	  Meteor.call("ai/getContainerInfo", this._id, function (error, result) {
+	    console.log("ai/getContainerInfo result:", result);
 	  });
 	}
 };
