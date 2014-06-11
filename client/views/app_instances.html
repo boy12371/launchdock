@@ -1,6 +1,13 @@
 <template name="appInstances">
 	<h2>App Instances</h2>
-	<table class="table table-bordered table-striped">
+	{{> DataTable
+    	id="appInstancesTable"
+        columns=this.columns
+        subscription="appInstancesTable"
+        query=appInstancesTableQuery
+        options=this.options
+    }}
+<!-- 	<table class="table table-bordered table-striped">
 		<thead>
 			<tr>
 				<th>From Image</th>
@@ -14,7 +21,7 @@
 		{{> instanceRow}}
 		{{/each}}
 		</tbody>
-	</table>
+	</table> -->
 	<h2>Launch a New Instance</h2>
 	{{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form"}}
 	{{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}

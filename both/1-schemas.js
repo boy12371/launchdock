@@ -46,16 +46,20 @@ Schemas.Host = new SimpleSchema({
 
 Schemas.AppInstance = new SimpleSchema({
 	host: {
-		type: String
+		type: String,
+		label: "App host"
 	},
 	port: {
-		type: Number
+		type: Number,
+		label: "App port"
 	},
 	image: {
-		type: String
+		type: String,
+		label: "Docker image"
 	},
 	containerId: {
-		type: String
+		type: String,
+		label: "Container ID"
 	},
 	createdAt: {
 		type: Date,
@@ -66,14 +70,17 @@ Schemas.AppInstance = new SimpleSchema({
 	},
 	env: {
 		type: Object,
-		blackbox: true
+		blackbox: true,
+		label: "Defined environment variables"
 	},
 	actualEnv: {
 		type: [String],
-		optional: true
+		optional: true,
+		label: "Actual environment variables"
 	},
 	docker: {
 		type: Object,
+		label: "Docker host info",
 		blackbox: true
 	},
 	hostnames: {
@@ -82,6 +89,7 @@ Schemas.AppInstance = new SimpleSchema({
 	},
 	dockerHosts: {
 		type: [String],
+		label: "Hosts running this instance",
 		optional: true
 	}
 });

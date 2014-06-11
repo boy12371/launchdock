@@ -34,7 +34,67 @@ Router.map(function() {
       ];
     },
     data: function () {
-      return AppInstances.find({}, {sort: {createdAt: -1}});
+      // return AppInstances.find({}, {sort: {createdAt: -1}});
+      
+      // Get columns from schema
+      var ss = AppInstances.simpleSchema();
+
+      return {
+        columns: [
+          {title: ss.label("host"), data: "host"},
+          {title: ss.label("port"), data: "port"},
+          {title: ss.label("image"), data: "image"},
+          {
+            title: ss.label("containerId"),
+            data: "containerId",
+            mRender: function (data, type, ai) {
+              return (ai.containerId || "").slice(0, 10) + "...";
+            }
+          },
+          {
+            title: ss.label("createdAt"),
+            data: "createdAt",
+            mRender: function (data, type, ai) {
+              return moment(ai.createdAt).format("LLL");
+            }
+          },
+          {title: ss.label("status"), data: "status"},
+          {
+            title: ss.label("env"),
+            data: "env",
+            mRender: function (data, type, ai) {
+              var lines = _.map(ai.env, function (val, name) {
+                return name + "=" + val;
+              });
+              return lines.join("<br>");
+            }
+          },
+          {
+            title: ss.label("actualEnv"),
+            data: "actualEnv",
+            mRender: function (data, type, ai) {
+              return (ai.actualEnv || []).join("<br>");
+            }
+          },
+          {
+            title: ss.label("docker"),
+            data: "docker",
+            mRender: function (data, type, ai) {
+              var lines = _.map(ai.docker, function (val, key) {
+                return "<strong>" + key + ":</strong> " + val;
+              });
+              return lines.join("<br>");
+            }
+          },
+          {title: ss.label("hostnames"), data: "hostnames"},
+          {title: ss.label("dockerHosts"), data: "dockerHosts"}
+        ],
+        options: {
+          order: [4, "desc"],
+          scrollY: 400,
+          scrollX: true
+        }
+      };
     }
   });
 

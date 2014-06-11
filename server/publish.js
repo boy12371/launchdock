@@ -16,6 +16,17 @@ Meteor.publish("hosts", function () {
 	}
 });
 
+AppInstancesTable = new DataTableComponent({
+  subscription: "appInstancesTable",
+  collection: AppInstances,
+  query: function (component) {
+    if (this.userId) {
+    	return {};
+    }
+  }
+});
+AppInstancesTable.publish()
+
 Hosts.allow({
   insert: function () {
       return true;

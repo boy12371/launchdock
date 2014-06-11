@@ -6,11 +6,15 @@
     },
     "bootstrap-3": {},
     "redis": {},
-    "accounts-ui-bootstrap-3": {},
+    "accounts-ui-bootstrap-3": {
+      "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
+      "branch": "master"
+    },
     "iron-router": {},
     "collection2": {},
     "autoform": {},
     "collection-helpers": {},
-    "numeral": {}
+    "numeral": {},
+    "jquery-datatables": {}
   }
 }

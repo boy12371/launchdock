@@ -28,6 +28,10 @@ Template.appInstances.dockerImageOptions = function () {
 	});
 };
 
+Template.appInstances.appInstancesTableQuery = function () {
+	return {};
+};
+
 Template.instanceRow.definedEnv = function () {
 	return _.map(this.env, function (val, name) {
 		return name + "=" + val;
