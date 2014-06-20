@@ -9,7 +9,12 @@ Meteor.methods({
 
     options = options || {};
 
-    var docker = DockerActions.getForBestHost();
+    var hostDoc = HostActions.getBest();
+    if (hostDoc) {
+      var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
+    } else {
+      var docker = DockerActions.get();
+    }
 
     if (typeof options.appImage !== "string") {
       throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
@@ -22,10 +27,6 @@ Meteor.methods({
     if (typeof options.rootUrl !== "string") {
       throw new Meteor.Error(400, 'Bad request', "You must pass the rootUrl option set to the desired root URL for the app instance.");
     }
-
-    // public host for sites
-    var hostDoc = Hosts.findOne({privateHost:docker.modem.host});
-    var host = hostDoc ? hostDoc.publicHost : '127.0.0.1';
 
     // Prepare environment variables
     var env = {
@@ -65,20 +66,12 @@ Meteor.methods({
 
     // Create a new app instance record
     var newInstance = AppInstances.insert({
-      host: host,
       port: port,
       image: options.appImage,
       containerId: containerId,
-      createdAt: new Date,
       status: containerInfo.State.Running ? "running" : "stopped",
       env: env,
-      docker: {
-        socketPath: docker.modem.socketPath,
-        host: docker.modem.host,
-        port: docker.modem.port,
-        version: docker.modem.version
-      },
-      dockerHosts: hostDoc && [hostDoc._id]
+      dockerHosts: [hostDoc._id]
     });
     if (options.hostname) {
       //if hostname is provided, add domain to hipache as a group.
@@ -97,11 +90,14 @@ Meteor.methods({
     check(instanceId, String);
 
     var ai = AppInstances.findOne({_id: instanceId});
-    if (ai.docker.host) {
-      var docker = DockerActions.get(ai.docker.host, ai.docker.port);
-    } else {
-      var docker = DockerActions.get(ai.host,ai.docker.port);
+    var dockerHosts = ai.dockerHosts;
+    if (!dockerHosts.length) {
+      console.log("Can't rebuild because app instance " + instanceId + " does not have dockerHosts listed.");
+      return false;
     }
+
+    // Currently an app instance runs on only one host
+    var docker = DockerActions.getForHost(dockerHosts[0]);
 
     var options = {};
     options.email = ai.env.METEOR_EMAIL;
@@ -257,7 +253,7 @@ Meteor.methods({
     // Note this hostname in the AppInstance info
     AppInstances.update({_id: instanceId}, {$push: {hostnames: hostname}});
     // Inform the proxy server that it needs to route the provided hostname to the provided instance
-    //HTTPProxy.HostNameMap.insert({hostname: hostname, target: {host: ai.host, port: ai.port}});
+    
     // use domain prefix as unique identifier
     if (hostname.split(".").length > 2) {
       var domainId = hostname.split(".")[0];
@@ -265,8 +261,15 @@ Meteor.methods({
       var domainId = Random.id(8);
     }
 
+    var dockerHosts = ai.hosts();
+    if (!dockerHosts.length) {
+      console.log("Can't add hostname because app instance " + instanceId + " does not have dockerHosts listed.");
+      return false;
+    }
+    var dockerHost = dockerHosts[0];
+
     Hipache.rpush('frontend:'+hostname, domainId );
-    Hipache.rpush('frontend:'+hostname, ai.host+":"+ai.port);
+    Hipache.rpush('frontend:'+hostname, dockerHost.publicHost+":"+ai.port);
     return true;
   },
   'ai/removeHostname': function (instanceId, hostname) {
@@ -307,7 +310,8 @@ ContainerActions = {
     // Update app instance doc with some actual container info
     AppInstances.update({_id: instanceId}, {$set: {
       actualEnv: info.Config && info.Config.Env,
-      status: (info.State && info.State.Running) ? "running" : "stopped"
+      status: (info.State && info.State.Running) ? "running" : "stopped",
+      'container.pid': info.State && info.State.Pid
     }});
 
     // Return container info

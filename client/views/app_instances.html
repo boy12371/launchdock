@@ -6,22 +6,15 @@
         subscription="appInstancesTable"
         query=appInstancesTableQuery
         options=this.options
+        styles="table table-bordered table-striped"
     }}
-<!-- 	<table class="table table-bordered table-striped">
-		<thead>
-			<tr>
-				<th>From Image</th>
-				<th>Info</th>
-				<th>Environment Variables</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-		{{#each this}}
-		{{> instanceRow}}
-		{{/each}}
-		</tbody>
-	</table> -->
+</template>
+
+<template name="createAppInstance">
+	<ol class="breadcrumb">
+		<li><a href="{{pathFor 'apps'}}">App Instances</a></li>
+		<li class="active">Create</li>
+	</ol>
 	<h2>Launch a New Instance</h2>
 	{{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form"}}
 	{{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}
@@ -33,38 +26,69 @@
 	{{/autoForm}}
 </template>
 
-<template name="instanceRow">
-	<tr>
-		<td>{{image}}</td>
-		<td>
-			<div><strong>ID:</strong> {{_id}}</div>
-			<div><strong>Container ID:</strong> {{shortContainerId}}...</div>
-			<div><strong>Container Mapped To:</strong> {{host}}:{{port}}</div>
-			<div><strong>Hostnames That Route To This Container:</strong> {{#each hostnames}}{{this}},{{/each}}</div>
-			<div><strong>Status:</strong> {{status}}</div>
-		</td>
-		<td>
-			{{#if this.env}}
-			<strong>Defined:</strong>
-			{{#each definedEnv}}
-			{{this}}<br>
-			{{/each}}
-			{{/if}}
-			{{#if this.actualEnv}}
-			<strong>Actual:</strong><br>
-			{{#each this.actualEnv}}
-			{{this}}<br>
-			{{/each}}
-			{{/if}}
-		</td>
-		<td>
-			<button class="btn btn-default btn-xs stop">Stop</button>
-			<button class="btn btn-default btn-xs start">Start</button>
-			<button class="btn btn-default btn-xs restart">Restart</button>
-			<button class="btn btn-default btn-xs kill">Kill</button>
-			<button class="btn btn-default btn-xs remove">Delete</button>
-			<button class="btn btn-default btn-xs rebuild">Rebuild</button>
-			<button class="btn btn-default btn-xs info">Log Info In Console</button>
-		</td>
-	</tr>
+<template name="appInstanceDetails">
+	<ol class="breadcrumb">
+		<li><a href="{{pathFor 'apps'}}">App Instances</a></li>
+		<li class="active">{{_id}}</li>
+	</ol>
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Instance ID</th>
+				<td>{{_id}}</td>
+			</tr>
+			<tr>
+				<th>Container ID</th>
+				<td>{{containerId}}</td>
+			</tr>
+			<tr>
+				<th>Container Process ID</th>
+				<td>{{container.pid}}</td>
+			</tr>
+			<tr>
+				<th>Image</th>
+				<td>{{image}}</td>
+			</tr>
+			<tr>
+				<th>Port</th>
+				<td>{{port}}</td>
+			</tr>
+			<tr>
+				<th>Available At</th>
+				<td>
+					{{#each hosts}}
+					<div>
+						<a href="http://{{this.privateHost}}:{{../port}}" target="_blank">{{this.privateHost}}:{{../port}}</a>
+					</div>
+					{{/each}}
+					{{#each hostnames}}
+					<div>
+						<a href="http://{{this}}" target="_blank">{{this}}</a>
+					</div>
+					{{/each}}
+				</td>
+			</tr>
+			<tr>
+				<th>Environment Variables</th>
+				<td>
+				<div><strong>Defined:</strong></div>
+				{{#each envAsArray}}
+				  <div>{{this}}</div>
+				{{/each}}
+				<div><strong>Actual:</strong></div>
+				{{#each actualEnv}}
+				  <div>{{this}}</div>
+				{{/each}}
+				</td>
+			</tr>
+			<tr>
+				<th>Status</th>
+				<td>{{status}}</td>
+			</tr>
+			<tr>
+				<th>Created At</th>
+				<td>{{createdAtLong}}</td>
+			</tr>
+		</tbody>
+	</table>
 </template>

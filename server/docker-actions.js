@@ -21,16 +21,6 @@ DockerActions = {
     }
     return d;
   },
-  // Return docker connection for the host that has the fewest containers
-  getForBestHost: function getDockerForBestHost() {
-    HostActions.updateAll();
-    target = Hosts.findOne({}, {sort: {'details.Containers': 1}});
-    if (target) {
-      return DockerActions.get(target.privateHost, target.port);
-    } else {
-      return DockerActions.get();
-    }
-  },
   getForHost: function getDockerForHost(hostId) {
     var target = Hosts.findOne(hostId);
     if (!target)
@@ -43,6 +33,10 @@ DockerActions = {
     var ai = AppInstances.findOne({_id: instanceId});
     if (!ai)
       throw new Meteor.Error(400, 'Bad request', "No app instance has ID " + instanceId);
-    return DockerActions.get(ai.docker.host, ai.docker.port);
+    var dockerHosts = ai.dockerHosts;
+    if (!dockerHosts || !dockerHosts.length)
+      throw new Meteor.Error(400, 'Bad request', "App instance " + instanceId + " has no dockerHosts listed");
+    // Currently each app instance runs on only one host
+    return DockerActions.getForHost(dockerHosts[0]);
   }
 };

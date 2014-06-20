@@ -46,6 +46,9 @@ Meteor.methods({
     return true;
   },
   'image/createOnAllHosts': function (imageId) {
+    this.unblock();
+    Utility.checkLoggedIn(this.userId);
+    
     ImageActions.createOnAllHosts(imageId);
     return true;
   },

@@ -45,10 +45,6 @@ Schemas.Host = new SimpleSchema({
 });
 
 Schemas.AppInstance = new SimpleSchema({
-	host: {
-		type: String,
-		label: "App host"
-	},
 	port: {
 		type: Number,
 		label: "App port"
@@ -61,9 +57,21 @@ Schemas.AppInstance = new SimpleSchema({
 		type: String,
 		label: "Container ID"
 	},
+	container: {
+		type: Object,
+		optional: true
+	},
+	'container.pid': {
+		type: Number,
+		optional: true
+	},
 	createdAt: {
 		type: Date,
-		denyUpdate: true
+		denyUpdate: true,
+		autoValue: function () {
+		  if (this.isInsert)
+		    return new Date;
+		}
 	},
 	status: {
 		type: String
@@ -77,11 +85,6 @@ Schemas.AppInstance = new SimpleSchema({
 		type: [String],
 		optional: true,
 		label: "Actual environment variables"
-	},
-	docker: {
-		type: Object,
-		label: "Docker host info",
-		blackbox: true
 	},
 	hostnames: {
 		type: [String],

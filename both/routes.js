@@ -29,72 +29,174 @@ Router.map(function() {
   	template: 'appInstances',
     waitOn: function() {
       return [
-        Meteor.subscribe("appInstances"),
         Meteor.subscribe("dockerImages")
       ];
     },
     data: function () {
-      // return AppInstances.find({}, {sort: {createdAt: -1}});
-      
-      // Get columns from schema
-      var ss = AppInstances.simpleSchema();
-
       return {
         columns: [
-          {title: ss.label("host"), data: "host"},
-          {title: ss.label("port"), data: "port"},
-          {title: ss.label("image"), data: "image"},
           {
-            title: ss.label("containerId"),
-            data: "containerId",
-            mRender: function (data, type, ai) {
-              return (ai.containerId || "").slice(0, 10) + "...";
-            }
-          },
-          {
-            title: ss.label("createdAt"),
+            title: "Created",
             data: "createdAt",
             mRender: function (data, type, ai) {
-              return moment(ai.createdAt).format("LLL");
+              return moment(ai.createdAt).format("YYYY-MM-DD HH:mm");
+            },
+            width: "100px"
+          },
+          {
+            title: "Host",
+            mRender: function (data, type, ai) {
+              // currently each app instance will only be on one host
+              var hostString = "";
+              Hosts.find({_id: {$in: ai.dockerHosts}}).forEach(function (host) {
+                hostString = host.privateHost + ":" + host.port;
+              });
+              return hostString;
             }
           },
-          {title: ss.label("status"), data: "status"},
           {
-            title: ss.label("env"),
+            title: "Available At",
+            mRender: function (data, type, ai) {
+              var hn = "";
+              // Add the host IP+app port as a hostname because it will work, too.
+              // Currently each app instance will only be on one host.
+              Hosts.find({_id: {$in: ai.dockerHosts}}).forEach(function (host) {
+                var hostString = host.publicHost + ":" + ai.port;
+                hn += '<div><a href="http://' + hostString + '" target="_blank">' + hostString + '</a></div>';
+              });
+              // Add any extra defined hostnames.
+              _.each(ai.hostnames, function (hostname) {
+                hn += '<div><a href="http://' + hostname + '" target="_blank">' + hostname + '</a></div>';
+              });
+              return hn;
+            }
+          },
+          {
+            title: "Image",
+            data: "image"
+          },
+          {
+            title: "Status",
+            data: "status",
+            width: "45px"
+          },
+          {
+            orderable: false,
+            width: "30px",
+            mRender: function (data, type, ai) {
+              return '<a class="btn btn-sm btn-default info" href="/app/' + ai._id + '">Details</a>';
+            }
+          },
+          {
+            data: "port",
+            sType: "numeric",
+            bVisible: false // column is hidden but included to be searchable
+          },
+          {
+            data: "containerId",
+            bVisible: false // column is hidden but included to be searchable
+          },
+          {
+            mRender: function (data, type, ai) {
+              return ai.container && ai.container.pid || ""; // XXX does not seeem to be searchable, not sure why
+            },
+            bVisible: false // column is hidden but included to be searchable
+          },
+          {
             data: "env",
             mRender: function (data, type, ai) {
               var lines = _.map(ai.env, function (val, name) {
                 return name + "=" + val;
               });
               return lines.join("<br>");
-            }
+            },
+            bVisible: false // column is hidden but included to be searchable
           },
           {
-            title: ss.label("actualEnv"),
             data: "actualEnv",
             mRender: function (data, type, ai) {
               return (ai.actualEnv || []).join("<br>");
-            }
-          },
-          {
-            title: ss.label("docker"),
-            data: "docker",
-            mRender: function (data, type, ai) {
-              var lines = _.map(ai.docker, function (val, key) {
-                return "<strong>" + key + ":</strong> " + val;
-              });
-              return lines.join("<br>");
-            }
-          },
-          {title: ss.label("hostnames"), data: "hostnames"},
-          {title: ss.label("dockerHosts"), data: "dockerHosts"}
+            },
+            bVisible: false // column is hidden but included to be searchable
+          }
         ],
         options: {
-          order: [4, "desc"],
-          scrollY: 400,
-          scrollX: true
+          order: [0, "desc"], // sort by createdAt descending
+          initComplete: function () {
+            $("#appInstancesTable input[type=search]").attr("placeholder", "Search");
+
+            // Because we're using bootstrap, I guess we're supposed to add the
+            // tableTools after init.
+            var tableTools = new $.fn.dataTable.TableTools(this, {
+              sRowSelect: "multi",
+              aButtons: [
+                {
+                    "sExtends": "text",
+                    "sButtonText": "New",
+                    "sButtonClass": "btn btn-default btn-sm newAppInstance"
+                },
+                "select_all",
+                "select_none",
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Stop",
+                    "sButtonClass": "btn btn-default btn-sm stop"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Start",
+                    "sButtonClass": "btn btn-default btn-sm start"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Restart",
+                    "sButtonClass": "btn btn-default btn-sm restart"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Kill",
+                    "sButtonClass": "btn btn-default btn-sm kill"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Delete",
+                    "sButtonClass": "btn btn-default btn-sm remove"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Rebuild",
+                    "sButtonClass": "btn btn-default btn-sm rebuild"
+                },
+                "csv",
+                "xls"
+              ],
+              sSwfPath: "copy_csv_xls.swf"
+            });
+            $(tableTools.fnContainer()).insertBefore('div.dataTables_wrapper');
+          }
         }
       };
+    }
+  });
+
+  this.route('appInstanceDetails', {
+    path: 'app/:_id',
+    waitOn: function() {
+      return [
+        Meteor.subscribe("appInstance", this.params._id)
+      ];
+    },
+    data: function () {
+      return AppInstances.findOne(this.params._id);
+    }
+  });
+
+  this.route("createAppInstance", {
+    path: "create_app",
+    waitOn: function() {
+      return [
+        Meteor.subscribe("dockerImages")
+      ];
     }
   });
 

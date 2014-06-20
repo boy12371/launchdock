@@ -56,5 +56,10 @@ HostActions = {
     Hosts.find().forEach(function (host) {
       HostActions.getInfo(host);
     });
-  }
+  },
+  // Return the doc for the host that has the fewest containers; TODO check defined max, too
+  getBest: function getBest() {
+    HostActions.updateAll();
+    return Hosts.findOne({}, {sort: {'details.Containers': 1}});
+  },
 };
