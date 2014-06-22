@@ -25,112 +25,37 @@ Meteor.methods({
     if (typeof options.env.MONGO_URL !== "string") {
       throw new Meteor.Error(400, 'Bad request', "You must pass the env.MONGO_URL option set to the desired MongoDB URL for the app instance.");
     }
-
-    // Prepare environment variables
-    var env = options.env;
-    var dockerEnv = _.map(env, function (val, key) {
-      return key + '=' + val;
-    });
-
-    // Determine the best host and get a Docker instance for it
-    var hostDoc = HostActions.getBest();
-    if (hostDoc) {
-      var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
-    } else {
-      var docker = DockerActions.get();
-    }
-
-    // Create a new container
-    var container = Meteor._wrapAsync(docker.createContainer.bind(docker))({
-      Image: options.appImage,
-      Env: dockerEnv,
-      ExposedPorts: {
-        "8080/tcp": {} // docker will auto-assign the host port this is mapped to
-      }
-    });
-
-    // Start the new container
-    Meteor._wrapAsync(container.start.bind(container))({
-      "PortBindings": { "8080/tcp": [{ "HostIp": "0.0.0.0" }] }
-    });
-
-    // Get info about the new container
-    var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
-
-    // Get the container's ID
-    var containerId = containerInfo.ID;
-
-    // Determine what port the new container was mapped to
-    var port = containerInfo.HostConfig.PortBindings["8080/tcp"][0].HostPort;
-
+    
     // Create a new app instance record
-    var newInstance = AppInstances.insert({
-      port: port,
+    var newInstanceId = AppInstances.insert({
       image: options.appImage,
-      containerId: containerId,
-      status: containerInfo.State.Running ? "running" : "stopped",
-      env: env,
-      dockerHosts: [hostDoc._id]
+      env: options.env
     });
+
+    // Run and attach a new docker container for it
+    ContainerActions.addForAppInstance(newInstanceId);
+
     if (options.hostname) {
-      //if hostname is provided, add domain to hipache as a group.
-      // new: domain.reactioncommerce.com  domain
-      Meteor.call("ai/addHostname", newInstance, options.hostname);
+      // If hostname is provided, add domain to hipache as a group.
+      Meteor.call("ai/addHostname", newInstanceId, options.hostname);
     }
+
     HostActions.updateAll();
-    ContainerActions.getInfo(newInstance);
+
     // Return the app instance ID for use in future calls; calling app should store this somewhere
-    return newInstance;
+    return newInstanceId;
   },
-  // Kill this app instance after cloning it to a new docker container
+  // Deactivate and then reactivate. End result is a new container,
+  // potentially on a different host, and potentially with a newer
+  // version of the image.
   'ai/rebuild': function (instanceId) {
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
 
-    var ai = AppInstances.findOne({_id: instanceId});
-    var dockerHosts = ai.dockerHosts;
-    if (!dockerHosts.length) {
-      console.log("Can't rebuild because app instance " + instanceId + " does not have dockerHosts listed.");
-      return false;
-    }
-
-    // Currently an app instance runs on only one host
-    var docker = DockerActions.getForHost(dockerHosts[0]);
-
-    var options = {
-      env: ai.env,
-      appImage: ai.image
-    };
-
-    console.log("rebuilding instance: "+instanceId);
-    // Stop any existing container and start new.
-    try {
-      Meteor.call("ai/kill", instanceId);
-    }
-    catch(err) {
-      console.log("No existing instance. launching new container: "+options.appImage);
-    }
-
-    var cloneId = Meteor.call("ai/launch", options);
-
-    // loop through hostnames and add additional hostnames from original
-    if (ai.hostnames && ai.hostnames.length) {
-      var hn = ai.hostnames[0];
-      Meteor.call("ai/removeHostname", instanceId, hn);
-      Meteor.call("ai/addHostname", cloneId, hn);
-    }
-
-    // Remove old container
-    try {
-      Meteor.call("ai/remove", instanceId);
-    }
-    catch(err) {
-      console.log("No existing instance.");
-    }
-
-    console.log("created: "+cloneId);
-    return cloneId;
+    ContainerActions.removeForAppInstance(instanceId);
+    ContainerActions.addForAppInstance(instanceId);
+    return true;
   },
   'ai/restart': function (instanceId) {
     this.unblock();
@@ -138,6 +63,8 @@ Meteor.methods({
     check(instanceId, String);
 
     var container = ContainerActions.getForAppInstance(instanceId);
+
+    if (!container) return;
 
     // Restart container
     Meteor._wrapAsync(container.restart.bind(container))();
@@ -151,6 +78,8 @@ Meteor.methods({
     check(instanceId, String);
 
     var container = ContainerActions.getForAppInstance(instanceId);
+
+    if (!container) return;
 
     // Start container
     Meteor._wrapAsync(container.start.bind(container))({
@@ -167,6 +96,8 @@ Meteor.methods({
 
     var container = ContainerActions.getForAppInstance(instanceId);
 
+    if (!container) return;
+
     // Stop container
     Meteor._wrapAsync(container.stop.bind(container))();
 
@@ -180,6 +111,8 @@ Meteor.methods({
 
     var container = ContainerActions.getForAppInstance(instanceId);
 
+    if (!container) return;
+
     // Kill container
     Meteor._wrapAsync(container.kill.bind(container))();
 
@@ -191,37 +124,37 @@ Meteor.methods({
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
 
-    var docker = DockerActions.getForAppInstance(instanceId);
-    var ai = AppInstances.findOne({_id: instanceId});
-    var containerId = ai.containerId;
-
-    // Are there actually any containers on this docker instance with this container ID?
-    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))();
-    var exists = _.any(containers, function (container) {
-      return container.Id === containerId;
-    });
-
-    // If the container still exists, remove it. If not, we don't care.
-    if (exists) {
-      // Get the container
-      var container = docker.getContainer(containerId);
-
-      // Kill container
-      Meteor._wrapAsync(container.kill.bind(container))();
-
-      // Remove container
-      Meteor._wrapAsync(container.remove.bind(container))();
-    }
-
-    // Unregister all hostnames from the proxy server
-    _.each(ai.hostnames, function (hostname) {
-      Meteor.call("ai/removeHostname", instanceId, hostname);
-    });
+    ContainerActions.removeForAppInstance(instanceId);
 
     // Remove app instance from collection
     if (AppInstances.remove({_id: instanceId}) === 0) {
       throw new Meteor.Error(500, 'Internal server error', "Failed to remove app instance with ID " + instanceId);
     }
+
+    HostActions.updateAll();
+    return true;
+  },
+  // Kills, removes, and detaches the docker container, but keeps
+  // the app instance record. Can be "activated" later by
+  // starting a new container.
+  'ai/deactivate': function (instanceId) {
+    this.unblock();
+    Utility.checkLoggedIn(this.userId);
+    check(instanceId, String);
+
+    ContainerActions.removeForAppInstance(instanceId);
+
+    HostActions.updateAll();
+    return true;
+  },
+  // Starts a new container for the instance. Only works if there
+  // is not already one listed (i.e., it is deactivated).
+  'ai/activate': function (instanceId) {
+    this.unblock();
+    Utility.checkLoggedIn(this.userId);
+    check(instanceId, String);
+
+    ContainerActions.addForAppInstance(instanceId);
 
     HostActions.updateAll();
     return true;
@@ -297,12 +230,16 @@ ContainerActions = {
   // Returns a docker container object for the container that is running the
   // given app instance
   getForAppInstance: function getForAppInstance(instanceId, docker) {
-    docker = docker || DockerActions.getForAppInstance(instanceId);
     var ai = AppInstances.findOne({_id: instanceId});
+    if (!ai.containerId)
+      return false;
+    docker = docker || DockerActions.getForAppInstance(instanceId);
     return docker.getContainer(ai.containerId);
   },
   getInfo: function getInfo(instanceId) {
     var container = ContainerActions.getForAppInstance(instanceId);
+    if (!container) return;
+
     var info = Meteor._wrapAsync(container.inspect.bind(container))();
 
     // Update app instance doc with some actual container info
@@ -319,5 +256,100 @@ ContainerActions = {
     AppInstances.find().forEach(function (appInstance) {
       ContainerActions.getInfo(appInstance._id);
     });
+  },
+  removeForAppInstance: function removeForAppInstance(instanceId) {
+    var ai = AppInstances.findOne({_id: instanceId});
+    var containerId = ai.containerId;
+
+    if (!containerId) return;
+
+    var docker = DockerActions.getForAppInstance(instanceId);
+
+    // Unregister all hostnames from the proxy server since
+    // they point to the container being removed.
+    _.each(ai.hostnames, function (hostname) {
+      Hipache.del("frontend:"+hostname)
+    });
+
+    // Are there actually any containers on this docker instance with this container ID?
+    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))();
+    var exists = _.any(containers, function (container) {
+      return container.Id === containerId;
+    });
+
+    // If the container still exists, remove it. If not, we don't care.
+    if (exists) {
+      // Get the container
+      var container = docker.getContainer(containerId);
+
+      // Kill container
+      Meteor._wrapAsync(container.kill.bind(container))();
+
+      // Remove container
+      Meteor._wrapAsync(container.remove.bind(container))();
+    }
+
+    // Remove container ID from AI record
+    AppInstances.update({_id: instanceId}, {
+      $unset: {
+        containerId: "",
+        container: "",
+        actualEnv: "",
+        port: "",
+        dockerHosts: ""
+      }
+    });
+  },
+  addForAppInstance: function addForAppInstance(instanceId) {
+    var ai = AppInstances.findOne({_id: instanceId});
+
+    if (!ai || ai.containerId) {
+      // Already has a container running
+      return;
+    }
+
+    // Determine the best host and get a Docker instance for it
+    var hostDoc = HostActions.getBest();
+    if (hostDoc) {
+      var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
+    } else {
+      var docker = DockerActions.get();
+    }
+
+    // Prep env variables
+    var dockerEnv = _.map(ai.env, function (val, key) {
+      return key + '=' + val;
+    });
+
+    // Create a new container
+    var container = Meteor._wrapAsync(docker.createContainer.bind(docker))({
+      Image: ai.image,
+      Env: dockerEnv,
+      ExposedPorts: {
+        "8080/tcp": {} // docker will auto-assign the host port this is mapped to
+      }
+    });
+
+    // Start the new container
+    Meteor._wrapAsync(container.start.bind(container))({
+      "PortBindings": { "8080/tcp": [{ "HostIp": "0.0.0.0" }] }
+    });
+
+    // Get info about the new container
+    var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+
+    // Determine what port the new container was mapped to
+    var port = containerInfo.HostConfig.PortBindings["8080/tcp"][0].HostPort;
+
+    // Update info in AI document
+    AppInstances.update({_id: instanceId}, {
+      $set: {
+        containerId: containerInfo.Id,
+        port: port,
+        dockerHosts: [hostDoc._id]
+      }
+    });
+
+    ContainerActions.getInfo(instanceId);
   }
 };

@@ -10,7 +10,7 @@ Schemas.Host = new SimpleSchema({
 	},
 	port: {
 		type: Number,
-		defaultValue: 4243
+		defaultValue: 2375
 	},
 	max: {
 		type: Number,
@@ -47,7 +47,8 @@ Schemas.Host = new SimpleSchema({
 Schemas.AppInstance = new SimpleSchema({
 	port: {
 		type: Number,
-		label: "App port"
+		label: "App port",
+		optional: true
 	},
 	image: {
 		type: String,
@@ -55,7 +56,8 @@ Schemas.AppInstance = new SimpleSchema({
 	},
 	containerId: {
 		type: String,
-		label: "Container ID"
+		label: "Container ID",
+		optional: true
 	},
 	container: {
 		type: Object,
@@ -74,7 +76,8 @@ Schemas.AppInstance = new SimpleSchema({
 		}
 	},
 	status: {
-		type: String
+		type: String,
+		optional: true
 	},
 	env: {
 		type: Object,

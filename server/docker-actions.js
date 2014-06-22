@@ -7,13 +7,13 @@ DockerActions = {
       if (host.indexOf("http://") === 0) {
         host = host.replace("http://", "");
       }
-      port = port || 4243;
+      port = port || 2375;
       d = new Docker({host: "http://" + host, port: port});
     } else {
       var platform = os.platform();
       if (platform === "darwin") {
         // We are on OSX; need to connect slightly differently
-        d = new Docker({host: 'http://127.0.0.1', port: 4243});
+        d = new Docker({host: 'http://127.0.0.1', port: 2375});
       } else {
         // We are on linux
         d = new Docker({socketPath: '/var/run/docker.sock'});
@@ -34,8 +34,9 @@ DockerActions = {
     if (!ai)
       throw new Meteor.Error(400, 'Bad request', "No app instance has ID " + instanceId);
     var dockerHosts = ai.dockerHosts;
-    if (!dockerHosts || !dockerHosts.length)
-      throw new Meteor.Error(400, 'Bad request', "App instance " + instanceId + " has no dockerHosts listed");
+    if (!dockerHosts || !dockerHosts.length) {
+      return false;
+    }
     // Currently each app instance runs on only one host
     return DockerActions.getForHost(dockerHosts[0]);
   }

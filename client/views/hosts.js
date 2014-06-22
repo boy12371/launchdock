@@ -21,5 +21,8 @@ Template.hosts.helpers({
   },
   shortId: function () {
     return this.id.slice(0, 8) + "...";
+  },
+  virtualSizeFormatted: function () {
+    return numeral(this.virtualSize).format('0.000 b');
   }
 });

@@ -10,7 +10,7 @@
             <p>Use the same host for public/private if you aren't using a secure VPC</p>
           </div>
         </div>
-        {{> afQuickField name="port" placeholder="4243" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+        {{> afQuickField name="port" placeholder="2375" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         {{> afQuickField name="max" placeholder="100" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         <div class="form-group">
           <div class="col-sm-offset-3 col-sm-9">
@@ -52,7 +52,7 @@
                 <tr>
                   <th>{{name}}</th>
                   <th><span title="{{id}}">{{shortId}}</span></th>
-                  <th>{{virtualSize}}</th>
+                  <th>{{virtualSizeFormatted}}</th>
                   <th>{{createdAtFormatted}}</th>
                 </tr>
                 {{/each}}

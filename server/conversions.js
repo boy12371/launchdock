@@ -16,13 +16,13 @@ Meteor.startup(function () {
 	// We no longer store "host" or "docker" properties in app instances,
 	// and we need the "dockerHosts" array now. Also, we need to auto-create
 	// the necessary hosts.
-	AppInstances.find({dockerHosts: null}).forEach(function (ai) {
+	AppInstances.find({$not: {containerId: null}, dockerHosts: null}).forEach(function (ai) {
 		var mod = {$set: {}, $unset: {host: "", docker: ""}};
 
 		var host = Hosts.findOne({privateHost: ai.host});
 		var hostId;
 		if (!host) {
-			hostId = Hosts.insert({privateHost: ai.host, publicHost: ai.host, port: 4243, max: 100, active: true});
+			hostId = Hosts.insert({privateHost: ai.host, publicHost: ai.host, port: 2375, max: 100, active: true});
 		} else {
 			hostId = host._id;
 		}

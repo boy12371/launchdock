@@ -39,11 +39,11 @@
 			</tr>
 			<tr>
 				<th>Container ID</th>
-				<td>{{containerId}}</td>
+				<td>{{#with containerId}}{{this}}{{else}}DEACTIVATED{{/with}}</td>
 			</tr>
 			<tr>
 				<th>Container Process ID</th>
-				<td>{{container.pid}}</td>
+				<td>{{#with container.pid}}{{this}}{{else}}DEACTIVATED{{/with}}</td>
 			</tr>
 			<tr>
 				<th>Image</th>
@@ -51,11 +51,19 @@
 			</tr>
 			<tr>
 				<th>Port</th>
-				<td>{{port}}</td>
+				<td>{{#with port}}{{this}}{{else}}DEACTIVATED{{/with}}</td>
 			</tr>
 			<tr>
 				<th>Available At</th>
 				<td>
+					{{#unless hosts}}
+					{{#unless hostnames}}
+					NOWHERE
+					{{/unless}}
+					{{/unless}}
+					{{#unless containerId}}
+					NOWHERE
+					{{else}}
 					{{#each hosts}}
 					<div>
 						<a href="http://{{this.privateHost}}:{{../port}}" target="_blank">{{this.privateHost}}:{{../port}}</a>
@@ -66,6 +74,7 @@
 						<a href="http://{{this}}" target="_blank">{{this}}</a>
 					</div>
 					{{/each}}
+					{{/unless}}
 				</td>
 			</tr>
 			<tr>
@@ -75,15 +84,23 @@
 				{{#each envAsArray}}
 				  <div>{{this}}</div>
 				{{/each}}
+				{{#with actualEnv}}
 				<div><strong>Actual:</strong></div>
-				{{#each actualEnv}}
+				{{#each this}}
 				  <div>{{this}}</div>
 				{{/each}}
+				{{/with}}
 				</td>
 			</tr>
 			<tr>
 				<th>Status</th>
-				<td>{{status}}</td>
+				<td>
+				{{#if containerId}}
+				  {{status}}
+				{{else}}
+				  DEACTIVATED
+				{{/if}}
+				</td>
 			</tr>
 			<tr>
 				<th>Created At</th>

@@ -46,9 +46,12 @@ Router.map(function() {
           {
             title: "Host",
             mRender: function (data, type, ai) {
+              if (!ai.containerId)
+                return "DEACTIVATED";
               // currently each app instance will only be on one host
               var hostString = "";
-              Hosts.find({_id: {$in: ai.dockerHosts}}).forEach(function (host) {
+              var dockerHosts = ai.dockerHosts || [];
+              Hosts.find({_id: {$in: dockerHosts}}).forEach(function (host) {
                 hostString = host.privateHost + ":" + host.port;
               });
               return hostString;
@@ -57,10 +60,14 @@ Router.map(function() {
           {
             title: "Available At",
             mRender: function (data, type, ai) {
+              if (!ai.containerId)
+                return "NOWHERE";
+
               var hn = "";
               // Add the host IP+app port as a hostname because it will work, too.
               // Currently each app instance will only be on one host.
-              Hosts.find({_id: {$in: ai.dockerHosts}}).forEach(function (host) {
+              var dockerHosts = ai.dockerHosts || [];
+              Hosts.find({_id: {$in: dockerHosts}}).forEach(function (host) {
                 var hostString = host.publicHost + ":" + ai.port;
                 hn += '<div><a href="http://' + hostString + '" target="_blank">' + hostString + '</a></div>';
               });
@@ -78,7 +85,13 @@ Router.map(function() {
           {
             title: "Status",
             data: "status",
-            width: "45px"
+            width: "45px",
+            mRender: function (data, type, ai) {
+              if (!ai.containerId)
+                return "DEACTIVATED";
+
+              return ai.status;
+            }
           },
           {
             orderable: false,
@@ -166,6 +179,16 @@ Router.map(function() {
                     "sExtends": "select",
                     "sButtonText": "Rebuild",
                     "sButtonClass": "btn btn-default btn-sm rebuild"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Deactivate",
+                    "sButtonClass": "btn btn-default btn-sm deactivate"
+                },
+                {
+                    "sExtends": "select",
+                    "sButtonText": "Activate",
+                    "sButtonClass": "btn btn-default btn-sm activate"
                 },
                 "csv",
                 "xls"

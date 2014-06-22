@@ -10,7 +10,8 @@ Hosts.attachSchema(Schemas.Host);
 // COLLECTION HELPERS
 AppInstances.helpers({
   hosts: function () {
-  	return Hosts.find({_id: {$in: this.dockerHosts}}).fetch();
+    var dockerHosts = this.dockerHosts || [];
+  	return Hosts.find({_id: {$in: dockerHosts}}).fetch();
   },
   envAsArray: function () {
   	return _.map(this.env, function (val, key) {

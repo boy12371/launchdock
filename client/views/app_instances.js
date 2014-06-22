@@ -93,23 +93,13 @@ Template.appInstances.events = {
     });
   },
   'click .remove': function (event, template) {
-    // Get selected app instance rows
-    var ais = selectedAppInstances(template);
-    // First make sure that all selected sites are stopped
-    var allStopped = _.every(ais, function (ai) {
-      return ai.status === "stopped";
-    });
-    if (!allStopped) {
-      alert("You must stop or kill all selected sites before deleting them.");
-      return;
-    }
-    // If all are stopped, then confirm deletion
+    // Confirm deletion
     if (!confirm("Delete ALL selected sites?")) {
       return;
     }
 
     // If confirmed, then remove all.
-    _.each(ais, function (ai) {
+    _.each(selectedAppInstances(template), function (ai) {
       Meteor.call("ai/remove", ai._id, logError);
     });
   },
@@ -120,6 +110,24 @@ Template.appInstances.events = {
 
     _.each(selectedAppInstances(template), function (ai) {
       Meteor.call("ai/rebuild", ai._id, logError);
+    });
+  },
+  'click .deactivate': function (event, template) {
+    if (!confirm("Deactivate ALL selected sites?")) {
+      return;
+    }
+
+    _.each(selectedAppInstances(template), function (ai) {
+      Meteor.call("ai/deactivate", ai._id, logError);
+    });
+  },
+  'click .activate': function (event, template) {
+    if (!confirm("Activate ALL selected sites?")) {
+      return;
+    }
+
+    _.each(selectedAppInstances(template), function (ai) {
+      Meteor.call("ai/activate", ai._id, logError);
     });
   }
 };

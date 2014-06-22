@@ -50,10 +50,10 @@ For a single server example, where docker apps are launched on the same docker s
 
     private host: http://127.0.0.1
     public host: http://127.0.0.1
-    port: 4243
+    port: 2375
     max containers: 100
 
-The private host is the address of the docker server you wish to launch apps on. The public host is the publicly accessible address that will be used by the proxy server. You should always lock down port 4243 on your servers. On AWS, with security groups you can do this by adding the security group IP to the custom IP field of a tcp/4243 entry.
+The private host is the address of the docker server you wish to launch apps on. The public host is the publicly accessible address that will be used by the proxy server. You should always lock down port 2375 on your servers. On AWS, with security groups you can do this by adding the security group IP to the custom IP field of a tcp/2375 entry.
 
 ## Step 2: Add an App Image
 
