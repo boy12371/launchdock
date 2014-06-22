@@ -110,21 +110,24 @@ You will need to log in as "admin" on the DDP connection before you can call any
 
 ```javascript
 var conn = DDP.connect("http://<rocker-docker-address>:8080");
-var MONGO_URL = "<app mongo url>";
+var mongoUrl = "<app mongo url>";
 var hostname = "<site url>";
+var appImage = "<reponame>/<app>";
+var mailUrl = "<smtp credentials>";
+var rootUrl = "<site absoluteUrl>";
 
 function doLaunch() {
     conn.call("ai/launch", {
-      appImage: "<reponame>/<app>",
-      mongoUrl: "mongodb://<dbuser>:<dbpass>@<dbhost>:<dbport>/<dbname>",
-      hostname: "<www.domain.com>",
-      rootUrl: "<site absoluteUrl>",
+      appImage: appImage,
+      hostname: hostname,
       env: {
-        MAIL_URL: "<smtp credentials>"
+        MAIL_URL: mailUrl,
+        MONGO_URL: mongoUrl,
+        ROOT_URL: rootUrl
       }
     }, function (error, result) {
       if (error)
-        console.log("Error in launchAppInstance: " + error);
+        console.log("Error in ai/launch: " + error);
       else
         console.log("New app instance ID is " + result);
     });
