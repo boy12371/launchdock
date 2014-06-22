@@ -3,10 +3,11 @@ AutoForm.addHooks("launchAppInstanceForm", {
     var doc = insertDoc;
     var options = {
       appImage: doc.dockerImage,
-      mongoUrl: doc.mongoUrl,
-      rootUrl: doc.rootUrl,
       hostname: doc.hostname,
-      env: {}
+      env: {
+        ROOT_URL: doc.rootUrl,
+        MONGO_URL: doc.mongoUrl
+      }
     };
     _.each(doc.env, function (obj) {
       options.env[obj.name] = obj.value;

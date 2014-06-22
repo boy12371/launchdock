@@ -9,37 +9,36 @@ Meteor.methods({
 
     options = options || {};
 
+    if (typeof options.appImage !== "string") {
+      throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
+    }
+
+    if (!_.isObject(options.env)) {
+      throw new Meteor.Error(400, 'Bad request', "You must pass environment variables in the env option.");
+    }
+    // TODO env variables should be changeable without relaunching
+
+    if (typeof options.env.ROOT_URL !== "string") {
+      throw new Meteor.Error(400, 'Bad request', "You must pass the env.ROOT_URL option set to the desired root URL for the app instance.");
+    }
+
+    if (typeof options.env.MONGO_URL !== "string") {
+      throw new Meteor.Error(400, 'Bad request', "You must pass the env.MONGO_URL option set to the desired MongoDB URL for the app instance.");
+    }
+
+    // Prepare environment variables
+    var env = options.env;
+    var dockerEnv = _.map(env, function (val, key) {
+      return key + '=' + val;
+    });
+
+    // Determine the best host and get a Docker instance for it
     var hostDoc = HostActions.getBest();
     if (hostDoc) {
       var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
     } else {
       var docker = DockerActions.get();
     }
-
-    if (typeof options.appImage !== "string") {
-      throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
-    }
-
-    if (typeof options.mongoUrl !== "string") {
-      throw new Meteor.Error(400, 'Bad request', "You must pass the mongoUrl option set to the MongoDB URL for the app instance's database.");
-    }
-
-    if (typeof options.rootUrl !== "string") {
-      throw new Meteor.Error(400, 'Bad request', "You must pass the rootUrl option set to the desired root URL for the app instance.");
-    }
-
-    // Prepare environment variables
-    var env = {
-      'MONGO_URL': options.mongoUrl,
-      'ROOT_URL': options.rootUrl,// TODO make this changeable with a separate method that selects from assigned hostnames
-      'METEOR_EMAIL': options.email
-    };
-    if (_.isObject(options.env)) {
-      _.extend(env, options.env);
-    }
-    var dockerEnv = _.map(env, function (val, key) {
-      return key + '=' + val;
-    });
 
     // Create a new container
     var container = Meteor._wrapAsync(docker.createContainer.bind(docker))({
@@ -99,11 +98,10 @@ Meteor.methods({
     // Currently an app instance runs on only one host
     var docker = DockerActions.getForHost(dockerHosts[0]);
 
-    var options = {};
-    options.email = ai.env.METEOR_EMAIL;
-    options.rootUrl = ai.env.ROOT_URL;
-    options.mongoUrl = ai.env.MONGO_URL;
-    options.appImage = ai.image;
+    var options = {
+      env: ai.env,
+      appImage: ai.image
+    };
 
     console.log("rebuilding instance: "+instanceId);
     // Stop any existing container and start new.
