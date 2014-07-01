@@ -41,7 +41,8 @@ Router.map(function() {
             mRender: function (data, type, ai) {
               return moment(ai.createdAt).format("YYYY-MM-DD HH:mm");
             },
-            width: "100px"
+            width: "100px",
+            defaultContent: "Unknown"
           },
           {
             title: "Host",
@@ -55,7 +56,8 @@ Router.map(function() {
                 hostString = host.privateHost + ":" + host.port;
               });
               return hostString;
-            }
+            },
+            defaultContent: "Unknown"
           },
           {
             title: "Available At",
@@ -76,11 +78,13 @@ Router.map(function() {
                 hn += '<div><a href="http://' + hostname + '" target="_blank">' + hostname + '</a></div>';
               });
               return hn;
-            }
+            },
+            defaultContent: "Unknown"
           },
           {
             title: "Image",
-            data: "image"
+            data: "image",
+            defaultContent: "Unknown"
           },
           {
             title: "Status",
@@ -91,29 +95,34 @@ Router.map(function() {
                 return "DEACTIVATED";
 
               return ai.status;
-            }
+            },
+            defaultContent: "Unknown"
           },
           {
             orderable: false,
             width: "30px",
             mRender: function (data, type, ai) {
               return '<a class="btn btn-sm btn-default info" href="/app/' + ai._id + '">Details</a>';
-            }
+            },
+            defaultContent: "Unknown"
           },
           {
             data: "port",
             sType: "numeric",
-            bVisible: false // column is hidden but included to be searchable
+            bVisible: false, // column is hidden but included to be searchable
+            defaultContent: "Unknown"
           },
           {
             data: "containerId",
-            bVisible: false // column is hidden but included to be searchable
+            bVisible: false, // column is hidden but included to be searchable
+            defaultContent: "Unknown"
           },
           {
             mRender: function (data, type, ai) {
               return ai.container && ai.container.pid || ""; // XXX does not seeem to be searchable, not sure why
             },
-            bVisible: false // column is hidden but included to be searchable
+            bVisible: false, // column is hidden but included to be searchable
+            defaultContent: "Unknown"
           },
           {
             data: "env",
@@ -123,14 +132,16 @@ Router.map(function() {
               });
               return lines.join("<br>");
             },
-            bVisible: false // column is hidden but included to be searchable
+            bVisible: false, // column is hidden but included to be searchable
+            defaultContent: "Unknown"
           },
           {
             data: "actualEnv",
             mRender: function (data, type, ai) {
               return (ai.actualEnv || []).join("<br>");
             },
-            bVisible: false // column is hidden but included to be searchable
+            bVisible: false, // column is hidden but included to be searchable
+            defaultContent: "Unknown"
           }
         ],
         options: {
