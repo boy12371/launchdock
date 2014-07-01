@@ -25,7 +25,7 @@ Meteor.methods({
     if (typeof options.env.MONGO_URL !== "string") {
       throw new Meteor.Error(400, 'Bad request', "You must pass the env.MONGO_URL option set to the desired MongoDB URL for the app instance.");
     }
-    
+
     // Create a new app instance record
     var newInstanceId = AppInstances.insert({
       image: options.appImage,
@@ -184,7 +184,7 @@ Meteor.methods({
     // Note this hostname in the AppInstance info
     AppInstances.update({_id: instanceId}, {$push: {hostnames: hostname}});
     // Inform the proxy server that it needs to route the provided hostname to the provided instance
-    
+
     // use domain prefix as unique identifier
     if (hostname.split(".").length > 2) {
       var domainId = hostname.split(".")[0];
@@ -200,7 +200,7 @@ Meteor.methods({
     var dockerHost = dockerHosts[0];
 
     Hipache.rpush('frontend:'+hostname, domainId );
-    Hipache.rpush('frontend:'+hostname, dockerHost.publicHost+":"+ai.port);
+    Hipache.rpush('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+ai.port);
     return true;
   },
   'ai/removeHostname': function (instanceId, hostname) {
