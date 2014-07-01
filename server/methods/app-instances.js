@@ -247,7 +247,7 @@ ContainerActions = {
     }
 
     // Are there actually any containers on this docker instance with this container ID?
-    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))();
+    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))({all: 1});
     var exists = _.any(containers, function (container) {
       return container.Id === ai.containerId;
     });

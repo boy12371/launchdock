@@ -30,17 +30,17 @@ Meteor.methods({
     var cursor = AppInstances.find({dockerHosts: hostId});
 
     // Deactivate all app instances on the host we're going to remove
-    // cursor.forEach(function (ai) {
-    //   ContainerActions.removeForAppInstance(ai._id);
-    // });
+    cursor.forEach(function (ai) {
+      ContainerActions.removeForAppInstance(ai._id);
+    });
 
     // Remove the host
     Hosts.remove({_id: hostId});
 
     // Reactivate app instances on a new host if requested
-    // keepAppsActive && cursor.forEach(function (ai) {
-    //   ContainerActions.addForAppInstance(ai._id);
-    // });
+    keepAppsActive && cursor.forEach(function (ai) {
+      ContainerActions.addForAppInstance(ai._id);
+    });
 
     return true;
   },
