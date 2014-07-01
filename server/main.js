@@ -13,6 +13,9 @@ if (!serverDir) {
 // dockerProxy = the docker server running the proxy
 dockerProxy = DockerActions.get();
 
+if (!dockerProxy)
+	throw new Error("Could not get dockerProxy server");
+
 // Find hipache redis port and create global `Hipache` client for use everywhere
 var container = dockerProxy.getContainer('hipache-npm'), containerInfo;
 try {

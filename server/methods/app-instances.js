@@ -232,13 +232,32 @@ ContainerActions = {
   getForAppInstance: function getForAppInstance(instanceId, docker) {
     var ai = AppInstances.findOne({_id: instanceId});
     if (!ai.containerId)
-      return false;
+      return null;
+
     docker = docker || DockerActions.getForAppInstance(instanceId);
-    return docker.getContainer(ai.containerId);
+    if (!docker) {
+      // Down or deleted? Move app elsewhere
+      ContainerActions.removeForAppInstance(instanceId, true);
+      if (ContainerActions.addForAppInstance(instanceId)) {
+        // XXX: danger of infinite looping here?
+        return ContainerActions.getForAppInstance(instanceId);
+      } else {
+        return null;
+      }
+    }
+
+    // Are there actually any containers on this docker instance with this container ID?
+    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))();
+    var exists = _.any(containers, function (container) {
+      return container.Id === ai.containerId;
+    });
+
+    return exists ? docker.getContainer(ai.containerId) : null;
   },
   getInfo: function getInfo(instanceId) {
     var container = ContainerActions.getForAppInstance(instanceId);
-    if (!container) return;
+    if (!container)
+      return null;
 
     var info = Meteor._wrapAsync(container.inspect.bind(container))();
 
@@ -253,17 +272,15 @@ ContainerActions = {
     return info;
   },
   updateInfoForAll: function updateContainerInfoForAllAppInstances() {
-    AppInstances.find().forEach(function (appInstance) {
+    AppInstances.find({containerId: {$exists: true, $ne: null}}).forEach(function (appInstance) {
       ContainerActions.getInfo(appInstance._id);
     });
   },
-  removeForAppInstance: function removeForAppInstance(instanceId) {
+  removeForAppInstance: function removeForAppInstance(instanceId, skipDocker) {
     var ai = AppInstances.findOne({_id: instanceId});
-    var containerId = ai.containerId;
 
-    if (!containerId) return;
-
-    var docker = DockerActions.getForAppInstance(instanceId);
+    if (!ai)
+      return false;
 
     // Unregister all hostnames from the proxy server since
     // they point to the container being removed.
@@ -271,22 +288,16 @@ ContainerActions = {
       Hipache.del("frontend:"+hostname)
     });
 
-    // Are there actually any containers on this docker instance with this container ID?
-    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))();
-    var exists = _.any(containers, function (container) {
-      return container.Id === containerId;
-    });
+    // We remove the docker container if we have one, otherwise ignore it
+    if (skipDocker !== true) {
+      var container = ContainerActions.getForAppInstance(instanceId);
+      if (container) {
+        // Kill container
+        Meteor._wrapAsync(container.kill.bind(container))();
 
-    // If the container still exists, remove it. If not, we don't care.
-    if (exists) {
-      // Get the container
-      var container = docker.getContainer(containerId);
-
-      // Kill container
-      Meteor._wrapAsync(container.kill.bind(container))();
-
-      // Remove container
-      Meteor._wrapAsync(container.remove.bind(container))();
+        // Remove container
+        Meteor._wrapAsync(container.remove.bind(container))();
+      }
     }
 
     // Remove container ID from AI record
@@ -303,18 +314,24 @@ ContainerActions = {
   addForAppInstance: function addForAppInstance(instanceId) {
     var ai = AppInstances.findOne({_id: instanceId});
 
-    if (!ai || ai.containerId) {
+    if (!ai) {
+      // Bad instanceId
+      return false;
+    }
+
+    if (ai.containerId) {
       // Already has a container running
-      return;
+      return true;
     }
 
     // Determine the best host and get a Docker instance for it
     var hostDoc = HostActions.getBest();
-    if (hostDoc) {
-      var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
-    } else {
-      var docker = DockerActions.get();
-    }
+    if (!hostDoc)
+      return false;
+
+    var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
+    if (!docker)
+      return false;
 
     // Prep env variables
     var dockerEnv = _.map(ai.env, function (val, key) {
@@ -351,5 +368,7 @@ ContainerActions = {
     });
 
     ContainerActions.getInfo(instanceId);
+
+    return true;
   }
 };

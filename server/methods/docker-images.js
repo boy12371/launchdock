@@ -76,6 +76,8 @@ ImageActions = {
   pullOnHost: function pullImageOnHost(host, port, repoTag) {
     var docker = DockerActions.get(host, port);
 
+    if (!docker) return false;
+
     try {
       Meteor._wrapAsync(docker.pull.bind(docker))(repoTag);
     } catch (error) {
@@ -85,6 +87,8 @@ ImageActions = {
   // Build a docker image from a tar on a single host
   buildOnHost: function buildImageOnHost(host, port, imageName, archiveUrl) {
     var docker = DockerActions.get(host, port);
+
+    if (!docker) return false;
 
     // XXX Do we want to build always, even if already present? Could be an updated archive.
     // var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
@@ -134,6 +138,7 @@ ImageActions = {
     var imageName = image.name;
     Hosts.find().forEach(function (host) {
       var docker = DockerActions.get(host.privateHost, host.port);
+      if (!docker) return;
       var dockerImage;
       var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
       _.every(images, function (image) {

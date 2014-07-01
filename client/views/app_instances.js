@@ -127,7 +127,12 @@ Template.appInstances.events = {
     }
 
     _.each(selectedAppInstances(template), function (ai) {
-      Meteor.call("ai/activate", ai._id, logError);
+      Meteor.call("ai/activate", ai._id, function (error, result) {
+        if (error)
+          console.log(error);
+        else if (!result)
+          console.log("Failed to activate app instance " + ai._id + ". Perhaps you have not defined any hosts or a host is down.");
+      });
     });
   }
 };

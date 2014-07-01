@@ -22,7 +22,28 @@ Meteor.methods({
       HostActions.updateAll();
       return true;
     }
-  }
+  },
+  'host/remove': function removeHost(hostId, keepAppsActive) {
+    this.unblock();
+    Utility.checkLoggedIn(this.userId);
+
+    var cursor = AppInstances.find({dockerHosts: hostId});
+
+    // Deactivate all app instances on the host we're going to remove
+    // cursor.forEach(function (ai) {
+    //   ContainerActions.removeForAppInstance(ai._id);
+    // });
+
+    // Remove the host
+    Hosts.remove({_id: hostId});
+
+    // Reactivate app instances on a new host if requested
+    // keepAppsActive && cursor.forEach(function (ai) {
+    //   ContainerActions.addForAppInstance(ai._id);
+    // });
+
+    return true;
+  },
 });
 
 /*
@@ -32,6 +53,7 @@ Meteor.methods({
 HostActions = {
   getInfo: function getInfo(host) {
     var docker = DockerActions.get(host.privateHost, host.port);
+    if (!docker) return null;
     var info = Meteor._wrapAsync(docker.info.bind(docker))();
     var imageList = Meteor._wrapAsync(docker.listImages.bind(docker))();
     var dockerImages = _.map(imageList, function (image) {

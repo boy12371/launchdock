@@ -19,6 +19,15 @@ DockerActions = {
         d = new Docker({socketPath: '/var/run/docker.sock'});
       }
     }
+
+    // Make sure the instance is up; TODO should probably do something
+    // simple like a ping instead. Not sure if docker has connection test endpoint.
+    try {
+      Meteor._wrapAsync(d.info.bind(d))();
+    } catch (error) {
+      d = null;
+    }
+
     return d;
   },
   getForHost: function getDockerForHost(hostId) {
@@ -35,8 +44,14 @@ DockerActions = {
       throw new Meteor.Error(400, 'Bad request', "No app instance has ID " + instanceId);
     var dockerHosts = ai.dockerHosts;
     if (!dockerHosts || !dockerHosts.length) {
-      return false;
+      return null;
     }
+
+    if (Hosts.find({_id: dockerHosts[0]}, {limit: 1}).count() !== 1) {
+      // Host ID listed in AI doesn't exist
+      return null;
+    }
+
     // Currently each app instance runs on only one host
     return DockerActions.getForHost(dockerHosts[0]);
   }

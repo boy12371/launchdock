@@ -7,7 +7,7 @@ Template.hosts.events({
   },
   'click #delete-host': function (event, template) {
     if (confirm("Really delete this docker host?")) {
-      Hosts.remove(this._id);
+      Meteor.call("host/remove", this._id, confirm("If there are any app instances on this host, should they be moved to another host? If you click Cancel, they will be deactivated."));
     }
   },
   'click #refresh-hosts': function (event, template) {
