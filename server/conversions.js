@@ -28,9 +28,13 @@ Meteor.startup(function () {
 		}
 
 		mod.$set.dockerHosts = [hostId];
-
 		// We don't validate because it will strip out keys not in the schema,
 		// even from `$unset`
 		AppInstances.update(ai._id, mod, {validate: false});
+		//We also need to update ROOT_URL to use hostnames now
+		if (ai.env.ROOT_URL = "http://localhost") {
+			var ROOT_URL = "https://"+ai.hostnames[0];
+			AppInstances.update(ai._id, {$set:{"env.ROOT_URL": ROOT_URL}});
+		}
 	});
 });
