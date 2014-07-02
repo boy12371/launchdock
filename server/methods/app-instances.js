@@ -38,6 +38,8 @@ Meteor.methods({
     if (options.hostname) {
       // If hostname is provided, add domain to hipache as a group.
       Meteor.call("ai/addHostname", newInstanceId, options.hostname);
+    } else if (env.ROOT_URL) {
+      Meteor.call("ai/addHostname", newInstanceId, env.ROOT_URL);
     }
 
     HostActions.updateAll();
@@ -285,6 +287,7 @@ ContainerActions = {
     // Unregister all hostnames from the proxy server since
     // they point to the container being removed.
     _.each(ai.hostnames, function (hostname) {
+      console.log("Removing hipache entry:",hostname);
       Hipache.del("frontend:"+hostname)
     });
 
@@ -366,6 +369,14 @@ ContainerActions = {
         dockerHosts: [hostDoc._id]
       }
     });
+
+    if (ai.hostnames) {
+      // If hostname is provided, add domain to hipache as a group.
+      console.log("Adding Hostname");
+      Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
+    } else if (env.ROOT_URL) {
+      Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL);
+    }
 
     ContainerActions.getInfo(instanceId);
 
