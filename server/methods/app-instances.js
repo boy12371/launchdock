@@ -38,8 +38,8 @@ Meteor.methods({
     if (options.hostname) {
       // If hostname is provided, add domain to hipache as a group.
       Meteor.call("ai/addHostname", newInstanceId, options.hostname);
-    } else if (env.ROOT_URL) {
-      Meteor.call("ai/addHostname", newInstanceId, env.ROOT_URL);
+    } else if (options.env.ROOT_URL) {
+      Meteor.call("ai/addHostname", newInstanceId, options.env.ROOT_URL.substr(options.env.ROOT_URL.indexOf('://')+3));
     }
 
     HostActions.updateAll();
@@ -370,13 +370,16 @@ ContainerActions = {
       }
     });
 
-    Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
+    if (ai.hostnames)
+      if (ai.hostnames[0])
+        Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
+
     console.log("Adding Hostname");
     if (ai.hostnames) {
       // If hostname is provided, add domain to hipache as a group.
       Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
-    } else if (env.ROOT_URL) {
-      Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL);
+    } else if (ai.env.ROOT_URL) {
+      Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3));
     }
 
     ContainerActions.getInfo(instanceId);
