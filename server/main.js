@@ -38,5 +38,5 @@ Meteor.startup(function () {
   Meteor.setInterval(function () {
     HostActions.updateAll();
     ContainerActions.updateInfoForAll();
-  }, 10000);
+  }, 30000);
 });

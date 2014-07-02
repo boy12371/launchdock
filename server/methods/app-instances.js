@@ -52,7 +52,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Rebuilding: ",instanceId);
     ContainerActions.removeForAppInstance(instanceId);
     ContainerActions.addForAppInstance(instanceId);
     return true;
@@ -61,7 +61,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Restarting: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
     if (!container) return;
@@ -76,7 +76,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Starting: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
     if (!container) return;
@@ -93,7 +93,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Stopping: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
     if (!container) return;
@@ -108,7 +108,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Killing: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
     if (!container) return;
@@ -123,7 +123,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Removing: ",instanceId);
     ContainerActions.removeForAppInstance(instanceId);
 
     // Remove app instance from collection
@@ -141,7 +141,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Deactivating: ",instanceId);
     ContainerActions.removeForAppInstance(instanceId);
 
     HostActions.updateAll();
@@ -153,7 +153,7 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
-
+    console.log("Activating: ",instanceId);
     ContainerActions.addForAppInstance(instanceId);
 
     HostActions.updateAll();
@@ -172,7 +172,7 @@ Meteor.methods({
     Utility.checkLoggedIn(this.userId);
     check(instanceId, String);
     check(hostname, String);
-
+    console.log("Add hostname: ",instanceId, hostname);
     // A hostname may only be mapped to one app instance
     var existing = AppInstances.findOne({hostnames: hostname}, {_id: 1})
     if (existing) {
