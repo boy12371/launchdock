@@ -59,6 +59,16 @@ Meteor.methods({
     ContainerActions.addForAppInstance(instanceId);
     return true;
   },
+  'ai/rebuildAll': function () {
+    this.unblock();
+    Utility.checkLoggedIn(this.userId);
+    console.log("Rebuilding all...");
+    AppInstances.find().forEach(function (ai) {
+      Meteor.call("ai/rebuild", ai._id);
+    });
+
+    return true;
+  },
   'ai/restart': function (instanceId) {
     this.unblock();
     Utility.checkLoggedIn(this.userId);

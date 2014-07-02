@@ -112,6 +112,13 @@ Template.appInstances.events = {
       Meteor.call("ai/rebuild", ai._id, logError);
     });
   },
+  'click .rebuild-all': function (event, template) {
+    if (!confirm("Rebuild ALL sites (not just those selected)?")) {
+      return;
+    }
+
+    Meteor.call("ai/rebuildAll", logError);
+  },
   'click .deactivate': function (event, template) {
     if (!confirm("Deactivate ALL selected sites?")) {
       return;
