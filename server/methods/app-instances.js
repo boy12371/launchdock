@@ -370,9 +370,10 @@ ContainerActions = {
       }
     });
 
+    Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
+    console.log("Adding Hostname");
     if (ai.hostnames) {
       // If hostname is provided, add domain to hipache as a group.
-      console.log("Adding Hostname");
       Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
     } else if (env.ROOT_URL) {
       Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL);
