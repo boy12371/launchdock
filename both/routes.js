@@ -146,6 +146,8 @@ Router.map(function() {
         ],
         options: {
           order: [0, "desc"], // sort by createdAt descending
+          // In "Show" list, have 10, 20, 50, 100, 500, All
+          lengthMenu: [ [10, 20, 50, 100, 500, 10000], [10, 20, 50, 100, 500, "All"] ],
           initComplete: function () {
             $("#appInstancesTable input[type=search]").attr("placeholder", "Search");
 
