@@ -13,4 +13,16 @@
 }
 
 div.DTTT { margin-bottom: 0.5em; float: right; }
-div.dataTables_wrapper { clear: both; }
+
+.dataTables_wrapper {
+	margin-top: 20px;
+}
+
+#search-form {
+	margin-top: 20px;
+}
+
+.searchFilterInfo span {
+	font-weight: 700;
+	font-style: italic;
+}

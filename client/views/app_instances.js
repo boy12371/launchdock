@@ -30,9 +30,39 @@ Template.createAppInstance.dockerImageOptions = function () {
   });
 };
 
-Template.appInstances.appInstancesTableQuery = function () {
-  return {};
-};
+Template.appInstances.helpers({
+  appInstancesTableQuery: function () {
+    var query = {};
+    var searchFor = Session.get("appInstanceSearchQuery") || "";
+    searchFor = searchFor.split(" ");
+    _.each(searchFor, function (term) {
+      if (term.length === 0)
+        return;
+
+      query.$or = query.$or || [];
+
+      _.each(["image", "containerId", "status", "actualEnv", "hostnames"], function (key) {
+        var q = {};
+        q[key] = {$regex: term, $options: "i"};
+        query.$or.push(q);
+      });
+
+      var numTerm = parseInt(term, 10);
+      if (!isNaN(numTerm)) {
+        _.each(["port", "container.pid"], function (key) {
+          var q = {};
+          q[key] = numTerm;
+          query.$or.push(q);
+        });
+      }
+      
+    });
+    return query;
+  },
+  searchTerms: function () {
+    return Session.get("appInstanceSearchQuery");
+  }
+});
 
 function selectedAppInstances(template) {
   var result = [];
@@ -141,5 +171,17 @@ Template.appInstances.events = {
           console.log("Failed to activate app instance " + ai._id + ". Perhaps you have not defined any hosts or a host is down.");
       });
     });
+  },
+  'submit #search-form': function (event, template) {
+    event.preventDefault();
+    var terms = template.$("#searchTerms").val();
+    if (typeof terms === "string" && terms.length)
+      Session.set("appInstanceSearchQuery", terms);
+    else
+      Session.set("appInstanceSearchQuery", null);
+  },
+  'click .clearSearch': function (event, template) {
+    event.preventDefault();
+    Session.set("appInstanceSearchQuery", null);
   }
 };

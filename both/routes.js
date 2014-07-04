@@ -165,7 +165,7 @@ Router.map(function() {
           // In "Show" list, have 10, 20, 50, 100, 500, All
           lengthMenu: [ [10, 20, 50, 100, 500, 10000], [10, 20, 50, 100, 500, "All"] ],
           initComplete: function () {
-            $("#appInstancesTable input[type=search]").attr("placeholder", "Search");
+            $("#appInstancesTable input[type=search]").remove();
 
             // Because we're using bootstrap, I guess we're supposed to add the
             // tableTools after init.
@@ -173,12 +173,13 @@ Router.map(function() {
               sRowSelect: "multi",
               aButtons: [
                 {
-                    "sExtends": "text",
-                    "sButtonText": "New",
-                    "sButtonClass": "btn btn-default btn-sm newAppInstance"
+                    "sExtends": "select_all",
+                    "sButtonText": "Select All on Page"
                 },
-                "select_all",
-                "select_none",
+                {
+                    "sExtends": "select_none",
+                    "sButtonText": "Deselect All on Page"
+                },
                 {
                     "sExtends": "select",
                     "sButtonText": "Stop",

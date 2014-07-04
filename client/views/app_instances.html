@@ -1,6 +1,17 @@
 <template name="appInstances">
 	<h2>App Instances</h2>
+	<button class="btn btn-primary newAppInstance">Launch New Instance</button>
 	<button class="btn btn-danger rebuild-all">Rebuild All Instances</button>
+	<form id="search-form" class="form-inline" role="form">
+	  <div class="form-group">
+	    <label class="sr-only" for="searchTerms">Search</label>
+	    <input type="text" class="form-control" id="searchTerms" placeholder="Search" value="{{searchTerms}}">
+	  </div>
+	  <button type="submit" class="btn btn-primary">Search</button>
+	</form>
+	{{#with searchTerms}}
+	<div class="searchFilterInfo"><span>Showing results for "{{this}}"</span><button class="btn-link clearSearch">Clear Search Filter</button></div>
+	{{/with}}
 	{{> DataTable
     	id="appInstancesTable"
         columns=this.columns
