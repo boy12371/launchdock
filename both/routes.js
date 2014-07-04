@@ -82,6 +82,17 @@ Router.map(function() {
             defaultContent: "Unknown"
           },
           {
+            // Hostnames for export
+            title: "Hostnames",
+            mRender: function (data, type, ai) {
+              if (!ai.hostnames || ai.hostnames.length === 0)
+                return "NONE";
+              return ai.hostnames.join("<br>");
+            },
+            bVisible: false,
+            defaultContent: "Unknown"
+          },
+          {
             title: "Image",
             data: "image",
             defaultContent: "Unknown"
@@ -107,17 +118,20 @@ Router.map(function() {
             defaultContent: "Unknown"
           },
           {
+            title: "Port",
             data: "port",
             sType: "numeric",
             bVisible: false, // column is hidden but included to be searchable
             defaultContent: "Unknown"
           },
           {
+            title: "Container ID",
             data: "containerId",
             bVisible: false, // column is hidden but included to be searchable
             defaultContent: "Unknown"
           },
           {
+            title: "Container Process ID",
             mRender: function (data, type, ai) {
               return ai.container && ai.container.pid || ""; // XXX does not seeem to be searchable, not sure why
             },
@@ -125,6 +139,7 @@ Router.map(function() {
             defaultContent: "Unknown"
           },
           {
+            title: "Defined Env Variables",
             data: "env",
             mRender: function (data, type, ai) {
               var lines = _.map(ai.env, function (val, name) {
@@ -136,6 +151,7 @@ Router.map(function() {
             defaultContent: "Unknown"
           },
           {
+            title: "Actual Env Variables",
             data: "actualEnv",
             mRender: function (data, type, ai) {
               return (ai.actualEnv || []).join("<br>");
@@ -203,8 +219,18 @@ Router.map(function() {
                     "sButtonText": "Activate",
                     "sButtonClass": "btn btn-default btn-sm activate"
                 },
-                "csv",
-                "xls"
+                {
+                    "sExtends": "csv",
+                    "sFileName": "app_instances.csv",
+                    "mColumns": [ 0, 1, 3, 4, 5, 7, 8, 9, 10, 11 ],
+                    "fnCellRender": function ( sValue, iColumn, nTr, iDataIndex ) {
+                        // Append the text 'TableTools' to column 5
+                        if ( iColumn === 3 || iColumn === 10 || iColumn === 11 ) {
+                            return sValue.replace(/<br>|<BR>/g,"\n");
+                        }
+                        return sValue;
+                    }
+                }
               ],
               sSwfPath: "copy_csv_xls.swf"
             });
