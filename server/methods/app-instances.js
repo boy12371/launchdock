@@ -13,23 +13,10 @@ Meteor.methods({
       throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
     }
 
-    if (!_.isObject(options.env)) {
-      throw new Meteor.Error(400, 'Bad request', "You must pass environment variables in the env option.");
-    }
-    // TODO env variables should be changeable without relaunching
-
-    if (typeof options.env.ROOT_URL !== "string") {
-      throw new Meteor.Error(400, 'Bad request', "You must pass the env.ROOT_URL option set to the desired root URL for the app instance.");
-    }
-
-    if (typeof options.env.MONGO_URL !== "string") {
-      throw new Meteor.Error(400, 'Bad request', "You must pass the env.MONGO_URL option set to the desired MongoDB URL for the app instance.");
-    }
-
     // Create a new app instance record
     var newInstanceId = AppInstances.insert({
       image: options.appImage,
-      env: options.env
+      env: options.env || {}
     });
 
     // Run and attach a new docker container for it
