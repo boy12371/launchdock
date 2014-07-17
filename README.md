@@ -7,11 +7,50 @@ There is a browser interface, but you can also remotely call the launcher API ov
 
 TODO Eventually there will be a small launcher package that simplifies remote calls from a separate Meteor app.
 
-## Installation
+## Configure the Rocker Docker Server
 
-Before you can deploy the launcher app, you must have a properly configured server instance on which to deploy it. Here are instructions for creating an EC2 server with AWS:
+Before you can run rocker-docker, you must have a properly configured server instance on which to run it.
 
-### Amazon Web Services Setup
+### General Instructions
+
+First install docker. Refer to the instructions on the Docker website. For example, for an Ubuntu server, you should be able to install the latest docker release with this command:
+
+```bash
+$ curl -s https://get.docker.io/ubuntu/ | sudo sh
+```
+
+To prevent having to `sudo` when using docker as your OS user, add your user to the "docker" group:
+
+```bash
+$ sudo usermod -aG docker <username>
+$ newgrp docker
+```
+
+(The first command adds your user to the "docker" group. The second command applies that permission change to the current shell so that you don't have to log out and log back in.)
+
+Now allow connections to the Docker daemon on port 2375:
+
+```bash
+$ echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock\"" | sudo tee -a /etc/default/docker
+```
+
+This requires restarting the Docker daemon, for example:
+
+```bash
+$ sudo service docker restart
+```
+
+Or:
+
+```bash
+$ sudo reboot
+```
+
+Finally, you must make sure ports 80 and 8080 are open for TCP traffic.
+
+### Amazon Web Services Instructions
+
+Here are instructions for creating an EC2 server with AWS. This is essentially the same as the "General Instructions", but there is a user data script that makes it a bit easier.
 
 1. In AWS Management Console, launch a new EC2 instance.
 2. Choose 64-bit Ubuntu.
@@ -23,18 +62,52 @@ Before you can deploy the launcher app, you must have a properly configured serv
 8. Review and click Launch.
 9. Create a .pem or select one you already have on your workstation. If you create one, be sure to save it, and to `chmod 400` it locally.
 
-We have now launched the server instance and installed Docker on it. The ec2-user-data script should have automatically pulled and installed the rocker-docker app. This takes a few minutes and may be still happening the first time you log in. If you have any trouble with commands, log off the server, wait a few minutes, and then SSH to the server and try again.
+We have now launched the server instance and installed Docker on it. To connect to the server, `ssh -i ~/key.pem ubuntu@54.187.229.4` (replace correct key file path and correct IP address of new EC2 instance).
 
-To connect to the server, `ssh -i ~/key.pem ubuntu@54.187.229.4` (replace correct key file path and correct IP address of new EC2 instance).
-
-Continue with the necessary docker commands:
+## Install the Rocker Docker App
 
 ```bash
-$ docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm
-$ docker run -d -v /var/run/docker.sock:/var/run/docker.sock --name launcher --link hipache-npm:hipache -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://127.0.0.1" -e PORT="8080" -p ::8080 -i -t ongoworks/rocker-docker
+$ docker pull ongoworks/hipache-npm
+$ docker pull ongoworks/rocker-docker
 ```
 
-If the commands are successful, you can see the launcher in your browser by going to:
+It may take awhile for the images to finish pulling. Use `docker images` command to check.
+
+## Set Up Additional Docker Hosts (Optional)
+
+If you need to be able to launch hundreds of app containers, or if you prefer to run the app instances on servers that are separate from the server running rocker-docker, you can set up additional servers running Docker, and rocker-docker will distribute your app instances across all of them. (See Step 1: Add Docker Hosts)
+
+If you're just getting started with rocker-docker, you might want to skip this for now and get things working on a single server first.
+
+The steps for this are actually the same as for setting up the Rocker Docker server. See "Configure the Rocker Docker Server", except that you do not need to open port 80 or 8080.
+
+### Firewall Considerations
+
+Check to see if you have a firewall enabled:
+
+```bash
+$ sudo ufw status verbose
+```
+
+If the firewall is active, you'll need to allow port 2375 through. First edit `/etc/default/ufw` and change `DEFAULT_FORWARD_POLICY` from "DROP" to "ACCEPT". Then:
+
+```bash
+$ sudo ufw reload
+$ sudo ufw allow 2375/tcp
+```
+
+**Note that connections on 2375 will have root access, so you should limit access to the server running Rocker Docker, ideally within a VPC.**
+
+## Start the Rocker Docker App
+
+```bash
+$ docker run --name hipache-npm -p ::6379 -p :80:80 -d ongoworks/hipache-npm
+$ docker run --name rocker-docker --link hipache-npm:hipache-npm -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://<domain.name>" -p :8080:8080 -d ongoworks/rocker-docker
+```
+
+The `-e ROOT_URL=""` can be omitted from the run command if you are accessing the Rocker Docker admin site by IP address rather than a domain name.
+
+If the commands are successful, you can see the Rocker Docker administrator app in your browser by going to:
 
 ```
 http://<your server address>:8080
@@ -42,11 +115,13 @@ http://<your server address>:8080
 
 Log in with username "admin" and password "admin". Once logged in, change the admin password.
 
+Troubleshooting: If you don't see anything when accessing that address in your browser, verify that port 8080 is open and check the container logs using `docker logs rocker-docker`.
+
 ## Step 1: Add Docker Hosts
 
-On the Hosts screen, you can manage docker hosts. These are the servers on which your app instances will run, within docker containers. You must first set up the server and install Docker on it. Then you can add it to the hosts list here.
+On the Hosts screen, you can manage docker hosts. These are the servers on which your app instances will run, within docker containers. You must first set up the server and install Docker on it (see "Set Up Additional Docker Hosts". Then you can add it to the hosts list here.
 
-For a single server example, where docker apps are launched on the same docker server that is running rocker-docker, you can add:
+If you are running app instances on the same docker server that is running rocker-docker, you can add:
 
     private host: http://127.0.0.1
     public host: http://127.0.0.1
@@ -97,6 +172,17 @@ On the Images screen, enter into the Name field the "<reponame>/<app>" tag you u
 ## Step 3: Manage App Instances
 
 On the App Instances screen, fill out the "Launch a New Instance" form and submit it. You should see the app instance launch almost immediately. At this point you can select it in the list and view additional information about it, start/stop/restart it, remove it, etc.
+
+## Updating Rocker Docker
+
+```bash
+$ docker pull ongoworks/rocker-docker
+$ docker stop rocker-docker
+$ docker rm rocker-docker
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name rocker-docker --link hipache-npm:hipache-npm -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://<domain.name>" -p :8080:8080 -d ongoworks/rocker-docker
+```
+
+The `-e ROOT_URL=""` can be omitted from the run command if you are accessing the Rocker Docker admin site by IP address rather than a domain name.
 
 ## Advanced Usage: From Another App
 
@@ -171,6 +257,7 @@ The new app instance's ID is returned by "ai/launch". You will want to save this
 
 ## TODO
 
+* Specify container linking (--link) at launch, which would allow, for example, launching a container from the `wordpress` image linked to a container from the `mysql` image, or Meteor container linked to mongodb container, etc.
 * Dynamic changing of root URL
 * Load balancing (currently distributes instantiation)
 * Auto scaling hooks to automatically update hosts

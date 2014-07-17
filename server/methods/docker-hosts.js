@@ -3,11 +3,17 @@
  */
 
 Meteor.methods({
-  'host/add': function addHost(privateHost, publicHost, port, max, active) {
+  'host/add': function addHost(doc) {
     this.unblock();
     Utility.checkLoggedIn(this.userId);
 
-    Hosts.insert({privateHost: privateHost, publicHost: publicHost, port: port, max: max, active: active});
+    var d = DockerActions.get(privateHost, port);
+
+    if (!d) {
+      return false;
+    }
+
+    Hosts.insert(doc);
     return true;
   },
   // Refresh details and image list for all hosts or refresh and return details and image list for one host

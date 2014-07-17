@@ -34,8 +34,8 @@ RUN rm -r programs/server/node_modules/fibers && npm install fibers@1.0.1
 # either change these or pass as --env in the docker run
 #
 ENV PORT 8080
-ENV ROOT_URL "http://127.0.0.1"
-ENV MONGO_URL "mongodb://127.0.0.1:3001/meteor"
+ENV ROOT_URL http://127.0.0.1
+ENV MONGO_URL mongodb://127.0.0.1:3001/meteor
 
 
 # Expose container port 8080 to the host (outside the container)
