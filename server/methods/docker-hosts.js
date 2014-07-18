@@ -6,15 +6,15 @@ Meteor.methods({
   'host/add': function addHost(doc) {
     this.unblock();
     Utility.checkLoggedIn(this.userId);
+    check(doc, Schemas.Host);
 
-    var d = DockerActions.get(privateHost, port);
+    var d = DockerActions.get(doc.privateHost, doc.port);
 
     if (!d) {
       return false;
     }
 
-    Hosts.insert(doc);
-    return true;
+    return Hosts.insert(doc);
   },
   // Refresh details and image list for all hosts or refresh and return details and image list for one host
   'host/refreshDetails': function refreshDetailsForHost(hostId) {
