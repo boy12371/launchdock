@@ -6,6 +6,7 @@ Meteor.methods({
   'host/add': function addHost(doc) {
     this.unblock();
     Utility.checkLoggedIn(this.userId);
+    Schemas.Host.clean(doc);
     check(doc, Schemas.Host);
 
     var d = DockerActions.get(doc.privateHost, doc.port);
