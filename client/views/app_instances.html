@@ -28,11 +28,9 @@
 		<li class="active">Create</li>
 	</ol>
 	<h2>Launch a New Instance</h2>
-	{{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form"}}
+	{{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form" type="method" meteormethod="ai/launch"}}
 	{{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}
-	{{> afQuickField name="mongoUrl"}}
-	{{> afQuickField name="rootUrl"}}
-	{{> afQuickField name="hostname"}}
+	{{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com, blog.domain.com, *.domain.com"}}
 	{{> afQuickField name="env"}}
 	<button type="submit" class="btn btn-primary">Launch</button>
 	{{/autoForm}}

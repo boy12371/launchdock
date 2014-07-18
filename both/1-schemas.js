@@ -121,15 +121,6 @@ Schemas.LaunchInstance = new SimpleSchema({
 	dockerImage: {
 		type: String
 	},
-	mongoUrl: {
-		type: String,
-		label: "MongoDB URL"
-	},
-	rootUrl: {
-		type: String,
-		label: "Root URL",
-		regEx: SimpleSchema.RegEx.Url
-	},
 	hostname: {
 		type: String,
 		optional: true

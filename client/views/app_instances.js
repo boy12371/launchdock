@@ -1,26 +1,19 @@
 AutoForm.addHooks("launchAppInstanceForm", {
-  onSubmit: function (insertDoc, updateDoc, currentDoc) {
-    var doc = insertDoc;
-    var options = {
-      appImage: doc.dockerImage,
-      hostname: doc.hostname,
-      env: {
-        ROOT_URL: doc.rootUrl,
-        MONGO_URL: doc.mongoUrl
-      }
-    };
-    _.each(doc.env, function (obj) {
-      options.env[obj.name] = obj.value;
-    });
-    Meteor.call("ai/launch", options, function (error, result) {
-      if (error) {
-        console.log(error);
-      } else {
-        AutoForm.resetForm("launchAppInstanceForm");
-        Router.go("apps");
-      }
-    });
-    return false; // prevent browser form submission
+  before: {
+    "ai/launch": function (doc, template) {
+      var newDoc = {
+        appImage: doc.dockerImage,
+        hostname: doc.hostname,
+        env: {}
+      };
+      _.each(doc.env, function (obj) {
+        newDoc.env[obj.name] = obj.value;
+      });
+      return newDoc;
+    }
+  },
+  onSuccess: function () {
+    Router.go("apps");
   }
 });
 
