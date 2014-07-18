@@ -98,14 +98,18 @@ $ sudo ufw allow 2375/tcp
 
 **Note that connections on 2375 will have root access, so you should limit access to the server running Rocker Docker, ideally within a VPC.**
 
+## Create a MongoDB Database For the Rocker Docker App
+
+Create it wherever you like, so long as you have a MongoDB connection URL that you can use in the next step.
+
 ## Start the Rocker Docker App
+
+Run two commands. In the second command, be sure to replace the placeholder text with the correct values. The `-e ROOT_URL=""` can be omitted from that command if you are accessing the Rocker Docker admin site by IP address rather than a domain name.
 
 ```bash
 $ docker run --name hipache-npm -p ::6379 -p :80:80 -d ongoworks/hipache-npm
 $ docker run --name rocker-docker --link hipache-npm:hipache-npm -e MONGO_URL="<launcher db connect string>" -e ROOT_URL="http://<domain.name>" -p :8080:8080 -d ongoworks/rocker-docker
 ```
-
-The `-e ROOT_URL=""` can be omitted from the run command if you are accessing the Rocker Docker admin site by IP address rather than a domain name.
 
 If the commands are successful, you can see the Rocker Docker administrator app in your browser by going to:
 
@@ -245,7 +249,7 @@ The new app instance's ID is returned by "ai/launch". You will want to save this
 
 ### Host API Methods
 
-* `conn.call("host/add", privateHost, publicHost, port, max, active, callback)`: Add a docker host.
+* `conn.call("host/add", {privateHost, publicHost, port, max, active}, callback)`: Add a docker host.
 * `conn.call("host/refreshDetails", hostId, callback)`: If a `hostId` is provided, refreshes the docker information for that host and returns it. If no `hostId` is provided, refreshes the docker information for all defined hosts.
 
 ### Image API Methods
