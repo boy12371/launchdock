@@ -252,7 +252,6 @@ ContainerActions = {
       return null;
 
     var info = Meteor._wrapAsync(container.inspect.bind(container))();
-
     // Update app instance doc with some actual container info
     AppInstances.update({_id: instanceId}, {$set: {
       actualEnv: info.Config && info.Config.Env,
@@ -349,7 +348,10 @@ ContainerActions = {
     var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
 
     // Determine what port the new container was mapped to
-    var port = containerInfo.HostConfig.PortBindings["8080/tcp"][0].HostPort;
+    console.log(containerInfo.NetworkSettings.Ports["8080/tcp"])
+    console.log(containerInfo.HostConfig.PortBindings["8080/tcp"])
+    var port = containerInfo.NetworkSettings.Ports["8080/tcp"][0].HostPort;
+    console.log(port)
 
     // Update info in AI document
     AppInstances.update({_id: instanceId}, {
