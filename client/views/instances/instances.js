@@ -43,7 +43,11 @@ Template.appInstances.helpers({
             showFilter: true,
             useFontAwesome: true,
             fields: [
-              {'key': 'hostnames', 'label': 'Domain'},
+              {'key': 'hostnames', 'label': 'Domain',
+                fn: function (value) {
+                    return new Spacebars.SafeString('<a href="http://'+value+'" class="domain-link" target="_blank">'+value+'</a>');
+                }
+              },
               {'key': 'status', 'label': 'Status'},
               {'key': 'createdAt', 'label': 'Created', 'sort': 'descending'},
               {'key': 'env.METEOR_EMAIL', 'label': 'Contact'},

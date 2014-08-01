@@ -9,6 +9,7 @@
       </div>
       <div class="btn-group">
         <button class="btn btn-primary newAppInstance">New</button>
+        {{#if selectedAppInstancesCount}}
         <button type="button" class="btn btn-primary rebuild">Rebuild</button>
         <button type="button" class="btn btn-primary stop">Stop</button>
         <button type="button" class="btn btn-primary start">Start</button>
@@ -16,6 +17,7 @@
         <button type="button" class="btn btn-primary remove">Remove</button>
         <button type="button" class="btn btn-primary deactivate">Deactivate</button>
         <button type="button" class="btn btn-primary activate">Activate</button>
+        {{/if}}
       </div>
     </div>
   </div>
