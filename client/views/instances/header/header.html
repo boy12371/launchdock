@@ -1,16 +1,22 @@
 <template name="instanceHeader">
-  <div class="col-md-6 app-manage-buttons">
-    <div class="btn-group">
-      <button class="btn btn-primary newAppInstance">Launch New Instance</button>
-      <button class="btn btn-danger rebuild-all">Rebuild All Instances</button>
-      <button type="button" class="btn btn-default rebuild">Rebuild</button>
-      <button type="button" class="btn btn-default stop">Stop</button>
-      <button type="button" class="btn btn-default start">Start</button>
-      <button type="button" class="btn btn-default kill">Kill</button>
-      <button type="button" class="btn btn-default remove">Remove</button>
-      <button type="button" class="btn btn-default deactivate">Deactivate</button>
-      <button type="button" class="btn btn-default activate">Activate</button>
-      <button type="button" class="btn btn-default clear-selected">Clear Selected</button>
+  <div class="col-md-8 app-manage-buttons">
+    <div class="btn-toolbar" role="toolbar">
+      <div class="btn-group">
+        <button class="btn btn-danger select-all">Select All</button>
+        {{#if selectedAppInstancesCount}}
+        <button type="button" class="btn btn-primary clear-all">Clear {{selectedAppInstancesCount}} Selected</button>
+        {{/if}}
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary newAppInstance">New</button>
+        <button type="button" class="btn btn-primary rebuild">Rebuild</button>
+        <button type="button" class="btn btn-primary stop">Stop</button>
+        <button type="button" class="btn btn-primary start">Start</button>
+        <button type="button" class="btn btn-primary kill">Kill</button>
+        <button type="button" class="btn btn-primary remove">Remove</button>
+        <button type="button" class="btn btn-primary deactivate">Deactivate</button>
+        <button type="button" class="btn btn-primary activate">Activate</button>
+      </div>
     </div>
   </div>
 </template>

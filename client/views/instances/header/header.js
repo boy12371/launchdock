@@ -2,13 +2,28 @@ function logError(error) {
   error && console.log(error);
 }
 
+Template.instanceHeader.helpers({
+  selectedAppInstancesCount: function () {
+    return Session.get("selectedAppInstances").length;
+  }
+});
+
 Template.instanceHeader.events = {
   'click .newAppInstance': function (event, template) {
     Router.go("createAppInstance");
   },
-  'click .clear-selected': function (event, template) {
+  'click .clear-all': function (event, template) {
     Session.set("selectedAppInstances",[]);
     $('.reactive-table tr').removeClass('selected');
+  },
+  'click .select-all': function (event, template) {
+    var selectedAppInstances = Session.get("selectedAppInstances") || [];
+    instances = AppInstances.find().fetch();
+
+    _.each(instances, function (ai) {
+      selectedAppInstances.push({'_id':ai._id})
+    });
+    Session.set("selectedAppInstances",selectedAppInstances);
   },
   'click .start': function (event, template) {
     if (!confirm("Start ALL selected sites?")) {
