@@ -15,6 +15,7 @@
     "autoform": {},
     "collection-helpers": {},
     "numeral": {},
-    "jquery-datatables": {}
+    "pages": {},
+    "fast-render": {}
   }
 }

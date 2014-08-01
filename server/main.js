@@ -12,32 +12,61 @@ if (!serverDir) {
 
 // dockerProxy = the docker server running the proxy
 // currently, we assume it's on the same server running rocker docker
-dockerProxy = DockerActions.get('http://172.17.42.1', 2375);
+dockerProxy = DockerActions.get('http://127.0.0.1', 2375);
 
-if (!dockerProxy)
-	throw new Error("Could not get dockerProxy server");
+if (!dockerProxy) {
+  console.log ("failed to connect to docker0. attempting to connect to a 127.0.0.1 docker proxy")
+  dockerProxy = DockerActions.get('http://127.0.0.1', 2375);
+
+  if (!dockerProxy)
+   throw new Error("Could not get dockerProxy server");
+}
 
 // Find hipache redis port and create global `Hipache` client for use everywhere
 var container = dockerProxy.getContainer('hipache-npm'), containerInfo;
 try {
 	containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
 } catch (e) {
-	throw new Error('You must start a hipache container named "hipache-npm" before running the launcher app. Use the command: docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
-}
+    console.log("No hipache-npm found, we're creating one.");
+    container = Meteor._wrapAsync(dockerProxy.createContainer.bind(dockerProxy))({
+          Image: 'ongoworks/hipache-npm',
+          name: 'hipache-npm',
+          ExposedPorts: {
+            "6379/tcp": {}, // docker will auto-assign the host port this is mapped to
+            "80/tcp": {}
+          }
+        });
 
+    Meteor._wrapAsync(container.start.bind(container))({
+      "PortBindings": { "6379/tcp": [{ "HostIp": "0.0.0.0" }],"80/tcp": [{ "HostIp": "0.0.0.0", "HostPort": "80" }] }
+    });
+
+    try {
+      containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+    } catch (e) {
+	   throw new Error('You must start a hipache container named "hipache-npm" before running the launcher app. Use the command: docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
+   }
+}
+// console.log(containerInfo)
+// console.log("hostConfig")
+// console.log(containerInfo.HostConfig.PortBindings)
+// console.log("network settings")
+// console.log(containerInfo.NetworkSettings)
 var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
+// console.log("connecting redis to:")
+// console.log(hostConfig)
 var platform = os.platform(), d;
-
-if (platform === "darwin") {
-	Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local
-} else {
-	Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
+if (hostConfig) {
+  if (platform === "darwin") {
+  	Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local
+  } else {
+  	Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
+  }
 }
-
 // Do 10 second polling of host and app instance details
 Meteor.startup(function () {
-  Meteor.setInterval(function () {
-    HostActions.updateAll();
-    ContainerActions.updateInfoForAll();
-  }, 30000);
+  // Meteor.setInterval(function () {
+  //   HostActions.updateAll();
+  //   ContainerActions.updateInfoForAll();
+  // }, 30000);
 });

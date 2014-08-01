@@ -1,0 +1,13 @@
+<template name="createAppInstance">
+  <ol class="breadcrumb">
+    <li><a href="{{pathFor 'apps'}}">App Instances</a></li>
+    <li class="active">Create</li>
+  </ol>
+  <h2>Launch a New Instance</h2>
+  {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form" type="method" meteormethod="ai/launch"}}
+  {{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}
+  {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com, blog.domain.com, *.domain.com"}}
+  {{> afQuickField name="env"}}
+  <button type="submit" class="btn btn-primary">Launch</button>
+  {{/autoForm}}
+</template>

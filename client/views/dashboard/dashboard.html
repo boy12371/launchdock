@@ -1,0 +1,37 @@
+<template name="dashboard">
+	{{#if currentUser}}
+	<h2>Dashboard</h2>
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">App Containers</h3>
+      </div>
+      <div class="panel-body">
+        <div class="running">
+          Running: {{runningInstances}}
+        </div>
+        <div class="paused">
+          Paused: {{pausedInstances}}
+        </div>
+      </div>
+      <div class="panel-footer">Total: {{totalInstances}}</div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">Hosts</h3>
+      </div>
+      <div class="panel-body">
+      {{#each runningHosts}}
+        <div>{{publicHost}} Containers: {{details.Containers}}</div>
+      {{/each}}
+      </div>
+      <div class="panel-footer">Total: {{totalHosts}}</div>
+    </div>
+  </div>
+	{{else}}
+	<p>Please log in.</p>
+	{{/if}}
+</template>

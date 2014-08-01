@@ -17,4 +17,6 @@ autoform
 collection-helpers
 moment
 numeral
-jquery-datatables
+pages
+coffeescript
+fast-render

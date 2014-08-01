@@ -19,10 +19,10 @@ div.DTTT { margin-bottom: 0.5em; float: right; }
 }
 
 #search-form {
-	margin-top: 20px;
+  margin-top: 5px;
 }
 
 .searchFilterInfo span {
-	font-weight: 700;
-	font-style: italic;
+  font-weight: 700;
+  font-style: italic;
 }

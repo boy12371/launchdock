@@ -1,72 +1,9 @@
-AutoForm.addHooks("launchAppInstanceForm", {
-  before: {
-    "ai/launch": function (doc, template) {
-      var newDoc = {
-        appImage: doc.dockerImage,
-        hostname: doc.hostname,
-        env: {}
-      };
-      _.each(doc.env, function (obj) {
-        newDoc.env[obj.name] = obj.value;
-      });
-      return newDoc;
-    }
-  },
-  onSuccess: function () {
-    Router.go("apps");
-  }
-});
-
-Template.createAppInstance.dockerImageOptions = function () {
-  return DockerImages.find().map(function (image) {
-    return {label: image.name, value: image.name};
-  });
-};
-
-Template.appInstances.helpers({
-  appInstancesTableQuery: function () {
-    var query = {};
-    var searchFor = Session.get("appInstanceSearchQuery") || "";
-    searchFor = searchFor.split(" ");
-    _.each(searchFor, function (term) {
-      if (term.length === 0)
-        return;
-
-      query.$or = query.$or || [];
-
-      _.each(["image", "containerId", "status", "actualEnv", "hostnames"], function (key) {
-        var q = {};
-        q[key] = {$regex: term, $options: "i"};
-        query.$or.push(q);
-      });
-
-      var numTerm = parseInt(term, 10);
-      if (!isNaN(numTerm)) {
-        _.each(["port", "container.pid"], function (key) {
-          var q = {};
-          q[key] = numTerm;
-          query.$or.push(q);
-        });
-      }
-      
-    });
-    return query;
-  },
-  searchTerms: function () {
-    return Session.get("appInstanceSearchQuery");
-  }
-});
-
 function selectedAppInstances(template) {
   var result = [];
-  // Get existing, already rendered datatable
-  // The package auto-assigns an ID, so we need to find out what it is first
-  var id = template.$("#appInstancesTable .dataTables_wrapper").attr("id");
-  id = id.replace("_wrapper", "");
-  var table = template.$("table#" + id).DataTable();
-  // See which rows are selected in it
-  table.rows('.selected').data().each(function (rowData) {
-    result.push(rowData);
+  // See which rows are selected
+  $('.selected').each(function (index) {
+    result[index] = {"_id": $(this).attr("data-id")};
+    $(this).toggleClass('selected');
   });
   return result;
 }
@@ -75,7 +12,7 @@ function logError(error) {
   error && console.log(error);
 }
 
-Template.appInstances.events = {
+Template.instanceHeader.events = {
   'click .newAppInstance': function (event, template) {
     Router.go("createAppInstance");
   },
