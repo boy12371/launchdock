@@ -4,7 +4,8 @@ function logError(error) {
 
 Template.instanceHeader.helpers({
   selectedAppInstancesCount: function () {
-    return Session.get("selectedAppInstances").length;
+    var selectedAppInstances = Session.get("selectedAppInstances") || [];
+    return selectedAppInstances.length;
   }
 });
 
