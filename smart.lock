@@ -17,8 +17,8 @@
       "autoform": {},
       "collection-helpers": {},
       "numeral": {},
-      "pages": {},
-      "fast-render": {}
+      "reactive-table": {},
+      "font-awesome": {}
     },
     "packages": {
       "dockerode": {
@@ -48,8 +48,8 @@
       },
       "collection2": {
         "git": "https://github.com/aldeed/meteor-collection2.git",
-        "tag": "v0.4.3",
-        "commit": "cb470de2cfeebeccbf76d4cc0a39ad4afc76d553"
+        "tag": "v0.4.4",
+        "commit": "c70deb36e10f63238b884529eea1e38cf0789903"
       },
       "autoform": {
         "git": "https://github.com/aldeed/meteor-autoform.git",
@@ -66,15 +66,15 @@
         "tag": "v1.5.3",
         "commit": "bdc97fc69bee7dadae1fc0f97fa6d9d76a03e73d"
       },
-      "pages": {
-        "git": "https://github.com/alethes/meteor-pages.git",
-        "tag": "v1.0.20",
-        "commit": "717cbac89f02d2f1bb160b24c997050ce2dee45e"
+      "reactive-table": {
+        "git": "https://github.com/ecohealthalliance/reactive-table.git",
+        "tag": "v0.3.16",
+        "commit": "2dcecb0c26f7dd9767aa3ab33972ba6b0f526028"
       },
-      "fast-render": {
-        "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.2.8",
-        "commit": "149984b1aff3a5642a270aff9bd9006872c8302e"
+      "font-awesome": {
+        "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
+        "tag": "v4.1.0",
+        "commit": "ce6b1e92715d1938babc5d69c655c17e387f5926"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",
@@ -90,6 +90,11 @@
         "git": "https://github.com/acreeger/meteor-moment.git",
         "tag": "v2.6.0",
         "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
+      },
+      "just-i18n": {
+        "git": "https://github.com/subhog/meteor-just-i18n.git",
+        "tag": "v0.3.0",
+        "commit": "a60e7f4350fb9648d6f6b4a01acbbc114c4f4343"
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",

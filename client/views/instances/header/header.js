@@ -1,13 +1,3 @@
-function selectedAppInstances(template) {
-  var result = [];
-  // See which rows are selected
-  $('.selected').each(function (index) {
-    result[index] = {"_id": $(this).attr("data-id")};
-    $(this).toggleClass('selected');
-  });
-  return result;
-}
-
 function logError(error) {
   error && console.log(error);
 }
@@ -16,12 +6,16 @@ Template.instanceHeader.events = {
   'click .newAppInstance': function (event, template) {
     Router.go("createAppInstance");
   },
+  'click .clear-selected': function (event, template) {
+    Session.set("selectedAppInstances",[]);
+    $('.reactive-table tr').removeClass('selected');
+  },
   'click .start': function (event, template) {
     if (!confirm("Start ALL selected sites?")) {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/start", ai._id, logError);
     });
   },
@@ -30,7 +24,7 @@ Template.instanceHeader.events = {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/stop", ai._id, logError);
     });
   },
@@ -39,7 +33,7 @@ Template.instanceHeader.events = {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/restart", ai._id, logError);
     });
   },
@@ -48,9 +42,10 @@ Template.instanceHeader.events = {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/kill", ai._id, logError);
     });
+
   },
   'click .remove': function (event, template) {
     // Confirm deletion
@@ -59,7 +54,7 @@ Template.instanceHeader.events = {
     }
 
     // If confirmed, then remove all.
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/remove", ai._id, logError);
     });
   },
@@ -68,7 +63,7 @@ Template.instanceHeader.events = {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/rebuild", ai._id, logError);
     });
   },
@@ -84,7 +79,7 @@ Template.instanceHeader.events = {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/deactivate", ai._id, logError);
     });
   },
@@ -93,7 +88,7 @@ Template.instanceHeader.events = {
       return;
     }
 
-    _.each(selectedAppInstances(template), function (ai) {
+    _.each(Session.get("selectedAppInstances"), function (ai) {
       Meteor.call("ai/activate", ai._id, function (error, result) {
         if (error)
           console.log(error);
@@ -101,17 +96,5 @@ Template.instanceHeader.events = {
           console.log("Failed to activate app instance " + ai._id + ". Perhaps you have not defined any hosts or a host is down.");
       });
     });
-  },
-  'submit #search-form': function (event, template) {
-    event.preventDefault();
-    var terms = template.$("#searchTerms").val();
-    if (typeof terms === "string" && terms.length)
-      Session.set("appInstanceSearchQuery", terms);
-    else
-      Session.set("appInstanceSearchQuery", null);
-  },
-  'click .clearSearch': function (event, template) {
-    event.preventDefault();
-    Session.set("appInstanceSearchQuery", null);
   }
 };

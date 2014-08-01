@@ -23,37 +23,36 @@ Template.createAppInstance.dockerImageOptions = function () {
   });
 };
 
+
 Template.appInstances.helpers({
-  appInstancesTableQuery: function () {
-    var query = {};
-    var searchFor = Session.get("appInstanceSearchQuery") || "";
-    searchFor = searchFor.split(" ");
-    _.each(searchFor, function (term) {
-      if (term.length === 0)
-        return;
-
-      query.$or = query.$or || [];
-
-      _.each(["image", "containerId", "status", "actualEnv", "hostnames"], function (key) {
-        var q = {};
-        q[key] = {$regex: term, $options: "i"};
-        query.$or.push(q);
-      });
-
-      var numTerm = parseInt(term, 10);
-      if (!isNaN(numTerm)) {
-        _.each(["port", "container.pid"], function (key) {
-          var q = {};
-          q[key] = numTerm;
-          query.$or.push(q);
-        });
-      }
-
-    });
-    return query;
-  },
-  searchTerms: function () {
-    return Session.get("appInstanceSearchQuery");
-  }
+    AppInstances: function(){
+      return AppInstances;
+    },
+    settings: function () {
+        return {
+            rowsPerPage: 25,
+            showFilter: true,
+            useFontAwesome: true,
+            fields: [
+              {'key': 'hostnames', 'label': 'Domain'},
+              {'key': 'status', 'label': 'Status'},
+              {'key': 'createdAt', 'label': 'Created', 'sort': 'descending'},
+              {'key': 'env.METEOR_EMAIL', 'label': 'Contact'},
+              {'key': 'image', 'label': 'Docker Image' }
+            ]
+        };
+    }
 });
 
+Template.appInstances.events({
+  'click .reactive-table tr': function (event,template) {
+    selectedAppInstances = Session.get("selectedAppInstances") || [];
+    if ( _.contains(selectedAppInstances,{'_id':this._id}) ) {
+      selectedAppInstances = _.without(selectedAppInstances, {'_id':this._id});
+    } else {
+      selectedAppInstances.push({'_id':this._id});
+    }
+    $(event.target).parent().toggleClass('selected');
+    Session.set("selectedAppInstances",selectedAppInstances);
+  }
+});

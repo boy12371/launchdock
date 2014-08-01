@@ -1,22 +1,8 @@
 <template name="instanceHeader">
-  <div class="col-xs-12 col-sm-4 col-md-4 pull-left">
-    <button class="btn btn-primary newAppInstance">Launch New Instance</button>
-    <button class="btn btn-danger rebuild-all">Rebuild All Instances</button>
-  </div>
-  <div class="col-xs-6 col-sm-2 col-md-4 pull-left">
-    <form id="search-form" class="form-inline" role="form">
-      <div class="form-group">
-        <label class="sr-only" for="searchTerms">Search</label>
-        <input type="text" class="form-control" id="searchTerms" placeholder="Search" value="{{searchTerms}}">
-      </div>
-      <button type="submit" class="btn btn-primary">Search</button>
-    </form>
-    {{#with searchTerms}}
-    <div class="searchFilterInfo"><span>Showing results for "{{this}}"</span><button class="btn-link clearSearch">Clear Search Filter</button></div>
-    {{/with}}
-</div>
-  <div class="col-xs-12 col-sm-6 col-md-4 app-manage-buttons pull-right">
+  <div class="col-md-6 app-manage-buttons">
     <div class="btn-group">
+      <button class="btn btn-primary newAppInstance">Launch New Instance</button>
+      <button class="btn btn-danger rebuild-all">Rebuild All Instances</button>
       <button type="button" class="btn btn-default rebuild">Rebuild</button>
       <button type="button" class="btn btn-default stop">Stop</button>
       <button type="button" class="btn btn-default start">Start</button>
@@ -24,6 +10,7 @@
       <button type="button" class="btn btn-default remove">Remove</button>
       <button type="button" class="btn btn-default deactivate">Deactivate</button>
       <button type="button" class="btn btn-default activate">Activate</button>
+      <button type="button" class="btn btn-default clear-selected">Clear Selected</button>
     </div>
   </div>
 </template>

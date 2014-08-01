@@ -17,6 +17,6 @@ autoform
 collection-helpers
 moment
 numeral
-pages
-coffeescript
-fast-render
+reactive-table
+font-awesome
+underscore

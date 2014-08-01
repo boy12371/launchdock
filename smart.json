@@ -15,7 +15,7 @@
     "autoform": {},
     "collection-helpers": {},
     "numeral": {},
-    "pages": {},
-    "fast-render": {}
+    "reactive-table": {},
+    "font-awesome": {}
   }
 }

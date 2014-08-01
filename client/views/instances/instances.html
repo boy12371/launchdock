@@ -1,5 +1,4 @@
 <template name="appInstances">
-	{{>instanceHeader}}
-	{{> pages}}
-	{{> pagesNav}}
+	{{> instanceHeader}}
+  {{> reactiveTable collection=AppInstances settings=settings}}
 </template>

@@ -22,7 +22,21 @@ Router.onBeforeAction(requireAuthentication);
 
 Router.map(function() {
   this.route('dashboard', {
-    path: '/'
+    path: '/',
+    waitOn: function() {
+      return [
+        Meteor.subscribe("hosts")
+      ];
+    }
+  });
+
+  this.route('apps', {
+    template: 'appInstances',
+    waitOn: function() {
+      return [
+        Meteor.subscribe("appInstances")
+      ];
+    }
   });
 
   this.route('appInstanceDetails', {
@@ -73,40 +87,6 @@ Router.map(function() {
 
   this.route('settings');
 });
-
-// ******************************************
-// Collection Pagination
-// uses: https://github.com/alethes/meteor-pages
-// creates routing and pagination
-// ******************************************
-var fields;
-
-fields = ["hostnames", "status", "createdAt","image"];
-
-Pages = new Meteor.Pagination( AppInstances, {
-  router: "iron-router",
-  route: "/apps/",
-  routerTemplate: 'appInstances',
-  templateName: "appInstances",
-  fastRender: true,
-  homeRoute: "apps",
-  // infinite: true, //just comment out for pagination
-  perPage: 20,
-  dataMargin: 5,
-  itemTemplate: "instanceRowItem",
-  table: {
-    "class": "table",
-    fields: fields,
-    header: _.map(fields, function(f) {
-      return f[0].toUpperCase() + f.slice(1);
-    }),
-    wrapper: "table-wrapper"
-  }
-});
-
-
-
-
 
 // Active pages
 if (Meteor.isClient) {
