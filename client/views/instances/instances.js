@@ -63,7 +63,7 @@ Template.appInstances.helpers({
 });
 
 Template.appInstances.events({
-  'click .reactive-table tr': function (event,template) {
+  'click .reactive-table tbody tr': function (event,template) {
     selectedAppInstances = Session.get("selectedAppInstances") || [];
     if (containsObject({'_id':this._id},selectedAppInstances) ) {
       selectedAppInstances = _.without(selectedAppInstances, _.findWhere(selectedAppInstances, {'_id':this._id}));
