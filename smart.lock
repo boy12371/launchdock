@@ -6,7 +6,6 @@
         "git": "https://github.com/ongoworks/meteor-dockerode.git",
         "branch": "master"
       },
-      "bootstrap-3": {},
       "redis": {},
       "accounts-ui-bootstrap-3": {
         "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
@@ -18,20 +17,16 @@
       "collection-helpers": {},
       "numeral": {},
       "reactive-table": {},
-      "font-awesome": {},
       "spin": {},
-      "accounts-entry": {}
+      "accounts-entry": {},
+      "bootstrap3-less": {},
+      "font-awesome-4-less": {}
     },
     "packages": {
       "dockerode": {
         "git": "https://github.com/ongoworks/meteor-dockerode.git",
         "branch": "master",
         "commit": "fced813ed02652d15b4390c094ceb3f51bd4dd3f"
-      },
-      "bootstrap-3": {
-        "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v3.2.0-1",
-        "commit": "17a63902fc6cf1096c5289d963c66cf28b474727"
       },
       "redis": {
         "git": "https://github.com/stevemanuel/meteor-redis.git",
@@ -73,11 +68,6 @@
         "tag": "v0.3.16",
         "commit": "2dcecb0c26f7dd9767aa3ab33972ba6b0f526028"
       },
-      "font-awesome": {
-        "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
-        "tag": "v4.1.0",
-        "commit": "ce6b1e92715d1938babc5d69c655c17e387f5926"
-      },
       "spin": {
         "git": "https://github.com/SachaG/meteor-spin.git",
         "tag": "v2.0.4",
@@ -87,6 +77,16 @@
         "git": "https://github.com/Differential/accounts-entry.git",
         "tag": "v0.8.0",
         "commit": "cf7f7d0ecc285824bc2748e305f5d693df99b4ae"
+      },
+      "bootstrap3-less": {
+        "git": "https://github.com/simison/bootstrap3-less",
+        "tag": "v0.2.1",
+        "commit": "dc94a51ed00d7de6d6f2b6d65107a876d849ad61"
+      },
+      "font-awesome-4-less": {
+        "git": "https://github.com/svub/fontawesome4-less.git",
+        "tag": "v4.4.0",
+        "commit": "250d2336a217c18eb70e9d074784a7db3ca38472"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",

@@ -1,6 +1,6 @@
 <template name="hosts">
-  <h2>Hosts</h2>
   <div class="container-fluid">
+    <h2>Hosts</h2>
     <div class="col-md-4">
       {{#autoForm id="hostInsertForm" role="form" collection="Hosts" class="form-horizontal" type="method" meteormethod="host/add"}}
         {{> afQuickField name="privateHost" placeholder="xx.xx.xx.xx" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}

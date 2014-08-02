@@ -5,9 +5,10 @@
 
 standard-app-packages
 dockerode
-bootstrap-3
 redis
+less
 accounts-password
+bootstrap3-less
 accounts-ui-bootstrap-3
 random
 iron-router
@@ -18,8 +19,7 @@ collection-helpers
 moment
 numeral
 reactive-table
-font-awesome
 underscore
 spin
 accounts-entry
-less
+font-awesome-4-less

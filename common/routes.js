@@ -12,7 +12,10 @@ function requireAuthentication(pause) {
     pause();
   } else {
     if (!Meteor.user()) {
-      this.render('login');
+      if (this.path == "/sign-in")  {
+        this.render('login');
+      } else
+        this.render('signUp');
       pause();
     }
   }

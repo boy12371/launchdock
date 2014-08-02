@@ -3,13 +3,13 @@
       <div class="panel-heading">
         <div class="panel-title">
           <span class="rocker">Hosts</span>
-          <div class="pull-right">Hosts: <span class="badge">{{totalHosts}}</span> Active: <span class="badge">{{runningHosts.count}}</span> Instances: <span class="badge">{{totalInstances}}</span></div>
+          <div class="rocker-toolbar pull-right">Hosts: <span class="badge">{{totalHosts}}</span> Active: <span class="badge">{{runningHosts.count}}</span> Instances: <span class="badge">{{totalInstances}}</span></div>
         </div>
       </div>
       <div class="panel-body">
       {{#each runningHosts}}
         <div class="col-sm-6 metric-wrapper">
-          <div class="row rocker metric-container">
+          <div class="row metric-container">
             <div class="metric-gauge col-sm-6">
               <canvas class="img-responsive host-gauge" id="{{_id}}">{{hostGuage}}</canvas>
             </div>

@@ -4,7 +4,6 @@
       "git": "https://github.com/ongoworks/meteor-dockerode.git",
       "branch": "master"
     },
-    "bootstrap-3": {},
     "redis": {},
     "accounts-ui-bootstrap-3": {
       "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
@@ -16,8 +15,9 @@
     "collection-helpers": {},
     "numeral": {},
     "reactive-table": {},
-    "font-awesome": {},
     "spin": {},
-    "accounts-entry": {}
+    "accounts-entry": {},
+    "bootstrap3-less": {},
+    "font-awesome-4-less": {}
   }
 }
