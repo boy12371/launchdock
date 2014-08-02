@@ -25,7 +25,7 @@ Router.map(function() {
     path: '/',
     waitOn: function() {
       return [
-        Meteor.subscribe("hosts")
+        Meteor.subscribe("hosts"),Meteor.subscribe("appInstances")
       ];
     }
   });

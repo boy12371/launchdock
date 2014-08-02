@@ -14,12 +14,29 @@ Schemas.Host = new SimpleSchema({
 	},
 	max: {
 		type: Number,
-		defaultValue: 100,
+		defaultValue: 200,
 		label: "Max #"
 	},
 	active: {
 		type: Boolean,
 		defaultValue: true
+	},
+	status: {
+		type: String,
+		optional: true
+	},
+	tag: {
+		type: String
+	},
+	metrics: {
+		type: Object,
+		optional: true
+	},
+	'metrics.running': {
+		type: Number
+	},
+	'metrics.paused': {
+		type: Number
 	},
 	details: {
 		type: Object,

@@ -60,7 +60,15 @@ Meteor.methods({
 HostActions = {
   getInfo: function getInfo(host) {
     var docker = DockerActions.get(host.privateHost, host.port);
-    if (!docker) return null;
+    // if we can't reach the host, mark it, and stop using it.
+    if (!docker) {
+      Hosts.update(host._id, {
+          $set: {
+            status: "Error",
+          }
+      });
+      return null;
+    }
     var info = Meteor._wrapAsync(docker.info.bind(docker))();
     var imageList = Meteor._wrapAsync(docker.listImages.bind(docker))();
     var dockerImages = _.map(imageList, function (image) {
@@ -75,6 +83,7 @@ HostActions = {
     Hosts.update(host._id, {
       $set: {
         details: info,
+        status: "Active",
         dockerImages: dockerImages
       }
     });

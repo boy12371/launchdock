@@ -12,6 +12,8 @@
         </div>
         {{> afQuickField name="port" placeholder="2375" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         {{> afQuickField name="max" placeholder="100" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+        {{> afQuickField name="tag" placeholder="tag" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+
         <div class="form-group">
           <div class="col-sm-offset-3 col-sm-9">
             <button type="submit" class="btn btn-default">Add to pool</button>
@@ -21,11 +23,12 @@
     </div>
     <div class="col-md-8">
       <ul class="list-group active-hosts">
-        <li class="list-group-item list-group-item-info">
+        <li class="list-group-item active">
           <button class="pull-right btn btn-default btn-xs" id="refresh-hosts" style="margin-top: 0">Refresh</button>
           <span>Hosts</span>
         </li>
         {{#each this}}
+          <li class="list-group-item list-group-item-info">{{tag}}</li>
           <li class="list-group-item">
             <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
             {{#if active}}

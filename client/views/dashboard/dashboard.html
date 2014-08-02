@@ -1,34 +1,39 @@
 <template name="dashboard">
 	{{#if currentUser}}
-	<h2>Dashboard</h2>
-  <div class="col-md-3">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3 class="panel-title">App Containers</h3>
-      </div>
-      <div class="panel-body">
-        <div class="running">
-          Running: {{runningInstances}}
-        </div>
-        <div class="paused">
-          Paused: {{pausedInstances}}
-        </div>
-      </div>
-      <div class="panel-footer">Total: {{totalInstances}}</div>
-    </div>
-  </div>
-
-  <div class="col-md-3">
+  <div class="col-md-5">
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">Hosts</h3>
       </div>
       <div class="panel-body">
       {{#each runningHosts}}
-        <div>{{publicHost}} Containers: {{details.Containers}}</div>
+        <div class="metric-wrapper">
+
+          <div class="row rocker metric-container">
+            <div class="metric-gauge col-md-4">
+              <canvas class="img-responsive host-gauge" id="{{_id}}">{{hostGuage}}</canvas>
+            </div>
+            <div class="col-md-6">
+              <div class="metric-tag">{{tag}}</div>
+              <div class="host col-md-12">
+                {{publicHost}} / {{privateHost}}
+              </div>
+              <div class="address col-md-12">
+                Containers: {{details.Containers}}
+              </div>
+
+              <div class="running col-md-12">
+                Running: {{runningInstances}}
+              </div>
+              <div class="paused col-md-12">
+                Paused: {{pausedInstances}}
+              </div>
+            </div>
+          </div>
+        </div>
       {{/each}}
       </div>
-      <div class="panel-footer">Total: {{totalHosts}}</div>
+      <div class="panel-footer">Total: {{totalHosts}}  | Apps: {{totalInstances}} </div>
     </div>
   </div>
 	{{else}}
