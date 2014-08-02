@@ -7,6 +7,10 @@
  gauge = [];
  reactiveGauge = function(id, currVal, maxValue) {
   // console.log("reactiveGauge",id, currVal, maxValue)
+  var percent = (currVal / maxValue) * 100;
+
+  if (percent < 30) { var colorStop = "#8FC0DA" } else
+  if (percent < 60) { var colorStop = "#f0ad4e" } else var colorStop = "#d9534f";
 
   if (id) {
     var opts = {
@@ -18,7 +22,7 @@
         strokeWidth: 0.035 // The rotation offsetiv>
       },
       colorStart: '#6FADCF',   // Colors
-      colorStop: '#8FC0DA',    // just experiment with them
+      colorStop: colorStop,    // just experiment with them
       strokeColor: '#E0E0E0'   // to see which ones work best for you
     };
     var target = document.getElementById(id); // your canvas element
