@@ -28,6 +28,11 @@ Schemas.Host = new SimpleSchema({
 	tag: {
 		type: String
 	},
+	shared: {
+		type: Boolean,
+		label: "Public Shared Host",
+		defaultValue: false
+	},
 	metrics: {
 		type: Object,
 		optional: true
@@ -127,6 +132,11 @@ Schemas.DockerImage = new SimpleSchema({
 		type: String,
 		regEx: SimpleSchema.RegEx.Url,
 		optional: true
+	},
+	shared: {
+		type: Boolean,
+		label: "Public Shared Image",
+		defaultValue: false
 	},
 	inRepo: {
 		type: Boolean,

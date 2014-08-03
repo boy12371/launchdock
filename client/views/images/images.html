@@ -1,48 +1,54 @@
 <template name="images">
 	<h2>Docker Images</h2>
-	<div class="panel panel-default">
-		<div class="panel-body">
-			<p>This is a list of all docker images that should be created on every host.</p>
-			<ul>
-				<li>When you add an image here, it is created on every defined host. This can take some time.</li>
-				<li>When you remove an image here, it is removed from every defined host.</li>
-				<li>When you add a new host, all the images in this list are created on that host. This can take some time.</li>
-			</ul>
-		</div>
-	</div>
 	<div class="container-fluid">
 	    <div class="col-md-4">
-	      {{#autoForm id="addDockerImageForm" collection="DockerImages" class="form-horizontal" role="form"}}
-			{{> afQuickField name="name" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
-			{{> afQuickField name="inRepo" template="bootstrap3-horizontal" input-col-class="col-sm-offset-3 col-sm-9" value=true}}
-			{{#if afFieldValueIs name="inRepo" value=false}}
-			{{> afQuickField name="tarUrl" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
-			{{/if}}
-			<div class="form-group">
-	          <div class="col-sm-offset-3 col-sm-9">
-	            <button type="submit" class="btn btn-default">Add</button>
-	          </div>
-	        </div>
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<p>This is a list of all docker images that should be created on every host.</p>
+						<ul>
+							<li>When you add an image here, it is created on every defined host. This can take some time.</li>
+							<li>When you remove an image here, it is removed from every defined host.</li>
+							<li>When you add a new host, all the images in this list are created on that host. This can take some time.</li>
+						</ul>
+					</div>
+				</div>
+
+
+	     {{#autoForm id="addDockerImageForm" collection="DockerImages" class="form-horizontal" role="form"}}
+				{{> afQuickField name="name" template="bootstrap3-horizontal" label-class="col-sm-2" input-col-class="col-sm-10"}}
+				{{> afQuickField name="shared" template="bootstrap3-horizontal" input-col-class="col-sm-offset-2 col-sm-5" value=false}}
+				{{> afQuickField name="inRepo" template="bootstrap3-horizontal" input-col-class="col-sm-offset-2 col-sm-5" value=true}}
+				{{#if afFieldValueIs name="inRepo" value=false}}
+					{{> afQuickField name="tarUrl" template="bootstrap3-horizontal" label-class="col-sm-2" input-col-class="col-sm-10"}}
+				{{/if}}
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-default btn-block">Add</button>
+					</div>
+				</div>
 		  {{/autoForm}}
+
 	    </div>
+
 	    <div class="col-md-8">
-			<table class="table table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Image Name</th>
-						<th>Source</th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-				{{#each this}}
-				{{> imageRow}}
-				{{/each}}
-				</tbody>
-			</table>
-		</div>
+				<table class="table table-bordered table-striped">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Image Name</th>
+							<th>Source</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+					{{#each this}}
+					{{> imageRow}}
+					{{/each}}
+					</tbody>
+				</table>
+			</div>
 	</div>
+
 </template>
 
 <template name="imageRow">

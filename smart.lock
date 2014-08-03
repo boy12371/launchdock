@@ -20,7 +20,8 @@
       "spin": {},
       "accounts-entry": {},
       "bootstrap3-less": {},
-      "font-awesome-4-less": {}
+      "font-awesome-4-less": {},
+      "collection-hooks": {}
     },
     "packages": {
       "dockerode": {
@@ -87,6 +88,11 @@
         "git": "https://github.com/svub/fontawesome4-less.git",
         "tag": "v4.4.0",
         "commit": "250d2336a217c18eb70e9d074784a7db3ca38472"
+      },
+      "collection-hooks": {
+        "git": "https://github.com/matb33/meteor-collection-hooks.git",
+        "tag": "v0.7.2",
+        "commit": "261f61f07b371ae913463fba8964a9b93cab531b"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",

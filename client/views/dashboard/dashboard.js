@@ -69,6 +69,6 @@ Template.dashboard.rendered = function () {
     });
   Deps.autorun(function(){
       data = Session.get('gaugeData')
-      gauge[data.id].set(data.currVal)
+      if (data) gauge[data.id].set(data.currVal)
   });
 };
