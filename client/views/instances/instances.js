@@ -6,7 +6,6 @@ function containsObject(obj, list) {
  return (_.isObject(res))? true:false;
 }
 
-
 AutoForm.addHooks("launchAppInstanceForm", {
   before: {
     "ai/launch": function (doc, template) {
@@ -39,7 +38,7 @@ Template.appInstances.helpers({
     settings: function () {
       var selectedAppInstances = Session.get('selectedAppInstances') || [];
         return {
-            rowsPerPage: 25,
+            rowsPerPage: 20,
             showFilter: true,
             useFontAwesome: true,
             fields: [
