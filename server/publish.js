@@ -1,5 +1,7 @@
 Meteor.publish("appInstance", function (id) {
-  if (this.userId) {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return AppInstances.find({_id: id}, {limit: 1});
+  } else if (this.userId) {
     return AppInstances.find({_id: id,'userId': this.userId}, {limit: 1});
   } else {
     return [];
@@ -7,7 +9,9 @@ Meteor.publish("appInstance", function (id) {
 });
 
 Meteor.publish("dockerImages", function () {
-	if (this.userId) {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return DockerImages.find();
+  } else if (this.userId) {
 		return DockerImages.find({ $or: [{'userId': this.userId}, {shared: true}]});
 	} else {
     return [];
@@ -15,7 +19,9 @@ Meteor.publish("dockerImages", function () {
 });
 
 Meteor.publish("hosts", function () {
-	if (this.userId) {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return Hosts.find();
+  } else if (this.userId) {
 		return Hosts.find({ $or: [{'userId': this.userId}, {shared: true}]});
 	} else {
     return [];
@@ -23,7 +29,9 @@ Meteor.publish("hosts", function () {
 });
 
 Meteor.publish("appInstances", function () {
-  if (this.userId) {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return AppInstances.find();
+  } else if (this.userId) {
     return AppInstances.find({'userId': this.userId});
   } else {
     return [];

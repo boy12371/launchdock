@@ -22,7 +22,8 @@
       "bootstrap3-less": {},
       "font-awesome-4-less": {},
       "collection-hooks": {},
-      "fast-render": {}
+      "fast-render": {},
+      "roles": {}
     },
     "packages": {
       "dockerode": {
@@ -67,8 +68,8 @@
       },
       "reactive-table": {
         "git": "https://github.com/ecohealthalliance/reactive-table.git",
-        "tag": "v0.3.16",
-        "commit": "2dcecb0c26f7dd9767aa3ab33972ba6b0f526028"
+        "tag": "v0.3.17",
+        "commit": "19ae3d81852a478ca873f90ff98aacee8d622da7"
       },
       "spin": {
         "git": "https://github.com/SachaG/meteor-spin.git",
@@ -99,6 +100,11 @@
         "git": "https://github.com/arunoda/meteor-fast-render.git",
         "tag": "v0.2.8",
         "commit": "149984b1aff3a5642a270aff9bd9006872c8302e"
+      },
+      "roles": {
+        "git": "https://github.com/alanning/meteor-roles.git",
+        "tag": "v1.2.10",
+        "commit": "7ccb35de0a6cb0c9a0c3666badd04757e39c09a6"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",
