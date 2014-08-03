@@ -31,6 +31,11 @@ Template.createAppInstance.dockerImageOptions = function () {
   });
 };
 
+// ************************************************************
+//  appInstance helpers
+//  see: https://github.com/ecohealthalliance/reactive-table
+//  for configuration / tables settings
+// ************************************************************
 Template.appInstances.helpers({
     AppInstances: function(){
       return AppInstances;
@@ -43,8 +48,8 @@ Template.appInstances.helpers({
             useFontAwesome: true,
             fields: [
               {'key': 'hostnames', 'label': 'Domain',
-                fn: function (value) {
-                    return new Spacebars.SafeString('<a href="http://'+value+'" class="domain-link" target="_blank">'+value+'</a>');
+                fn: function (value,item ) {
+                    return new Spacebars.SafeString('<i class="app-detail-icon" data-id="'+item._id+'"></i><a href="http://'+value+'" class="domain-link" target="_blank">'+value+'</a>');
                 }
               },
               {'key': 'status', 'label': 'Status'},
@@ -62,7 +67,18 @@ Template.appInstances.helpers({
 });
 
 Template.appInstances.events({
+  'click .reactive-table tbody tr .app-detail-icon': function (event,template) {
+    event.stopPropagation();
+    id =  $(event.currentTarget).data().id;
+    Router.go("/app/"+id);    //Router.go('app', {_id: id}); //Should work, hmmm?
+  },
+
+  'click .reactive-table tbody tr a': function (event,template) {
+    event.stopPropagation(); // We don't want to the row selected if we're clicking out to view site.
+  },
+
   'click .reactive-table tbody tr': function (event,template) {
+    event.stopPropagation();
     selectedAppInstances = Session.get("selectedAppInstances") || [];
     if (containsObject({'_id':this._id},selectedAppInstances) ) {
       selectedAppInstances = _.without(selectedAppInstances, _.findWhere(selectedAppInstances, {'_id':this._id}));

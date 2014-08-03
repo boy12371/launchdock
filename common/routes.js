@@ -26,6 +26,7 @@ Router.onBeforeAction(requireAuthentication);
 Router.map(function() {
   this.route('dashboard', {
     path: '/',
+    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("hosts"),Meteor.subscribe("appInstances")
@@ -35,6 +36,7 @@ Router.map(function() {
 
   this.route('apps', {
     template: 'appInstances',
+    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("appInstances")
@@ -44,6 +46,7 @@ Router.map(function() {
 
   this.route('appInstanceDetails', {
     path: 'app/:_id',
+    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("appInstance", this.params._id)
@@ -75,6 +78,7 @@ Router.map(function() {
   });
 
   this.route('hosts', {
+    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("hosts")

@@ -1,11 +1,13 @@
 <template name="dashboard">
     <div class="panel panel-default">
+      {{#if runningHosts.count}}
       <div class="panel-heading">
         <div class="panel-title">
           <span class="rocker">Hosts</span>
           <div class="rocker-toolbar pull-right">Hosts: <span class="badge">{{totalHosts}}</span> Active: <span class="badge">{{runningHosts.count}}</span> Instances: <span class="badge">{{totalInstances}}</span></div>
         </div>
       </div>
+      {{/if}}
       <div class="panel-body">
       {{#each runningHosts}}
         <div class="col-sm-6 metric-wrapper">
@@ -29,6 +31,19 @@
                 Paused: {{pausedInstances}}
               </div>
             </div>
+          </div>
+        </div>
+      {{else}}
+        <div class="row welcome-steps">
+          <h1>Hello, let's Rock! </h1>
+          <div class="col-sm-4">
+            <span class="setup-step">1</span><p>Start by adding an <a href="{{pathFor 'images'}}">image</a>. It's easy to add <a href="{{pathFor 'images'}}">images</a> from the Docker Hub repositories, or add a tar.gz build URL.</p>
+          </div>
+          <div class="col-sm-4">
+            <span class="setup-step">2</span><p>Next, you'll want to add a <a href="{{pathFor 'hosts'}}">host</a>. That's your Docker <a href="{{pathFor 'hosts'}}">host</a>, and really the last step. Aftwards, this home page will become your dashboard.</p>
+          </div>
+          <div class="col-sm-4">
+           <span class="setup-step setup-step-final">3</span><p>Finally, control your containers and launch new apps from <a href="{{pathFor 'apps'}}">App Instances</a>, or through the remote DDP API</p>
           </div>
         </div>
       {{/each}}

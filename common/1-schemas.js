@@ -125,6 +125,7 @@ Schemas.AppInstance = new SimpleSchema({
 Schemas.DockerImage = new SimpleSchema({
 	name: {
 		type: String,
+		label: "Org/Name",
 		index: 1,
 		unique: true
 	},
@@ -140,6 +141,7 @@ Schemas.DockerImage = new SimpleSchema({
 	},
 	inRepo: {
 		type: Boolean,
+		label: "Docker Hub Repo",
 		defaultValue: true
 	}
 });

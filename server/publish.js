@@ -8,7 +8,7 @@ Meteor.publish("appInstance", function (id) {
 
 Meteor.publish("dockerImages", function () {
 	if (this.userId) {
-		return DockerImages.find({'userId': this.userId});
+		return DockerImages.find({ $or: [{'userId': this.userId}, {shared: true}]});
 	} else {
     return [];
   }
