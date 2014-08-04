@@ -8,7 +8,6 @@ Meteor.startup(function () {
 
   Meteor.setInterval(function () {
     if (Settings.findOne().activeHeal) {
-      Meteor._debug("heartbeat");
       HostActions.updateAll();
       ContainerActions.updateInfoForAll();
     }

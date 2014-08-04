@@ -1,8 +1,12 @@
+function capitaliseFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 AutoForm.addHooks(null, {
   onError: function (type, error, template) {
-    alertify.error(error.message);
+    alertify.error(capitaliseFirstLetter(error.message));
   },
   onSuccess: function (type, result, template) {
-    alertify.success(type + " successfully:");
+    alertify.success(capitaliseFirstLetter(type) + " completed.");
   }
 });
