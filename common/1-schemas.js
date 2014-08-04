@@ -191,5 +191,16 @@ Schemas.Settings = new SimpleSchema({
 	},
 	'notifications.hostStatus': {
 		type: Boolean
+	},
+	kadira: {
+		type: Object,
+		label: "Kadira",
+		optional: true
+	},
+	'kadira.appId': {
+		type: String
+	},
+	'kadira.appSecret': {
+		type: String
 	}
 });

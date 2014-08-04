@@ -24,7 +24,8 @@
       "collection-hooks": {},
       "fast-render": {},
       "roles": {},
-      "alertfy": {}
+      "alertfy": {},
+      "kadira": {}
     },
     "packages": {
       "dockerode": {
@@ -49,8 +50,8 @@
       },
       "collection2": {
         "git": "https://github.com/aldeed/meteor-collection2.git",
-        "tag": "v0.4.4",
-        "commit": "c70deb36e10f63238b884529eea1e38cf0789903"
+        "tag": "v0.4.5",
+        "commit": "336903730249197b3358dac31b1bd5ed64fecc50"
       },
       "autoform": {
         "git": "https://github.com/aldeed/meteor-autoform.git",
@@ -111,6 +112,11 @@
         "git": "https://github.com/cristiandley/Alertfy.git",
         "tag": "v0.0.2",
         "commit": "e412bf2b6e8f39737f86c2ac8cce37116c3e3ab8"
+      },
+      "kadira": {
+        "git": "https://github.com/meteorhacks/kadira.git",
+        "tag": "v2.4.9",
+        "commit": "8bb902989917522822a0897117672ae858c23427"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",
