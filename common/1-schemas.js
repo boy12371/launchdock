@@ -178,6 +178,11 @@ Schemas.Settings = new SimpleSchema({
 		label: "Alternate Redis Host",
 		optional: true
 	},
+	mailUrl: {
+		type: String,
+		label: "SMTP / Mail URL",
+		optional: true
+	},
 	notifications: {
 		type: Object,
 		label: "System Notifications",
