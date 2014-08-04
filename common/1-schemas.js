@@ -14,12 +14,34 @@ Schemas.Host = new SimpleSchema({
 	},
 	max: {
 		type: Number,
-		defaultValue: 100,
+		defaultValue: 200,
 		label: "Max #"
 	},
 	active: {
 		type: Boolean,
 		defaultValue: true
+	},
+	status: {
+		type: String,
+		optional: true
+	},
+	tag: {
+		type: String
+	},
+	shared: {
+		type: Boolean,
+		label: "Public Shared Host",
+		defaultValue: false
+	},
+	metrics: {
+		type: Object,
+		optional: true
+	},
+	'metrics.running': {
+		type: Number
+	},
+	'metrics.paused': {
+		type: Number
 	},
 	details: {
 		type: Object,
@@ -103,6 +125,7 @@ Schemas.AppInstance = new SimpleSchema({
 Schemas.DockerImage = new SimpleSchema({
 	name: {
 		type: String,
+		label: "Org/Name",
 		index: 1,
 		unique: true
 	},
@@ -111,8 +134,14 @@ Schemas.DockerImage = new SimpleSchema({
 		regEx: SimpleSchema.RegEx.Url,
 		optional: true
 	},
+	shared: {
+		type: Boolean,
+		label: "Public Shared Image",
+		defaultValue: false
+	},
 	inRepo: {
 		type: Boolean,
+		label: "Docker Hub Repo",
 		defaultValue: true
 	}
 });
@@ -134,6 +163,49 @@ Schemas.LaunchInstance = new SimpleSchema({
 		type: String
 	},
 	'env.$.value': {
+		type: String
+	}
+});
+
+Schemas.Settings = new SimpleSchema({
+	activeHeal: {
+		type: Boolean,
+		defaultValue: false,
+		label: "Active Heal (auto rebuild containers)"
+	},
+	redisUrl: {
+		type: String,
+		label: "Alternate Redis Host",
+		optional: true
+	},
+	mailUrl: {
+		type: String,
+		label: "SMTP / Mail URL",
+		optional: true
+	},
+	notifications: {
+		type: Object,
+		label: "System Notifications",
+		optional: true
+	},
+	'notifications.instanceStatus': {
+		type: Boolean
+	},
+	'notifications.hostStatus': {
+		type: Boolean
+	},
+	'notifications.hostStatus': {
+		type: Boolean
+	},
+	kadira: {
+		type: Object,
+		label: "Kadira",
+		optional: true
+	},
+	'kadira.appId': {
+		type: String
+	},
+	'kadira.appSecret': {
 		type: String
 	}
 });
