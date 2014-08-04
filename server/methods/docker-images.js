@@ -5,7 +5,7 @@
 Meteor.methods({
   'image/add': function (imageName) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
 
     try {
       var imageId = DockerImages.insert({
@@ -21,7 +21,7 @@ Meteor.methods({
   },
   'image/addFromArchive': function (imageName, archiveUrl) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
 
     try {
       var imageId = DockerImages.insert({
@@ -38,17 +38,17 @@ Meteor.methods({
   },
   'image/remove': function (imageId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
 
     ImageActions.removeOnAllHosts(imageId);
     DockerImages.remove({_id: imageId});
-    
+
     return true;
   },
   'image/createOnAllHosts': function (imageId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
-    
+    Utility.checkLoggedIn(Meteor.userId());
+
     ImageActions.createOnAllHosts(imageId);
     return true;
   },

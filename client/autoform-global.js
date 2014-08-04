@@ -1,9 +1,12 @@
+function capitaliseFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 AutoForm.addHooks(null, {
   onError: function (type, error, template) {
-    console.log(error);
-    alert("There was an error!");
+    alertify.error(capitaliseFirstLetter(error.message));
   },
   onSuccess: function (type, result, template) {
-    console.log(type + " was successful with result:", result);
+    alertify.success(capitaliseFirstLetter(type) + " completed.");
   }
 });

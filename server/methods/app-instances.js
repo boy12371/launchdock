@@ -5,7 +5,7 @@
 Meteor.methods({
   'ai/launch': function (options) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
 
     options = options || {};
 
@@ -32,7 +32,7 @@ Meteor.methods({
   // version of the image.
   'ai/rebuild': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Rebuilding: ",instanceId);
     ContainerActions.removeForAppInstance(instanceId);
@@ -41,7 +41,7 @@ Meteor.methods({
   },
   'ai/rebuildAll': function () {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     console.log("Rebuilding all...");
     AppInstances.find().forEach(function (ai) {
       Meteor.call("ai/rebuild", ai._id);
@@ -51,7 +51,7 @@ Meteor.methods({
   },
   'ai/restart': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Restarting: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
@@ -66,7 +66,7 @@ Meteor.methods({
   },
   'ai/start': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Starting: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
@@ -83,7 +83,7 @@ Meteor.methods({
   },
   'ai/stop': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Stopping: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
@@ -98,7 +98,7 @@ Meteor.methods({
   },
   'ai/kill': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Killing: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
@@ -113,7 +113,7 @@ Meteor.methods({
   },
   'ai/remove': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Removing: ",instanceId);
     ContainerActions.removeForAppInstance(instanceId);
@@ -131,7 +131,7 @@ Meteor.methods({
   // starting a new container.
   'ai/deactivate': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Deactivating: ",instanceId);
     ContainerActions.removeForAppInstance(instanceId);
@@ -143,7 +143,7 @@ Meteor.methods({
   // is not already one listed (i.e., it is deactivated).
   'ai/activate': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Activating: ",instanceId);
     ContainerActions.addForAppInstance(instanceId);
@@ -153,7 +153,7 @@ Meteor.methods({
   },
   'ai/getEnvironmentVariables': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
 
     var ai = AppInstances.findOne({_id: instanceId});
@@ -161,7 +161,7 @@ Meteor.methods({
   },
   'ai/addHostname': function (instanceId, hostname) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     check(hostname, String);
     console.log("Add hostname: ",instanceId, hostname);
@@ -197,7 +197,8 @@ Meteor.methods({
   },
   'ai/removeHostname': function (instanceId, hostname) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    console.log(Meteor.userId())
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     check(hostname, String);
 
@@ -211,7 +212,7 @@ Meteor.methods({
   },
   'ai/getContainerInfo': function (instanceId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
 
     return ContainerActions.getInfo(instanceId);
@@ -348,10 +349,7 @@ ContainerActions = {
     var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
 
     // Determine what port the new container was mapped to
-    console.log(containerInfo.NetworkSettings.Ports["8080/tcp"])
-    console.log(containerInfo.HostConfig.PortBindings["8080/tcp"])
     var port = containerInfo.NetworkSettings.Ports["8080/tcp"][0].HostPort;
-    console.log(port)
 
     // Update info in AI document
     AppInstances.update({_id: instanceId}, {
