@@ -5,9 +5,10 @@
 
 standard-app-packages
 dockerode
-bootstrap-3
 redis
+less
 accounts-password
+bootstrap3-less
 accounts-ui-bootstrap-3
 random
 iron-router
@@ -17,4 +18,14 @@ autoform
 collection-helpers
 moment
 numeral
-jquery-datatables
+reactive-table
+underscore
+spin
+accounts-entry
+font-awesome-4-less
+collection-hooks
+fast-render
+roles
+alertfy
+kadira
+email

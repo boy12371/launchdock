@@ -5,7 +5,7 @@
 Meteor.methods({
   'host/add': function addHost(doc) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
     Schemas.Host.clean(doc);
     check(doc, Schemas.Host);
 
@@ -20,7 +20,7 @@ Meteor.methods({
   // Refresh details and image list for all hosts or refresh and return details and image list for one host
   'host/refreshDetails': function refreshDetailsForHost(hostId) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
 
     if (hostId) {
       var host = Hosts.findOne(hostId);
@@ -32,7 +32,7 @@ Meteor.methods({
   },
   'host/remove': function removeHost(hostId, keepAppsActive) {
     this.unblock();
-    Utility.checkLoggedIn(this.userId);
+    Utility.checkLoggedIn(Meteor.userId());
 
     var cursor = AppInstances.find({dockerHosts: hostId});
 
@@ -60,7 +60,15 @@ Meteor.methods({
 HostActions = {
   getInfo: function getInfo(host) {
     var docker = DockerActions.get(host.privateHost, host.port);
-    if (!docker) return null;
+    // if we can't reach the host, mark it, and stop using it.
+    if (!docker) {
+      Hosts.update(host._id, {
+          $set: {
+            status: "Error",
+          }
+      });
+      return null;
+    }
     var info = Meteor._wrapAsync(docker.info.bind(docker))();
     var imageList = Meteor._wrapAsync(docker.listImages.bind(docker))();
     var dockerImages = _.map(imageList, function (image) {
@@ -75,6 +83,7 @@ HostActions = {
     Hosts.update(host._id, {
       $set: {
         details: info,
+        status: "Active",
         dockerImages: dockerImages
       }
     });
