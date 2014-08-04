@@ -9,6 +9,7 @@
     <div class="panel-body">
     {{#autoForm id="settingsAdminForm" collection="Settings" role="form" type="update" doc=settingsDoc}}
       {{> afQuickField name="activeHeal"}}
+      {{> afQuickField name="mailUrl" placeholder="smtp://USERNAME:PASSWORD@HOST:PORT/"}}
       {{> afQuickField name="redisUrl"}}
       {{> afQuickField name="kadira"}}
       {{> afQuickField name="notifications"}}
