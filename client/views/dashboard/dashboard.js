@@ -58,8 +58,13 @@ Template.dashboard.helpers({
     return Hosts.find().count();
   },
   hostGuage: function () {
-    gaugeData.push({'id':this._id,'currVal':this.details.Containers,'maxValue':this.max});
-    Session.set("gaugeData",{'id':this._id,'currVal':this.details.Containers});
+    if (this.details) {
+      var containers = this.details.Containers || 0;
+    } else {
+      var containers = 0
+    }
+    gaugeData.push({'id':this._id,'currVal':containers,'maxValue':this.max});
+    Session.set("gaugeData",{'id':this._id,'currVal':containers,'maxValue':this.max});
   }
 });
 
@@ -69,6 +74,7 @@ Template.dashboard.rendered = function () {
     });
   Deps.autorun(function(){
       data = Session.get('gaugeData')
-      if (data) gauge[data.id].set(data.currVal)
+      if (!gauge[data.id]) reactiveGauge(data.id,data.currVal,data.maxValue);
+      if (data.id) gauge[data.id].set(data.currVal)
   });
 };

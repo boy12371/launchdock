@@ -47,15 +47,10 @@ try {
 	   throw new Error('You must start a hipache container named "hipache-npm" before running the launcher app. Use the command: docker run --name hipache-npm -p ::6379 -p 80:80 -d ongoworks/hipache-npm');
    }
 }
-// console.log(containerInfo)
-// console.log("hostConfig")
-// console.log(containerInfo.HostConfig.PortBindings)
-// console.log("network settings")
-// console.log(containerInfo.NetworkSettings)
+// get network settings from docker info
 var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
-// console.log("connecting redis to:")
-// console.log(hostConfig)
 var platform = os.platform(), d;
+
 if (hostConfig) {
   if (platform === "darwin") {
   	Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local
@@ -63,10 +58,3 @@ if (hostConfig) {
   	Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
   }
 }
-// Do 10 second polling of host and app instance details
-Meteor.startup(function () {
-  // Meteor.setInterval(function () {
-  //   HostActions.updateAll();
-  //   ContainerActions.updateInfoForAll();
-  // }, 30000);
-});

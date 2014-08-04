@@ -92,7 +92,12 @@ Router.map(function() {
     }
   });
 
-  this.route('settings');
+  this.route("settings", {
+    waitOn: function() {
+      return [ Meteor.subscribe("settings")];
+    }
+  });
+
 });
 
 // Active pages

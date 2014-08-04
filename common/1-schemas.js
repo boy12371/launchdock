@@ -166,3 +166,30 @@ Schemas.LaunchInstance = new SimpleSchema({
 		type: String
 	}
 });
+
+Schemas.Settings = new SimpleSchema({
+	activeHeal: {
+		type: Boolean,
+		defaultValue: false,
+		label: "Active Heal (auto rebuild containers)"
+	},
+	redisUrl: {
+		type: String,
+		label: "Alternate Redis Host",
+		optional: true
+	},
+	notifications: {
+		type: Object,
+		label: "System Notifications",
+		optional: true
+	},
+	'notifications.instanceStatus': {
+		type: Boolean
+	},
+	'notifications.hostStatus': {
+		type: Boolean
+	},
+	'notifications.hostStatus': {
+		type: Boolean
+	}
+});

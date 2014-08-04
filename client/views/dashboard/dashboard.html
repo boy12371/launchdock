@@ -10,10 +10,10 @@
       {{/if}}
       <div class="panel-body">
       {{#each runningHosts}}
-        <div class="col-sm-6 metric-wrapper">
+        <div class="col-sm-6 col-md-4 col-lg-3 metric-wrapper">
           <div class="row metric-container">
             <div class="metric-gauge col-sm-6">
-              <canvas class="img-responsive host-gauge" id="{{_id}}">{{hostGuage}}</canvas>
+              <canvas class="host-gauge" id="{{_id}}">{{hostGuage}}</canvas>
             </div>
             <div class="col-sm-6">
               <div class="metric-tag">{{tag}}</div>

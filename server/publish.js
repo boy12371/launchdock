@@ -38,6 +38,32 @@ Meteor.publish("appInstances", function () {
   }
 });
 
+Meteor.publish("settings", function () {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return Settings.find();
+  } else if (this.userId) {
+    return Settings.find({'userId': this.userId});
+  } else {
+    return [];
+  }
+});
+
+Settings.allow({
+  update: function (userId, doc) {
+    if (Roles.userIsInRole(Meteor.userId(), ['admin'])) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  insert: function (){
+    return false;
+  },
+  remove: function() {
+    return false;
+  }
+});
+
 Hosts.allow({
   insert: function () {
       return true;

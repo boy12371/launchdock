@@ -7,6 +7,9 @@ DockerImages.attachSchema(Schemas.DockerImage);
 Hosts = new Meteor.Collection("Hosts");
 Hosts.attachSchema(Schemas.Host);
 
+Settings = new Meteor.Collection("Settings");
+Settings.attachSchema(Schemas.Settings);
+
 //
 // COLLECTION HELPERS
 // see: https://github.com/dburles/meteor-collection-helpers
@@ -42,5 +45,9 @@ DockerImages.before.insert(function (userId, doc) {
 });
 
 Hosts.before.insert(function (userId, doc) {
+  doc.userId = Meteor.userId();
+});
+
+Settings.before.insert(function (userId, doc) {
   doc.userId = Meteor.userId();
 });
