@@ -1,0 +1,123 @@
+@import "/packages/bootstrap3-less/bootstrap.import.less";
+@import "/packages/bootstrap3-less/lib/less/theme.import.less";
+@import "/packages/font-awesome-4-less/font-awesome.import.less";
+@import url('//fonts.googleapis.com/css?family=Black+Ops+One|Cuprum:400,700,400italic');
+
+// @navbar-inverse-bg: #FF69B4; // needs a fabulous color ;)
+// @navbar-inverse-color: black;
+// @navbar-inverse-link-color: black;
+@font-family-sans-serif: "Cuprum", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@headings-font-family: "Black Ops One";
+@font-size-base: 18px;
+@navbar-border-radius: 0px;
+@navbar-inverse-brand-color: #fff;
+
+//
+//************** GENERAL ******************//
+//
+
+h2 {
+  margin-top:0px;
+}
+
+.entry-logo {
+  height: 20px;
+  padding-left: 40px;
+}
+
+.entry {
+  background: inherit;
+}
+
+.navbar-brand {
+    font-family: "Black Ops One";
+    letter-spacing: 3px;
+}
+
+//
+//************** APP INSTANCES ******************//
+//
+.reactive-table {
+  margin-top: 20px;
+}
+
+.active-hosts span {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.table-striped > tbody > tr.selected:nth-child(odd) > td,
+.table-striped > tbody > tr.selected:nth-child(odd) > th,
+.table-striped > tbody > tr.selected:nth-child(even) > td,
+.table-striped > tbody > tr.selected:nth-child(even) > th {
+  background-color: #A9B7D1 !important;
+}
+
+.app-detail-icon {
+  #fa-icon(arrows-alt, @gray);
+  padding-right: 10px;
+}
+
+
+
+//
+//************** DASHBOARD ******************//
+//
+.rocker {
+  .h2
+}
+.metric-gauge {
+  min-width: 100%;
+  min-height: 100%;
+}
+.panel-body .metric-wrapper > div:nth-child(odd) {
+   border-right: 3px dashed @gray-lighter;
+}
+
+.metric-container {
+  padding: 40px 20px 40px 20px;
+}
+
+.metric-tag {
+  border-bottom: 1px solid black;
+  margin-bottom: 5px;
+}
+
+.rocker-toolbar {
+  padding-top: 10px;
+}
+
+.welcome-steps {
+  h1 {
+    padding-bottom: 100px;
+    padding-left: 50px;
+  }
+  p {
+    margin-top: 40px;
+    font-size: 3rem;
+  }
+}
+
+.setup-step {
+  margin-left: 25%;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  background-color: @gray-lighter;
+  display: block;
+  text-align: center;
+  font-size: 12rem;
+  padding-top: 20px;
+  border: 3px solid @gray;
+}
+
+.setup-step-final {
+  background-image: url('images/signin.png');
+  background-size: cover;
+
+}
+//
+//************** IMAGES ******************//
+//
+
+#addDockerImageForm .form-group { margin-bottom: 0px;}
