@@ -16,7 +16,7 @@ MAINTAINER Aaron Judd <aaron@ongoworks.com>
 RUN apt-get install -qq -y curl git
 
 # Update to latest node
-RUN npm cache clean -f && npm install -g n && sudo n stable
+RUN npm cache clean -f && npm install -g n && n stable
 
 # Install Meteor
 RUN curl https://install.meteor.com | /bin/sh
