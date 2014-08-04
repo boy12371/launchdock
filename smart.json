@@ -21,6 +21,7 @@
     "font-awesome-4-less": {},
     "collection-hooks": {},
     "fast-render": {},
-    "roles": {}
+    "roles": {},
+    "alertfy": {}
   }
 }
