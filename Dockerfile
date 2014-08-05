@@ -31,7 +31,7 @@ RUN mrt install && meteor bundle --directory /var/www/app
 
 # Set the working directory to be used for commands that are run, including the default CMD below
 WORKDIR /var/www/app
-
+RUN npm install phantomjs
 #
 # Default ENV settings for meteor app
 # Required to run meteor!
