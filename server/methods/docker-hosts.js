@@ -103,7 +103,6 @@ HostActions = {
     _.each(hosts, function (h) {
        if (bestHost) return;
        if (h.max > h.details.Containers) {
-        Hosts.update({'_id':h._id}, { $inc:{ 'details.Containers':1 }} )
         return bestHost = h;
        }
     });
