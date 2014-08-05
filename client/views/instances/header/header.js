@@ -36,51 +36,52 @@ Template.instanceHeader.events = {
     });
   },
   'click .stop': function (event, template) {
-    if (!confirm("Stop ALL selected sites?")) {
-      return;
-    }
-
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/stop", ai._id, logError);
+    alertify.confirm("Stop selected sites?", function (e) {
+        var count = 0;
+        if (e) {
+          _.each(Session.get("selectedAppInstances"), function (ai) {
+            Meteor.call("ai/stop", ai._id, logError);
+            count ++
+          });
+        }
+        alertify.success("Stopping "+count+" containers");
     });
+
   },
   'click .restart': function (event, template) {
-    if (!confirm("Restart ALL selected sites?")) {
-      return;
-    }
-
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/restart", ai._id, logError);
+    alertify.confirm("Restart selected sites?", function (e) {
+        if (e) {
+        _.each(Session.get("selectedAppInstances"), function (ai) {
+          Meteor.call("ai/restart", ai._id, logError);
+        });
+        }
     });
   },
   'click .kill': function (event, template) {
-    if (!confirm("Kill ALL selected sites?")) {
-      return;
-    }
-
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/kill", ai._id, logError);
+    alertify.confirm("Kill and delete containers for selected sites?", function (e) {
+      if (e) {
+        _.each(Session.get("selectedAppInstances"), function (ai) {
+          Meteor.call("ai/kill", ai._id, logError);
+        });
+      }
     });
-
   },
   'click .remove': function (event, template) {
-    // Confirm deletion
-    if (!confirm("Delete ALL selected sites?")) {
-      return;
-    }
-
-    // If confirmed, then remove all.
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/remove", ai._id, logError);
+    alertify.confirm("PERMANENTLY DELETE RECORDS AND CONTAINER FOR SELECTED SITES?", function (e) {
+      if (e) {
+        _.each(Session.get("selectedAppInstances"), function (ai) {
+          Meteor.call("ai/remove", ai._id, logError);
+        });
+      }
     });
   },
   'click .rebuild': function (event, template) {
-    if (!confirm("Rebuild ALL selected sites?")) {
-      return;
-    }
-
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/rebuild", ai._id, logError);
+    alertify.confirm("Rebuild selected sites?", function (e) {
+        if (e) {
+        _.each(Session.get("selectedAppInstances"), function (ai) {
+          Meteor.call("ai/rebuild", ai._id, logError);
+        });
+        }
     });
   },
   'click .rebuild-all': function (event, template) {
@@ -91,26 +92,26 @@ Template.instanceHeader.events = {
     Meteor.call("ai/rebuildAll", logError);
   },
   'click .deactivate': function (event, template) {
-    if (!confirm("Deactivate ALL selected sites?")) {
-      return;
-    }
-
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/deactivate", ai._id, logError);
+    alertify.confirm("Deactivate selected sites?", function (e) {
+        if (e) {
+        _.each(Session.get("selectedAppInstances"), function (ai) {
+          Meteor.call("ai/deactivate", ai._id, logError);
+        });
+        }
     });
   },
   'click .activate': function (event, template) {
-    if (!confirm("Activate ALL selected sites?")) {
-      return;
-    }
-
-    _.each(Session.get("selectedAppInstances"), function (ai) {
-      Meteor.call("ai/activate", ai._id, function (error, result) {
-        if (error)
-          console.log(error);
-        else if (!result)
-          console.log("Failed to activate app instance " + ai._id + ". Perhaps you have not defined any hosts or a host is down.");
-      });
+    alertify.confirm("Activate selected sites?", function (e) {
+        if (e) {
+          _.each(Session.get("selectedAppInstances"), function (ai) {
+            Meteor.call("ai/activate", ai._id, function (error, result) {
+              if (error)
+                console.log(error);
+              else if (!result)
+                console.log("Failed to activate app instance " + ai._id + ". Perhaps you have not defined any hosts or a host is down.");
+            });
+          });
+        }
     });
   }
 };

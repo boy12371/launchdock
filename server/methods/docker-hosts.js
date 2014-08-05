@@ -98,6 +98,14 @@ HostActions = {
   // Return the doc for the host that has the fewest containers; TODO check defined max, too
   getBest: function getBest() {
     HostActions.updateAll();
-    return Hosts.findOne({}, {sort: {'details.Containers': 1}});
-  },
+    var availableHosts = [];
+    var hosts = Hosts.find({'status':'Active','active': true},{sort: {'details.Containers': 1} } ).fetch();
+    _.each(hosts, function (h) {
+       if (h.max > h.details.Containers) {
+        return bestHost = h;
+       }
+       if (bestHost) return false;
+    });
+    return bestHost;
+  }
 };

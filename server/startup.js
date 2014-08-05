@@ -1,4 +1,4 @@
-// Do 10 second polling of host and app instance details
+// Settings fixture data
 Meteor.startup(function () {
   if (Settings.find().count() === 0) {
     Settings.direct.insert({
@@ -6,6 +6,9 @@ Meteor.startup(function () {
     });
   }
 
+//
+//  Do 10 second polling of host and app instance details - this is the "active heal" polling
+//
   Meteor.setInterval(function () {
     if (Settings.findOne().activeHeal) {
       HostActions.updateAll();

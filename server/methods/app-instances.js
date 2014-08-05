@@ -22,8 +22,6 @@ Meteor.methods({
     // Run and attach a new docker container for it
     ContainerActions.addForAppInstance(newInstanceId);
 
-    HostActions.updateAll();
-
     // Return the app instance ID for use in future calls; calling app should store this somewhere
     return newInstanceId;
   },
@@ -56,11 +54,12 @@ Meteor.methods({
     console.log("Restarting: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
-    if (!container) return;
-
+    if (!container) {
+      Meteor.call('ai/rebuild', instanceId)
+      return true;
+    }
     // Restart container
     Meteor._wrapAsync(container.restart.bind(container))();
-
     ContainerActions.getInfo(instanceId);
     return true;
   },
@@ -71,7 +70,10 @@ Meteor.methods({
     console.log("Starting: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
-    if (!container) return;
+    if (!container) {
+      Meteor.call('ai/rebuild', instanceId)
+      return true;
+    }
 
     // Start container
     Meteor._wrapAsync(container.start.bind(container))({
@@ -88,10 +90,19 @@ Meteor.methods({
     console.log("Stopping: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
-    if (!container) return;
-
+    if (!container)  {
+      AppInstances.update({'_id':instanceId}, {$set:{'status':'stopped'}});
+      console.log("Container for "+instanceId+"not found. Marking stopped.")
+      return true;
+    }
     // Stop container
-    Meteor._wrapAsync(container.stop.bind(container))();
+    try {
+      Meteor._wrapAsync(container.stop.bind(container))();
+    } catch (e) {
+      AppInstances.update({'_id':instanceId}, {$set:{'status':'stopped'}});
+      console.log("Container invalid for "+instanceId+". Marking stopped.")
+      return true;
+    }
 
     ContainerActions.getInfo(instanceId);
     return true;
@@ -103,10 +114,20 @@ Meteor.methods({
     console.log("Killing: ",instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
 
-    if (!container) return;
+    if (!container)  {
+      AppInstances.update({'_id':instanceId}, {$set:{'status':'stopped'}});
+      console.log("Container for "+instanceId+"not found. Marking stopped.")
+      return true;
+    }
 
     // Kill container
-    Meteor._wrapAsync(container.kill.bind(container))();
+    try {
+      Meteor._wrapAsync(container.kill.bind(container))();
+    } catch (e) {
+      AppInstances.update({'_id':instanceId}, {$set:{'status':'stopped'}});
+      console.log("Container invalid for "+instanceId+". Marking stopped.")
+      return true;
+    }
 
     ContainerActions.getInfo(instanceId);
     return true;
@@ -319,6 +340,7 @@ ContainerActions = {
 
     // Determine the best host and get a Docker instance for it
     var hostDoc = HostActions.getBest();
+
     if (!hostDoc)
       return false;
 
