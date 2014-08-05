@@ -16,7 +16,7 @@ MAINTAINER Aaron Judd <aaron@ongoworks.com>
 RUN apt-get install -qq -y curl git
 
 # Update to latest node
-RUN npm cache clean -f && npm install -g n && n stable
+RUN npm cache clean -f && npm install -g n && n 0.10.29
 
 # Install Meteor
 RUN curl https://install.meteor.com | /bin/sh
@@ -31,7 +31,6 @@ RUN mrt install && meteor bundle --directory /var/www/app
 
 # Set the working directory to be used for commands that are run, including the default CMD below
 WORKDIR /var/www/app
-RUN rm -r programs/server/node_modules/fibers && npm install fibers@1.0.1
 
 #
 # Default ENV settings for meteor app
