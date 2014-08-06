@@ -11,7 +11,7 @@ Template.instanceHeader.helpers({
 
 Template.instanceHeader.events = {
   'click .newAppInstance': function (event, template) {
-    Router.go("createAppInstance");
+    $('#appCreateModal').modal('toggle');
   },
   'click .clear-all': function (event, template) {
     Session.set("selectedAppInstances",[]);

@@ -6,31 +6,6 @@ function containsObject(obj, list) {
  return (_.isObject(res))? true:false;
 }
 
-AutoForm.addHooks("launchAppInstanceForm", {
-  before: {
-    "ai/launch": function (doc, template) {
-      var newDoc = {
-        appImage: doc.dockerImage,
-        hostname: doc.hostname,
-        env: {}
-      };
-      _.each(doc.env, function (obj) {
-        newDoc.env[obj.name] = obj.value;
-      });
-      return newDoc;
-    }
-  },
-  onSuccess: function () {
-    Router.go("apps");
-  }
-});
-
-Template.createAppInstance.dockerImageOptions = function () {
-  return DockerImages.find().map(function (image) {
-    return {label: image.name, value: image.name};
-  });
-};
-
 // ************************************************************
 //  appInstance helpers
 //  see: https://github.com/ecohealthalliance/reactive-table
@@ -38,7 +13,7 @@ Template.createAppInstance.dockerImageOptions = function () {
 // ************************************************************
 Template.appInstances.helpers({
     AppInstances: function(){
-      return AppInstances;
+      return AppInstances.find();
     },
     settings: function () {
       var selectedAppInstances = Session.get('selectedAppInstances') || [];

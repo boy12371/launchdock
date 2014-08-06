@@ -23,6 +23,7 @@
     "fast-render": {},
     "roles": {},
     "alertfy": {},
-    "kadira": {}
+    "kadira": {},
+    "typeahead": {}
   }
 }

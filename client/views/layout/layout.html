@@ -17,6 +17,15 @@
 	    <ul class="nav navbar-nav">
 	      <li class="{{#if currentPageIs 'settings'}}active{{/if}}"><a href="{{pathFor 'settings'}}">Settings</a></li>
 	    </ul>
+	    <ul class="nav navbar-nav">
+	      <li class="{{#if currentPageIs 'addapp'}}active{{/if}}" id="">
+					<!-- Button trigger modal -->
+					<button class="btn btn-primary btn-lg launch-button" data-toggle="modal" data-target="#appCreateModal">
+					  Launch a new application container
+					</button>
+					{{>createAppInstance}}
+	      </li>
+	    </ul>
 	    <ul class="nav navbar-nav navbar-right">
 	      {{> loginButtons}}
 	    </ul>

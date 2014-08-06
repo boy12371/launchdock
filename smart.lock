@@ -25,7 +25,8 @@
       "fast-render": {},
       "roles": {},
       "alertfy": {},
-      "kadira": {}
+      "kadira": {},
+      "typeahead": {}
     },
     "packages": {
       "dockerode": {
@@ -60,8 +61,8 @@
       },
       "collection-helpers": {
         "git": "https://github.com/dburles/meteor-collection-helpers.git",
-        "tag": "v0.3.0",
-        "commit": "842bd9343b19c0e45ae20ac9c63c8c356889959a"
+        "tag": "v0.3.1",
+        "commit": "eff6c859cd91eae324f6c99ab755992d0f271d91"
       },
       "numeral": {
         "git": "https://github.com/vsivsi/meteor-numeral.git",
@@ -115,8 +116,13 @@
       },
       "kadira": {
         "git": "https://github.com/meteorhacks/kadira.git",
-        "tag": "v2.4.9",
-        "commit": "8bb902989917522822a0897117672ae858c23427"
+        "tag": "v2.4.10",
+        "commit": "036c85cea98369a55cf3a5c46463dffe755dadbd"
+      },
+      "typeahead": {
+        "git": "https://github.com/sergeyt/meteor-typeahead.git",
+        "tag": "v0.0.11",
+        "commit": "b97b4a92edeceb8f76aa8e6eb0f71252b34d4de3"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",

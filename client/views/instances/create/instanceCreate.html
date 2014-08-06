@@ -1,13 +1,29 @@
 <template name="createAppInstance">
-  <ol class="breadcrumb">
-    <li><a href="{{pathFor 'apps'}}">App Instances</a></li>
-    <li class="active">Create</li>
-  </ol>
-  <h2>Launch a New Instance</h2>
-  {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form" type="method" meteormethod="ai/launch"}}
-  {{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}
-  {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com, blog.domain.com, *.domain.com"}}
-  {{> afQuickField name="env"}}
-  <button type="submit" class="btn btn-primary">Launch</button>
-  {{/autoForm}}
+          <!-- Modal -->
+          <div class="modal fade" id="appCreateModal" tabindex="-1" role="dialog" aria-labelledby="appCreateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="appCreateModalLabel">Launch a new application container</h4>
+                </div>
+                <div class="modal-body">
+                  {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form" type="method" meteormethod="ai/launch"}}
+                    {{> afQuickField name="dockerImage" template="typeahead" placeholder="namespace/image"}}
+                    {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com, blog.domain.com, *.domain.com"}}
+                    {{> afQuickField name="env"}}
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary save-changes">Save changes</button>
+                  </div>
+                {{/autoForm}}
+                  </div>
+              </div>
+            </div>
+          </div>
+</template>
+
+
+<template name="afInput_typeahead">
+  <input type="text" data-schema-key="{{this.name}}" name="{{this.name}}" id="hub-autocomplete" class="{{this.cls}} form-control typeahead" value="{{this.value}}" autocomplete="off" spellcheck="off" data-source="hubAutocomplete" {{this.atts}}/>
 </template>
