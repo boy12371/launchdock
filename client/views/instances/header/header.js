@@ -69,8 +69,14 @@ Template.instanceHeader.events = {
   'click .remove': function (event, template) {
     alertify.confirm("PERMANENTLY DELETE RECORDS AND CONTAINER FOR SELECTED SITES?", function (e) {
       if (e) {
-        _.each(Session.get("selectedAppInstances"), function (ai) {
-          Meteor.call("ai/remove", ai._id, logError);
+        removeInstances = Session.get('selectedAppInstances')
+        _.each(removeInstances, function (ai) {
+          Meteor.call("ai/remove", ai._id, logError, function(error,result) {
+            var selectedAppInstances = Session.get('selectedAppInstances')
+            selectedAppInstances = _.without(selectedAppInstances, _.findWhere(selectedAppInstances, {'_id':result}));
+            alertify.success("Removed: "+result)
+            Session.set('selectedAppInstances',selectedAppInstances)
+          });
         });
       }
     });
