@@ -16,7 +16,7 @@ Meteor.methods({
     // Create a new app instance record
     var newInstanceId = AppInstances.insert({
       image: options.appImage,
-      hostnames: [options.hostname],
+      hostnames: options.hostnames,
       env: options.env || {}
     });
 

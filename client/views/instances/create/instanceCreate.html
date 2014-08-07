@@ -9,9 +9,9 @@
                 </div>
                 <div class="modal-body">
                   {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form" type="method" meteormethod="ai/launch"}}
-                    {{> afQuickField name="dockerImage" template="typeahead" placeholder="namespace/image"}}
-                    {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com, blog.domain.com, *.domain.com"}}
-                    {{> afQuickField name="env"}}
+                    {{> afQuickField name="dockerImage" template="createAppInstance" placeholder="namespace/image"}}
+                    {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com,  *.domain.com"}}
+                    {{> afQuickField name="env" template="createAppInstance"}}
                   <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary save-changes">Save changes</button>
@@ -24,6 +24,49 @@
 </template>
 
 
-<template name="afInput_typeahead">
-  <input type="text" data-schema-key="{{this.name}}" name="{{this.name}}" id="hub-autocomplete" class="{{this.cls}} form-control typeahead" value="{{this.value}}" autocomplete="off" spellcheck="off" data-source="hubAutocomplete" {{this.atts}}/>
+<template name="afInput_createAppInstance">
+  <input type="text" data-schema-key="{{this.name}}" name="{{this.name}}" id="hub-autocomplete" class="{{this.cls}} form-control typeahead" value="{{this.value}}" autocomplete="off" spellcheck="off" data-source="hubAutocomplete" {{this.atts}} data-minLength=3 data-hint=true/>
 </template>
+
+<template name="afArrayField_createAppInstance">
+  <div class="panel panel-default">
+    <div class="panel-heading">{{afFieldLabelText name=this.atts.name}}</div>
+    {{#if afFieldIsInvalid name=this.atts.name autoform=this.autoform}}
+    <div class="panel-body has-error">
+      <span class="help-block">{{{afFieldMessage name=this.atts.name autoform=this.autoform}}}</span>
+    </div>
+    {{/if}}
+    <ul class="list-group">
+      {{#afEachArrayItem name=this.atts.name minCount=this.atts.minCount maxCount=this.atts.maxCount}}
+      <li class="list-group-item autoform-array-item">
+          {{> afQuickField template="createAppInstance" name=this.name label=false options="auto" fields=../atts.fields omitFields=../atts.omitFields}}
+
+          {{#if afArrayFieldHasMoreThanMinimum name=../atts.name autoform=../autoform minCount=../atts.minCount maxCount=../atts.maxCount}}
+          {{#unless afArrayFieldIsFirstVisible}}
+          <button class="btn btn-primary btn-sm autoform-remove-item"><span class="glyphicon glyphicon-minus"></span></button>
+          {{/unless}}
+          {{/if}}
+
+          {{#if afArrayFieldHasLessThanMaximum name=../atts.name autoform=../autoform minCount=../atts.minCount maxCount=../atts.maxCount}}
+            <button class="btn btn-primary btn-sm align-right autoform-add-item" data-autoform-field="{{../atts.name}}" data-autoform-minCount="{{../atts.minCount}}" data-autoform-maxCount="{{../atts.maxCount}}"><span class="glyphicon glyphicon-plus"></span></button>
+          {{/if}}
+
+      </li>
+      {{/afEachArrayItem}}
+
+    </ul>
+  </div>
+</template>
+
+<template name="afObjectField_createAppInstance">
+  {{#if afFieldIsInvalid name=this.atts.name autoform=this.autoform}}
+  <span class="help-block">{{{afFieldMessage name=this.atts.name autoform=this.autoform}}}</span>
+  {{/if}}
+  {{#each afFieldNames name=this.atts.name fields=this.atts.fields omitFields=this.atts.omitFields}}
+    <div class="col-sm-5">
+      {{> afQuickField label=false name=this placeholder="schemaLabel" options="auto" fields=../atts.fields omitFields=../atts.omitFields}}
+    </div>
+  {{/each}}
+</template>
+
+

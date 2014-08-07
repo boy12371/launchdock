@@ -28,7 +28,7 @@ AutoForm.addHooks("launchAppInstanceForm", {
     "ai/launch": function (doc, template) {
       var newDoc = {
         appImage: doc.dockerImage,
-        hostname: doc.hostname,
+        hostnames: [doc.hostname],
         env: {}
       };
       _.each(doc.env, function (obj) {
@@ -46,11 +46,11 @@ AutoForm.addHooks("launchAppInstanceForm", {
 //
 //  docker hub autocomplete input template
 //
-Template["afInput_typeahead"].hubAutocomplete = function () {
+Template["afInput_createAppInstance"].hubAutocomplete = function () {
   return Session.get('hubSearch') || [];
 };
 
-Template["afInput_typeahead"].rendered = function() {
+Template["afInput_createAppInstance"].rendered = function() {
   Meteor.typeahead('.typeahead');
 }
 
@@ -58,7 +58,6 @@ Template.createAppInstance.events({
   'keypress .typeahead': function (event, template) {
     typewatch(function () {
       var query = $(event.currentTarget).val();
-      if (query.length < 3) return;
       Meteor.call('hub/autocomplete', query, function(err, res){
         var results = res.map(function(s){return s.namespace+"/"+s.name;});
         Session.set('hubSearch', results);
