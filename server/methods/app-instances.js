@@ -16,6 +16,7 @@ Meteor.methods({
     // Create a new app instance record
     var newInstanceId = AppInstances.insert({
       image: options.appImage,
+      hostnames: [options.hostname],
       env: options.env || {}
     });
 
@@ -145,7 +146,7 @@ Meteor.methods({
     }
 
     HostActions.updateAll();
-    return true;
+    return instanceId;
   },
   // Kills, removes, and detaches the docker container, but keeps
   // the app instance record. Can be "activated" later by
