@@ -20,6 +20,14 @@ Template.createAppInstance.helpers({
         return {label: image.name, value: image.name};
       });
     }
+  },
+  appTemplateEnvs: function () {
+    if (!Session.equals("appTemplate")) {
+      return  Session.get("appTemplate")
+    } else {
+      return [];
+    }
+
   }
 });
 
@@ -37,8 +45,11 @@ AutoForm.addHooks("launchAppInstanceForm", {
       return newDoc;
     }
   },
-  onSuccess: function () {
+  onSuccess: function (doc,template) {
     $('#appCreateModal').modal('toggle');
+    // this.resetForm();
+    // Session.set("hubSearch","");
+    // Session.set("appTemplate","");
     Router.go("apps");
   }
 });
@@ -72,9 +83,10 @@ Template.createAppInstance.events({
       // validate image exists in hub, or locally, provide error
       Meteor.call('hub/getTags',repository[0], repository[1], function (error,results) {
         if (exists && results) {
+          Session.set("appTemplate",AppTemplates.findOne({'image':exists.name}));
           alertify.success("Image exists and is ready to use");
         } else if (results) {
-          Meteor.call("image/add", image, function () {
+          Meteor.call("image/add", image, function (error,results) {
             alertify.log("Image downloading from Docker Hub");
           });
         } else {

@@ -32,7 +32,7 @@
       "dockerode": {
         "git": "https://github.com/ongoworks/meteor-dockerode.git",
         "branch": "master",
-        "commit": "fced813ed02652d15b4390c094ceb3f51bd4dd3f"
+        "commit": "239cb492e5e644e141290a670f079acc78d159b4"
       },
       "redis": {
         "git": "https://github.com/stevemanuel/meteor-redis.git",
@@ -116,8 +116,8 @@
       },
       "kadira": {
         "git": "https://github.com/meteorhacks/kadira.git",
-        "tag": "v2.4.10",
-        "commit": "036c85cea98369a55cf3a5c46463dffe755dadbd"
+        "tag": "v2.4.12",
+        "commit": "08c1f65bec94094f17f5df3ebd65cfcc298e5368"
       },
       "typeahead": {
         "git": "https://github.com/sergeyt/meteor-typeahead.git",
