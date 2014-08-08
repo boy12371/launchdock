@@ -11,7 +11,7 @@ Settings = new Meteor.Collection("Settings");
 Settings.attachSchema(Schemas.Settings);
 
 AppTemplates = new Meteor.Collection("AppTemplates");
-Settings.attachSchema(Schemas.AppTemplate);
+AppTemplates.attachSchema(Schemas.AppTemplate);
 
 //
 // COLLECTION HELPERS
