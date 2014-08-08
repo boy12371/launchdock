@@ -159,7 +159,7 @@ Schemas.AppTemplate = new SimpleSchema({
 		optional: true
 	},
 	env: {
-		type: [Object],
+		type: Object,
 		label: "Default Environment Variables",
 		optional: true
 	}
@@ -170,8 +170,7 @@ Schemas.LaunchInstance = new SimpleSchema({
 		type: String
 	},
 	hostname: {
-		type: String,
-		optional: true
+		type: String
 	},
 	env: {
 		type: [Object],

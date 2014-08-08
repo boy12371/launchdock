@@ -45,11 +45,11 @@ AutoForm.addHooks("launchAppInstanceForm", {
       return newDoc;
     }
   },
-  onSuccess: function (doc,template) {
+  onSuccess: function (doc, template) {
+    console.log(doc,template)
     $('#appCreateModal').modal('toggle');
-    // this.resetForm();
-    // Session.set("hubSearch","");
-    // Session.set("appTemplate","");
+    $('#launchAppInstanceForm').find("input[type=text]").val(""); // couldn't get resetForm to work.
+    Session.set("appTemplate");
     Router.go("apps");
   }
 });
