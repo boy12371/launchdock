@@ -159,8 +159,15 @@ Schemas.AppTemplate = new SimpleSchema({
 		optional: true
 	},
 	env: {
-		type: Object,
-		label: "Default Environment Variables",
+		type: [Object],
+		label: "Additional Environment Variables",
+		optional: true
+	},
+	'env.$.name': {
+		type: String
+	},
+	'env.$.value': {
+		type: String,
 		optional: true
 	}
 });

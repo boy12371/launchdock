@@ -7,10 +7,7 @@
         "branch": "master"
       },
       "redis": {},
-      "accounts-ui-bootstrap-3": {
-        "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
-        "branch": "master"
-      },
+      "accounts-ui-bootstrap-3": {},
       "iron-router": {},
       "collection2": {},
       "autoform": {},
@@ -40,9 +37,9 @@
         "commit": "8af9aaab84f4a87358ccb4616592a373661f712b"
       },
       "accounts-ui-bootstrap-3": {
-        "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
-        "branch": "master",
-        "commit": "a218ab9ddb84b2da75d1fe4a7272f35a5e2a66be"
+        "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
+        "tag": "v0.3.4",
+        "commit": "9f006ee48d869877d90d54ac75b54550a587df8f"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
@@ -71,8 +68,8 @@
       },
       "reactive-table": {
         "git": "https://github.com/ecohealthalliance/reactive-table.git",
-        "tag": "v0.3.17",
-        "commit": "19ae3d81852a478ca873f90ff98aacee8d622da7"
+        "tag": "v0.3.18",
+        "commit": "a5381cadf712acd2a18d3e1dc4f3e72256760c8d"
       },
       "spin": {
         "git": "https://github.com/SachaG/meteor-spin.git",
@@ -101,8 +98,8 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.2.8",
-        "commit": "149984b1aff3a5642a270aff9bd9006872c8302e"
+        "tag": "v1.0.0",
+        "commit": "acbc04982025fe78cebb8865b5a04689741d4b0b"
       },
       "roles": {
         "git": "https://github.com/alanning/meteor-roles.git",
