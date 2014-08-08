@@ -146,13 +146,31 @@ Schemas.DockerImage = new SimpleSchema({
 	}
 });
 
+Schemas.AppTemplate = new SimpleSchema({
+	image: {
+		type: String,
+		label: "Org/Name",
+		index: 1,
+		unique: true
+	},
+	tarUrl: {
+		type: String,
+		regEx: SimpleSchema.RegEx.Url,
+		optional: true
+	},
+	env: {
+		type: Object,
+		label: "Default Environment Variables",
+		optional: true
+	}
+});
+
 Schemas.LaunchInstance = new SimpleSchema({
 	dockerImage: {
 		type: String
 	},
 	hostname: {
-		type: String,
-		optional: true
+		type: String
 	},
 	env: {
 		type: [Object],

@@ -5,10 +5,7 @@
       "branch": "master"
     },
     "redis": {},
-    "accounts-ui-bootstrap-3": {
-      "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
-      "branch": "master"
-    },
+    "accounts-ui-bootstrap-3": {},
     "iron-router": {},
     "collection2": {},
     "autoform": {},
@@ -23,6 +20,7 @@
     "fast-render": {},
     "roles": {},
     "alertfy": {},
-    "kadira": {}
+    "kadira": {},
+    "typeahead": {}
   }
 }

@@ -1,13 +1,72 @@
 <template name="createAppInstance">
-  <ol class="breadcrumb">
-    <li><a href="{{pathFor 'apps'}}">App Instances</a></li>
-    <li class="active">Create</li>
-  </ol>
-  <h2>Launch a New Instance</h2>
-  {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" role="form" type="method" meteormethod="ai/launch"}}
-  {{> afQuickField name="dockerImage" options=dockerImageOptions firstOption="(Select a Docker Image)"}}
-  {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com, blog.domain.com, *.domain.com"}}
-  {{> afQuickField name="env"}}
-  <button type="submit" class="btn btn-primary">Launch</button>
-  {{/autoForm}}
+          <!-- Modal -->
+          <div class="modal fade" id="appCreateModal" tabindex="-1" role="dialog" aria-labelledby="appCreateModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="appCreateModalLabel">Launch a new application container</h4>
+                </div>
+                <div class="modal-body">
+                  {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" doc=appTemplateEnvs role="form" type="method" meteormethod="ai/launch"}}
+                    {{> afQuickField name="dockerImage" template="createAppInstance" placeholder="namespace/image"}}
+                    {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com,  *.domain.com"}}
+                    {{> afQuickField name="env" template="createAppInstance"}}
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary save-changes">Launch</button>
+                  </div>
+                {{/autoForm}}
+                  </div>
+              </div>
+            </div>
+          </div>
 </template>
+
+
+<template name="afInput_createAppInstance">
+  <input type="text" data-schema-key="{{this.name}}" name="{{this.name}}" id="hub-autocomplete" class="{{this.cls}} form-control typeahead" value="{{this.value}}" autocomplete="off" spellcheck="off" data-source="hubAutocomplete" {{this.atts}} data-minLength=3 data-hint=true/>
+</template>
+
+<template name="afArrayField_createAppInstance">
+  <div class="panel panel-default">
+    <div class="panel-heading">{{afFieldLabelText name=this.atts.name}}</div>
+    {{#if afFieldIsInvalid name=this.atts.name autoform=this.autoform}}
+    <div class="panel-body has-error">
+      <span class="help-block">{{{afFieldMessage name=this.atts.name autoform=this.autoform}}}</span>
+    </div>
+    {{/if}}
+    <ul class="list-group">
+      {{#afEachArrayItem name=this.atts.name minCount=this.atts.minCount maxCount=this.atts.maxCount}}
+      <li class="list-group-item autoform-array-item">
+        <div class="row">
+          {{> afQuickField template="createAppInstance" name=this.name label=false options="auto" fields=../atts.fields omitFields=../atts.omitFields}}
+
+          {{#if afArrayFieldHasMoreThanMinimum name=../atts.name autoform=../autoform minCount=1 maxCount=../atts.maxCount}}
+            <button class="btn btn-primary btn-sm autoform-remove-item"><span class="glyphicon glyphicon-minus"></span></button>
+          {{else}}
+            <button class="btn btn-primary btn-sm disabled"><span class="glyphicon glyphicon-minus"></span></button>
+          {{/if}}
+
+          {{#if afArrayFieldHasLessThanMaximum name=../atts.name autoform=../autoform minCount=../atts.minCount maxCount=../atts.maxCount}}
+            <button class="btn btn-primary btn-sm align-right autoform-add-item" data-autoform-field="{{../atts.name}}" data-autoform-minCount="{{../atts.minCount}}" data-autoform-maxCount="{{../atts.maxCount}}"><span class="glyphicon glyphicon-plus"></span></button>
+          {{/if}}
+        </div>
+      </li>
+      {{/afEachArrayItem}}
+    </ul>
+  </div>
+</template>
+
+<template name="afObjectField_createAppInstance">
+  {{#if afFieldIsInvalid name=this.atts.name autoform=this.autoform}}
+  <span class="help-block">{{{afFieldMessage name=this.atts.name autoform=this.autoform}}}</span>
+  {{/if}}
+  {{#each afFieldNames name=this.atts.name fields=this.atts.fields omitFields=this.atts.omitFields}}
+    <div class="col-sm-5">
+      {{> afQuickField label=false name=this placeholder="schemaLabel" options="auto" fields=../atts.fields omitFields=../atts.omitFields}}
+    </div>
+  {{/each}}
+</template>
+
+

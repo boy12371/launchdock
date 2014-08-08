@@ -48,6 +48,11 @@ Meteor.publish("settings", function () {
   }
 });
 
+Meteor.publish("appTemplates", function () {
+  return AppTemplates.find();
+});
+
+
 Settings.allow({
   update: function (userId, doc) {
     if (Roles.userIsInRole(Meteor.userId(), ['admin'])) {

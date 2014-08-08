@@ -10,6 +10,9 @@ Hosts.attachSchema(Schemas.Host);
 Settings = new Meteor.Collection("Settings");
 Settings.attachSchema(Schemas.Settings);
 
+AppTemplates = new Meteor.Collection("AppTemplates");
+Settings.attachSchema(Schemas.AppTemplate);
+
 //
 // COLLECTION HELPERS
 // see: https://github.com/dburles/meteor-collection-helpers
@@ -38,6 +41,16 @@ AppInstances.helpers({
 //
 AppInstances.before.insert(function (userId, doc) {
   doc.userId = Meteor.userId();
+  var env = [];
+  // STORE ENV KEY/NAME FOR VAR TEMPLATING FOR NEW INSTANCES
+  appDefaults = AppTemplates.findOne({'image': doc.image});
+  if (!appDefaults && doc.env) {
+    _.each(doc.env, function(value,key) {
+      env.push({"name":key, "value": ""});
+    });
+    AppTemplates.insert({image: doc.image,env: env})
+  }
+  // TODO: UPDATE EXISTING WITH NEW VARIABLES
 });
 
 DockerImages.before.insert(function (userId, doc) {
