@@ -143,6 +143,11 @@ Schemas.DockerImage = new SimpleSchema({
 		type: Boolean,
 		label: "Docker Hub Repo",
 		defaultValue: true
+	},
+	status: {
+		type: String,
+		defaultValue: "0",
+		optional: true
 	}
 });
 

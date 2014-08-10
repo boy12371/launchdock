@@ -11,6 +11,9 @@ var typewatch = (function(){
 //  createAppinstance
 //
 Template.createAppInstance.helpers({
+  imageSelected: function () {
+    return Session.get('imageSelected');
+  },
   hubAutocomplete: function () {
     // initially we'll return local existing images, but typeahead search docker hub
     if (Session.equals('hubSearch')) {
@@ -22,12 +25,24 @@ Template.createAppInstance.helpers({
     }
   },
   appTemplateEnvs: function () {
-    if (!Session.equals("appTemplate")) {
-      return  Session.get("appTemplate")
+    if (!Session.equals("imageSelected")) {
+      return AppTemplates.findOne({'image':Session.get('imageSelected')});
     } else {
       return [];
     }
+  },
+  imageStatus: function() {
+    if (!Session.equals("imageSelected")) {
+      var status = DockerImages.findOne({'name':Session.get('imageSelected')}).status;
+      if (status == "Downloaded") {
+        return 100;
+      } else {
+        return status;
+      }
 
+    } else {
+      return false
+    }
   }
 });
 
@@ -46,10 +61,9 @@ AutoForm.addHooks("launchAppInstanceForm", {
     }
   },
   onSuccess: function (doc, template) {
-    console.log(doc,template)
     $('#appCreateModal').modal('toggle');
-    $('#launchAppInstanceForm').find("input[type=text]").val(""); // couldn't get resetForm to work.
-    Session.set("appTemplate");
+    $('#launchAppInstanceForm').find("input[type=text]").val(""); // couldn't get resetForm to work. eg: AutoForm.resetForm('launchAppInstanceForm')
+    Session.set('imageSelected');
     Router.go("apps");
   }
 });
@@ -66,6 +80,10 @@ Template["afInput_createAppInstance"].rendered = function() {
 }
 
 Template.createAppInstance.events({
+  'click #btn-launch-close': function(event,template) {
+    Session.set('imageSelected');
+    $('#launchAppInstanceForm').find("input[type=text]").val(""); // couldn't get resetForm to work.
+  },
   'keypress .typeahead': function (event, template) {
     typewatch(function () {
       var query = $(event.currentTarget).val();
@@ -83,11 +101,12 @@ Template.createAppInstance.events({
       // validate image exists in hub, or locally, provide error
       Meteor.call('hub/getTags',repository[0], repository[1], function (error,results) {
         if (exists && results) {
-          Session.set("appTemplate",AppTemplates.findOne({'image':exists.name}));
+          Session.set("imageSelected",image);
           alertify.success("Image exists and is ready to use");
         } else if (results) {
           Meteor.call("image/add", image, function (error,results) {
-            alertify.log("Image downloading from Docker Hub");
+            Session.set("imageSelected",image);
+            Meteor.call('image/status',image);
           });
         } else {
           alertify.log("Invalid Docker Hub image.");

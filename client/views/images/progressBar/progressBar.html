@@ -1,0 +1,16 @@
+<template name="imageProgressBar">
+{{> imageStatus}}
+</template>
+
+<template name="imageDownloaded">
+<i class="fa fa-check-circle-o check-progress image-download-progress"></i>
+</template>
+
+
+<template name="imageProgress">
+<div class="imageProgress">
+  <div class="alert alert-info text-center" role="alert">
+  Download of {{name}} to hosts in progress   <i class="fa fa-circle-o-notch fa-spin"></i>
+  </div>
+</div>
+</template>

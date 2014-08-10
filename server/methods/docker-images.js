@@ -19,6 +19,45 @@ Meteor.methods({
     ImageActions.createOnAllHosts(imageId);
     return true;
   },
+  // method check all hosts to see if an image exists
+  // took this approach over streams of pull status, maybe reinvestigate
+  // but as we're likely pulling on multiple hosts, merging stream status was PiTA
+  // however, this is prone to misreporting as we're not filtering for latest
+  'image/status': function (imageName) {
+    Utility.checkLoggedIn(Meteor.userId());
+    var existsAll = false;
+    var maxCheck = 350;
+    var statusCheck = 0;
+
+    var image = DockerImages.findOne({'name':imageName})
+    // loop up to maxCheck, checking for image on all hosts.
+    var intervalId = Meteor.setInterval(function() {
+      var hostCount = 0;
+      var imageCount = 0;
+      // console.log("checking status"+imageName)
+      Hosts.find({'status':'Active','active': true}).forEach(function (host) {
+        hostCount ++;
+        if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
+      });
+      statusCheck ++;
+      if (imageCount >= hostCount) {
+        existsAll = true;
+        DockerImages.update(image._id,{$set:{status:"Downloaded"}});
+        Meteor.clearInterval(intervalId)
+        return existsAll;
+      } else if (existsAll == false && statusCheck >= maxCheck) {
+        Meteor.clearInterval(intervalId);
+        DockerImages.update(image._id,{$set:{status:"Pending"}});
+        return existsAll;
+      } else {
+        // Ideally we'd get the size of the image but api doesn't support yet
+        percent = (statusCheck/maxCheck *100).toFixed(0).toString();
+        DockerImages.update(image._id,{$set:{status:percent}});
+        HostActions.updateAll();
+      }
+    }, 1000);
+
+  },
   'image/addFromArchive': function (imageName, archiveUrl) {
     this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
@@ -84,6 +123,7 @@ ImageActions = {
       throw new Meteor.Error(500, 'Internal server error', "Error pulling image: " + (error && error.message ? error.message : 'Unknown'));
     }
   },
+
   // Build a docker image from a tar on a single host
   buildOnHost: function buildImageOnHost(host, port, imageName, archiveUrl) {
     var docker = DockerActions.get(host, port);
@@ -136,21 +176,19 @@ ImageActions = {
       throw new Meteor.Error(500, 'Internal server error', "Invalid image ID");
 
     var imageName = image.name;
+    console.log("deleting image:"+imageName)
     Hosts.find().forEach(function (host) {
       var docker = DockerActions.get(host.privateHost, host.port);
       if (!docker) return;
       var dockerImage;
       var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
-      _.every(images, function (image) {
-        if (image.RepoTags && _.contains(image.RepoTags, imageName + ":latest")) {
+      _.each(images, function (image) {
+        if (_.contains(image.RepoTags, imageName + ":latest")) {
+          console.log("deleting image:"+imageName)
           dockerImage = docker.getImage(image.Id);
-          return false;
+          Meteor._wrapAsync(dockerImage.remove.bind(dockerImage))();
         }
       });
-
-      if (dockerImage) {
-        Meteor._wrapAsync(dockerImage.remove.bind(dockerImage))();
-      }
     });
 
     HostActions.updateAll();
