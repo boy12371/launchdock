@@ -143,6 +143,11 @@ Schemas.DockerImage = new SimpleSchema({
 		type: Boolean,
 		label: "Docker Hub Repo",
 		defaultValue: true
+	},
+	status: {
+		type: String,
+		defaultValue: "0",
+		optional: true
 	}
 });
 
@@ -159,8 +164,15 @@ Schemas.AppTemplate = new SimpleSchema({
 		optional: true
 	},
 	env: {
-		type: Object,
-		label: "Default Environment Variables",
+		type: [Object],
+		label: "Additional Environment Variables",
+		optional: true
+	},
+	'env.$.name': {
+		type: String
+	},
+	'env.$.value': {
+		type: String,
 		optional: true
 	}
 });

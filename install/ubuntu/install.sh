@@ -18,7 +18,7 @@ npm install --silent -g forever meteorite phantomjs
 # Add your Meteor application to source and bundle it to run as node app
 mkdir /var/www/source && cd /var/www/source
 # clone your project repository (or download,untar,etc)
-git clone https://github.com/ongoworks/rocker-docker.git .
+git clone https://github.com/ongoworks/launchdock.git .
 # Bundle meteorsrc to /var/www/app
 mrt install && meteor bundle --directory /var/www/app
 

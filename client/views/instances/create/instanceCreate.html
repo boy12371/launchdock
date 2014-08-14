@@ -1,26 +1,27 @@
 <template name="createAppInstance">
-          <!-- Modal -->
-          <div class="modal fade" id="appCreateModal" tabindex="-1" role="dialog" aria-labelledby="appCreateModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                  <h4 class="modal-title" id="appCreateModalLabel">Launch a new application container</h4>
-                </div>
-                <div class="modal-body">
-                  {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" doc=appTemplateEnvs role="form" type="method" meteormethod="ai/launch"}}
-                    {{> afQuickField name="dockerImage" template="createAppInstance" placeholder="namespace/image"}}
-                    {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com,  *.domain.com"}}
-                    {{> afQuickField name="env" template="createAppInstance"}}
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary save-changes">Launch</button>
-                  </div>
-                {{/autoForm}}
-                  </div>
-              </div>
-            </div>
+  <!-- Modal -->
+  <div class="modal fade" id="appCreateModal" tabindex="-1" role="dialog" aria-labelledby="appCreateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="appCreateModalLabel">Launch a new application container</h4>
+        </div>
+        <div class="modal-body">
+          {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" doc=appTemplateEnvs role="form" type="method" meteormethod="ai/launch"}}
+            {{> afQuickField name="dockerImage" template="createAppInstance" placeholder="namespace/image"}}
+            {{> imageProgressBar name=imageSelected}}
+            {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com,  *.domain.com"}}
+            {{> afQuickField name="env" template="createAppInstance"}}
+          <div class="modal-footer">
+            <button type="reset" class="btn btn-default" data-dismiss="modal" id="btn-launch-close">Close</button>
+            <button type="submit" class="btn btn-primary btn-launch-instance" id="btn-launch-instance">Launch</button>
           </div>
+        {{/autoForm}}
+          </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 
@@ -68,5 +69,3 @@
     </div>
   {{/each}}
 </template>
-
-

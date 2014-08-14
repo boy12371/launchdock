@@ -51,7 +51,7 @@ AutoForm.addHooks("hostInsertForm", {
   after: {
     "host/add": function (error, result, template) {
       if (result === false) {
-        alert("Oops! We couldn't connect to Docker on the private address and port that you entered. Make sure that Docker is running on the server, that it has been set up to accept connections on the port you entered, and that that port is open and accessible from the Rocker Docker server.");
+        alert("Oops! We couldn't connect to Docker on the private address and port that you entered. Make sure that Docker is running on the server, that it has been set up to accept connections on the port you entered, and that that port is open and accessible from the Launch Dock server.");
       }
     }
   }

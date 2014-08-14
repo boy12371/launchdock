@@ -1,7 +1,4 @@
 Template.settings.helpers({
-  settingsDoc: function () {
-    return Settings.findOne();
-  },
   containersUsed: function() {
     return AppInstances.find({'userId':Meteor.userId()}).count();
   },

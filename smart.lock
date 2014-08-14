@@ -7,10 +7,7 @@
         "branch": "master"
       },
       "redis": {},
-      "accounts-ui-bootstrap-3": {
-        "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
-        "branch": "master"
-      },
+      "accounts-ui-bootstrap-3": {},
       "iron-router": {},
       "collection2": {},
       "autoform": {},
@@ -40,9 +37,9 @@
         "commit": "8af9aaab84f4a87358ccb4616592a373661f712b"
       },
       "accounts-ui-bootstrap-3": {
-        "git": "https://github.com/aldeed/meteor-accounts-ui-bootstrap-3.git",
-        "branch": "master",
-        "commit": "a218ab9ddb84b2da75d1fe4a7272f35a5e2a66be"
+        "git": "https://github.com/mangasocial/meteor-accounts-ui-bootstrap-3.git",
+        "tag": "v0.3.4",
+        "commit": "9f006ee48d869877d90d54ac75b54550a587df8f"
       },
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
@@ -51,8 +48,8 @@
       },
       "collection2": {
         "git": "https://github.com/aldeed/meteor-collection2.git",
-        "tag": "v0.4.5",
-        "commit": "336903730249197b3358dac31b1bd5ed64fecc50"
+        "tag": "v0.4.6",
+        "commit": "80554182486be0d8e74f7ed02194a5649d712e27"
       },
       "autoform": {
         "git": "https://github.com/aldeed/meteor-autoform.git",
@@ -71,8 +68,8 @@
       },
       "reactive-table": {
         "git": "https://github.com/ecohealthalliance/reactive-table.git",
-        "tag": "v0.3.17",
-        "commit": "19ae3d81852a478ca873f90ff98aacee8d622da7"
+        "tag": "v0.3.20",
+        "commit": "f6da4bb8ce809a86230cf63753198c7e84a0bd15"
       },
       "spin": {
         "git": "https://github.com/SachaG/meteor-spin.git",
@@ -101,13 +98,13 @@
       },
       "fast-render": {
         "git": "https://github.com/arunoda/meteor-fast-render.git",
-        "tag": "v0.2.8",
-        "commit": "149984b1aff3a5642a270aff9bd9006872c8302e"
+        "tag": "v1.0.0",
+        "commit": "acbc04982025fe78cebb8865b5a04689741d4b0b"
       },
       "roles": {
         "git": "https://github.com/alanning/meteor-roles.git",
-        "tag": "v1.2.10",
-        "commit": "7ccb35de0a6cb0c9a0c3666badd04757e39c09a6"
+        "tag": "v1.2.11",
+        "commit": "2d7dc91848ec874d3a0852c77f462d0fae749de5"
       },
       "alertfy": {
         "git": "https://github.com/cristiandley/Alertfy.git",
@@ -116,8 +113,8 @@
       },
       "kadira": {
         "git": "https://github.com/meteorhacks/kadira.git",
-        "tag": "v2.4.12",
-        "commit": "08c1f65bec94094f17f5df3ebd65cfcc298e5368"
+        "tag": "v2.4.13",
+        "commit": "1f3c1a427084af5a2eca2e299eb65bc01387df8a"
       },
       "typeahead": {
         "git": "https://github.com/sergeyt/meteor-typeahead.git",
@@ -131,13 +128,13 @@
       },
       "simple-schema": {
         "git": "https://github.com/aldeed/meteor-simple-schema.git",
-        "tag": "v0.6.0",
-        "commit": "418ec496612fb2afc853e342f0d2269b6674a2fe"
+        "tag": "v0.7.0",
+        "commit": "77d267aec4ba8a70f677e5d9ef9fb91fb0e3f0f6"
       },
       "moment": {
         "git": "https://github.com/acreeger/meteor-moment.git",
-        "tag": "v2.6.0",
-        "commit": "26156df681750fd6e6ed77043eef32b6653ebbdf"
+        "tag": "v2.8.1",
+        "commit": "722ea63783d594341023836b7d418ab2567dab8c"
       },
       "just-i18n": {
         "git": "https://github.com/subhog/meteor-just-i18n.git",
