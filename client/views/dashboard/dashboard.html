@@ -34,16 +34,19 @@
           </div>
         </div>
       {{else}}
-        <div class="row welcome-steps">
-          <h1>Hello, let's rock! </h1>
+        <div class="welcome-steps">
+          <h1>Launch preparation</h1>
           <div class="col-sm-4">
-            <span class="setup-step">1</span><p>Start by adding an <a href="{{pathFor 'images'}}">image</a>. It's easy to add <a href="{{pathFor 'images'}}">images</a> from the Docker Hub repositories, or add a tar.gz build URL.</p>
+            <a href="{{pathFor 'images'}}" class="setup-step-first">1</a>
+            <p>Start by adding an <a href="{{pathFor 'images'}}">image</a>. It's easy to add <a href="{{pathFor 'images'}}">images</a> from the Docker Hub repositories, or add a tar.gz build URL.</p>
           </div>
           <div class="col-sm-4">
-            <span class="setup-step">2</span><p>Next, you'll want to add a <a href="{{pathFor 'hosts'}}">host</a>. That's your Docker <a href="{{pathFor 'hosts'}}">host</a>, and really the last step. Afterwards, this page will become your dashboard.</p>
+             <a href="{{pathFor 'hosts'}}"  class="setup-step-second">2</a>
+             <p>Next, you'll want to add a <a href="{{pathFor 'hosts'}}">host</a>. That's your Docker <a href="{{pathFor 'hosts'}}">host</a>, and really the last step. Afterwards, this page will become your dashboard.</p>
           </div>
           <div class="col-sm-4">
-           <span class="setup-step setup-step-final">3</span><p>Finally, control your containers and launch new apps from <a href="{{pathFor 'apps'}}">Containers</a>, or through the remote DDP API</p>
+           <a href="{{pathFor 'apps'}}" class="setup-step-third">3</a>
+           <p>Finally, control your containers and launch new apps from <a href="{{pathFor 'apps'}}">Containers</a>, or through the remote DDP API</p>
           </div>
         </div>
       {{/each}}

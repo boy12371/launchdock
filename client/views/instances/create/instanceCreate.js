@@ -25,10 +25,12 @@ Template.createAppInstance.helpers({
     }
   },
   appTemplateEnvs: function () {
+    var doc = []
     if (!Session.equals("imageSelected")) {
-      return AppTemplates.findOne({'image':Session.get('imageSelected')});
-    } else {
-      return [];
+      templates = AppTemplates.findOne({'image':Session.get('imageSelected')});
+      if (templates) return templates
+      // return tag as a suggested env
+      return {env: [{"name":"tag", "value": ""}] };
     }
   },
   imageStatus: function() {
@@ -68,17 +70,6 @@ AutoForm.addHooks("launchAppInstanceForm", {
   }
 });
 
-//
-//  docker hub autocomplete input template
-//
-Template["afInput_createAppInstance"].hubAutocomplete = function () {
-  return Session.get('hubSearch') || [];
-};
-
-Template["afInput_createAppInstance"].rendered = function() {
-  Meteor.typeahead('.typeahead');
-}
-
 Template.createAppInstance.events({
   'click #btn-launch-close': function(event,template) {
     Session.set('imageSelected');
@@ -115,6 +106,4 @@ Template.createAppInstance.events({
     }
   }
 });
-
-
 

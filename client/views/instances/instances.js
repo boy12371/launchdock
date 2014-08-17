@@ -1,9 +1,20 @@
-// ***
+// ************************************************************
 // little helper to locate object in an array
-// ***
+// ************************************************************
+
 function containsObject(obj, list) {
  var res = _.find(list, function(val){ return _.isEqual(obj, val)});
  return (_.isObject(res))? true:false;
+}
+
+// ************************************************************
+// make random tag colors from string
+// ************************************************************
+
+function stringToColor(str) {
+    for (var i = 0, hash = 0; i < str.length; hash = str.charCodeAt(i++) + ((hash << 5) - hash));
+    for (var i = 0, color = "#"; i < 3; color += ("00" + ((hash >> i++ * 8) & 0xFF).toString(16)).slice(-2));
+    return color;
 }
 
 // ************************************************************
@@ -11,6 +22,7 @@ function containsObject(obj, list) {
 //  see: https://github.com/ecohealthalliance/reactive-table
 //  for configuration / tables settings
 // ************************************************************
+
 Template.appInstances.helpers({
     AppInstances: function(){
       return AppInstances.find();
@@ -22,15 +34,26 @@ Template.appInstances.helpers({
             showFilter: true,
             useFontAwesome: true,
             fields: [
+              {'key': 'env.tag', 'label': 'Env/Tag',
+                fn: function (value,item ) {
+                    var tag = "";
+                    if (value) {
+                      var bgcolor = stringToColor(value)
+                      var tag = '<span class="label" style="background-color:'+bgcolor+'">'+value+'</span>';
+                    }
+                    return new Spacebars.SafeString('<i class="app-detail-icon" data-id="'+item._id+'"></i>'+tag);
+                }
+              },
               {'key': 'hostnames', 'label': 'Domain',
                 fn: function (value,item ) {
-                    return new Spacebars.SafeString('<i class="app-detail-icon" data-id="'+item._id+'"></i><a href="http://'+value+'" class="domain-link" target="_blank">'+value+'</a>');
+                    return new Spacebars.SafeString('<a href="http://'+value+'" class="domain-link" target="_blank">'+value+'</a>');
                 }
               },
               {'key': 'status', 'label': 'Status'},
               {'key': 'createdAt', 'label': 'Created', 'sort': 'descending'},
               {'key': 'env.METEOR_EMAIL', 'label': 'Contact'},
               {'key': 'image', 'label': 'Docker Image' }
+
             ],
             rowClass: function(item) {
               if (containsObject({'_id':item._id},selectedAppInstances) ) {
@@ -40,6 +63,10 @@ Template.appInstances.helpers({
         };
     }
 });
+
+// ************************************************************
+// Template events
+// ************************************************************
 
 Template.appInstances.events({
   'click .reactive-table tbody tr .app-detail-icon': function (event,template) {

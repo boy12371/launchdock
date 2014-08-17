@@ -92,12 +92,14 @@ h2 {
 
 .welcome-steps {
   h1 {
-    padding-bottom: 100px;
-    padding-left: 50px;
+    padding-bottom: 80px;
   }
   p {
     margin-top: 40px;
     font-size: 3rem;
+  }
+  a:hover {
+    text-decoration: none;
   }
 }
 
@@ -114,10 +116,19 @@ h2 {
   border: 3px solid @gray;
 }
 
-.setup-step-final {
+.setup-step-first {
+  .setup-step;
+  color: @brand-warning;
+}
+.setup-step-second {
+  .setup-step;
+  color: @brand-info;
+}
+.setup-step-third {
+  .setup-step;
+  color: @brand-success;
   background-image: url('images/signin.png');
   background-size: cover;
-
 }
 //
 //************** IMAGES ******************//
@@ -184,4 +195,13 @@ h2 {
 
 .tt-suggestion p {
   margin: 0;
+}
+
+//************** CreateAppInstance ******************//
+#launchAppInstanceForm .image-download-progress {
+  font-size: 4rem;
+  color: green;
+  position: absolute;
+  top: 15px;
+  right: 19px;
 }

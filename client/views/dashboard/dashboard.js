@@ -74,7 +74,9 @@ Template.dashboard.rendered = function () {
     });
   Deps.autorun(function(){
       data = Session.get('gaugeData')
-      if (!gauge[data.id]) reactiveGauge(data.id,data.currVal,data.maxValue);
-      if (data.id) gauge[data.id].set(data.currVal)
+      if (data) {
+        if (!gauge[data.id]) reactiveGauge(data.id,data.currVal,data.maxValue);
+        if (data.id) gauge[data.id].set(data.currVal);
+      }
   });
 };
