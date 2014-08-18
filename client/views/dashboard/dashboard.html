@@ -1,0 +1,7 @@
+<template name="dashboard">
+{{#if userHosts}}
+  {{> dashboardHosts}}
+{{else}}
+  {{> dashboardIntro}}
+{{/if}}
+</template>
