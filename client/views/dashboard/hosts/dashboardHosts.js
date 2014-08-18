@@ -34,7 +34,7 @@
   }
 }
 
-Template.dashboard.helpers({
+Template.dashboardHosts.helpers({
   totalInstances: function () {
     if (this.tag) {
       return this.tag;
@@ -46,13 +46,16 @@ Template.dashboard.helpers({
     return AppInstances.find().count();
   },
   runningInstances: function () {
-    return AppInstances.find({'status':'running','dockerHosts':this._id}).count();
+    return AppInstances.find({'status':'running','dockerHosts':this._id}).count() || 0;
   },
   pausedInstances: function () {
-    return AppInstances.find({'status':'stopped','dockerHosts':this._id}).count();
+    return AppInstances.find({'status':'stopped','dockerHosts':this._id}).count() || 0;
   },
   runningHosts: function () {
     return Hosts.find({'active':true});
+  },
+  userHosts: function () {
+    return Hosts.find({'userId':Meteor.userId()}).count() || 0;
   },
   totalHosts: function () {
     return Hosts.find().count();
@@ -68,7 +71,7 @@ Template.dashboard.helpers({
   }
 });
 
-Template.dashboard.rendered = function () {
+Template.dashboardHosts.rendered = function () {
     _.each(gaugeData, function (gauge) {
       reactiveGauge(gauge.id,gauge.currVal,gauge.maxValue);
     });

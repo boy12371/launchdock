@@ -71,6 +71,9 @@ $ docker pull ongoworks/hipache-npm
 $ docker pull ongoworks/launchdock
 ```
 
+*Note: Local installation*
+Install `boot2docker` and then run `meteor` should be all you need for a local Launch Dock
+
 It may take awhile for the images to finish pulling. Use `docker images` command to check.
 
 ## Set Up Additional Docker Hosts (Optional)

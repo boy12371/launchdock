@@ -1,0 +1,32 @@
+<template name="dashboardHosts">
+{{#if runningHosts.count}}
+<div class="container-fluid dashboard-hosts">
+<h2>System Status</h2>
+    {{#each runningHosts}}
+      <div class="col-sm-6 col-md-4 col-lg-3 metric-wrapper">
+        <div class="row metric-container">
+          <div class="metric-gauge col-sm-6">
+            <canvas class="host-gauge" id="{{_id}}">{{hostGuage}}</canvas>
+          </div>
+          <div class="col-sm-6">
+            <div class="metric-tag">{{tag}}</div>
+            <div class="host col-sm-12">
+              {{publicHost}} / {{privateHost}}
+            </div>
+            <div class="address col-sm-12">
+              Containers: {{details.Containers}}
+            </div>
+
+            <div class="running col-sm-12">
+              Running: {{runningInstances}}
+            </div>
+            <div class="paused col-sm-12">
+              Paused: {{pausedInstances}}
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/each}}
+</div>
+{{/if}}
+</template>

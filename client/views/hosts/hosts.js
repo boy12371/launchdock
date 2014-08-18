@@ -44,6 +44,9 @@ Template.hosts.helpers({
   },
   virtualSizeFormatted: function () {
     return numeral(this.virtualSize).format('0.000 b');
+  },
+  chanceTag: function() {
+    return Meteor.user().username +"/"+ chance.city().toLowerCase();
   }
 });
 

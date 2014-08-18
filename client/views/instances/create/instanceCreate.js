@@ -30,7 +30,8 @@ Template.createAppInstance.helpers({
       templates = AppTemplates.findOne({'image':Session.get('imageSelected')});
       if (templates) return templates
       // return tag as a suggested env
-      return {env: [{"name":"tag", "value": ""}] };
+      var tag = Meteor.user().username +"/"+ chance.word().toLowerCase();
+      return {env: [{"name":"tag", "value": tag}] };
     }
   },
   imageStatus: function() {
