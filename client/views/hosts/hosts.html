@@ -30,11 +30,13 @@
         {{#each this}}
           <li class="list-group-item list-group-item-info">{{tag}}</li>
           <li class="list-group-item">
-            <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
-            {{#if active}}
-            <span class="pull-right glyphicon glyphicon-pause" id="pause-host"></span>
-            {{else}}
-            <span class="pull-right glyphicon glyphicon-play" id="start-host"></span>
+            {{#if displayControls}}
+              <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
+              {{#if active}}
+              <span class="pull-right glyphicon glyphicon-pause" id="pause-host"></span>
+              {{else}}
+              <span class="pull-right glyphicon glyphicon-play" id="start-host"></span>
+              {{/if}}
             {{/if}}
             <div>{{privateHost}}:{{port}} (<em>Public: {{publicHost}}:{{port}}</em>)</div>
             <div>{{#if active}}<strong style="color: green">Active</strong>{{else}}<strong style="color: gray">Inactive</strong>{{/if}}</div>

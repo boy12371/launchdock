@@ -25,3 +25,9 @@ Template.layout.helpers({
     return Hosts.find().count();
   }
 });
+
+Template.layout.events({
+  'click #login-buttons-logout': function () {
+    Router.go('dashboard');
+  }
+});

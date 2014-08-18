@@ -85,7 +85,7 @@ Router.map(function() {
       ];
     },
     data: function () {
-      return Hosts.find({userId:Meteor.userId()}, {sort: {'details.Containers': -1}});
+      return Hosts.find({}, {sort: {'details.Containers': -1}});
     },
     onAfterAction: function () {
       Meteor.call("host/refreshDetails");

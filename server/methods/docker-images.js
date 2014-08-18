@@ -10,7 +10,10 @@ Meteor.methods({
     try {
       var imageId = DockerImages.insert({
         name: imageName,
-        inRepo: true
+        inRepo: true,
+        shared: true,
+        registryUrl: "https://registry.hub.docker.com"
+        // TODO: both shared and this registry can be used in future for additional registry
       });
     } catch (e) {
       throw new Meteor.Error(400, 'Bad Request', 'An image with that name already exists.');
@@ -19,10 +22,29 @@ Meteor.methods({
     ImageActions.createOnAllHosts(imageId);
     return true;
   },
-  // method check all hosts to see if an image exists
+  //
+  // method to just check to that that is image is on all host
+  //
+  'image/exists': function (imageName) {
+      var hostCount = 0;
+      var imageCount = 0;
+      // console.log("checking status"+imageName)
+      Hosts.find({'status':'Active','active': true}).forEach(function (host) {
+        hostCount ++;
+        if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
+      });
+      if (imageCount >= hostCount) {
+        return true;
+      } else {
+        return false;
+      }
+  },
+  //
+  // method check all hosts to check download progress and existance on all hosts
   // took this approach over streams of pull status, maybe reinvestigate
   // but as we're likely pulling on multiple hosts, merging stream status was PiTA
   // however, this is prone to misreporting as we're not filtering for latest
+  //
   'image/status': function (imageName) {
     Utility.checkLoggedIn(Meteor.userId());
     var existsAll = false;
@@ -34,7 +56,7 @@ Meteor.methods({
     var intervalId = Meteor.setInterval(function() {
       var hostCount = 0;
       var imageCount = 0;
-      // console.log("checking status"+imageName)
+      console.log("checking image/status: "+imageName)
       Hosts.find({'status':'Active','active': true}).forEach(function (host) {
         hostCount ++;
         if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
@@ -55,7 +77,7 @@ Meteor.methods({
         DockerImages.update(image._id,{$set:{status:percent}});
         HostActions.updateAll();
       }
-    }, 1000);
+    }, 2500);
 
   },
   'image/addFromArchive': function (imageName, archiveUrl) {

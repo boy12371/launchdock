@@ -89,7 +89,15 @@ Template.createAppInstance.events({
     var image = $(event.currentTarget).val();
     if (image && image.indexOf('/') != -1) {
       var repository = image.split("/");
-      var exists = DockerImages.findOne({'name':image});
+      var exists = false;
+      Meteor.call('image/exists', image, function(error,result) {
+        var record = DockerImages.findOne({'name':image});
+        if (result == true && record) {
+          exists = true;
+        } else {
+          exists = false;
+        }
+      });
       // validate image exists in hub, or locally, provide error
       Meteor.call('hub/getTags',repository[0], repository[1], function (error,results) {
         if (exists && results) {
