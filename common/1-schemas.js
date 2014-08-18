@@ -139,6 +139,11 @@ Schemas.DockerImage = new SimpleSchema({
 		label: "Public Shared Image",
 		defaultValue: false
 	},
+	registryUrl: {
+		type: String,
+		regEx: SimpleSchema.RegEx.Url,
+		optional: true
+	},
 	inRepo: {
 		type: Boolean,
 		label: "Docker Hub Repo",
