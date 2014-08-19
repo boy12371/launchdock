@@ -16,3 +16,10 @@ Meteor.startup(function () {
     }
   }, 30000);
 });
+
+
+ Meteor.startup(function () {
+    AccountsEntry.config({
+      signupCode: 'launchdock'        // only restricts username+password users, not OAuth
+    });
+  });

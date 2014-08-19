@@ -6,9 +6,16 @@
         "git": "https://github.com/ongoworks/meteor-dockerode.git",
         "branch": "master"
       },
+      "accounts-docker": {
+        "git": "https://github.com/ongoworks/meteor-accounts-docker.git",
+        "branch": "master"
+      },
       "redis": {},
       "accounts-ui-bootstrap-3": {},
-      "iron-router": {},
+      "iron-router": {
+        "git": "https://github.com/EventedMind/iron-router.git",
+        "tag": "v0.8.2"
+      },
       "collection2": {},
       "autoform": {},
       "collection-helpers": {},
@@ -23,13 +30,19 @@
       "roles": {},
       "alertfy": {},
       "kadira": {},
-      "typeahead": {}
+      "typeahead": {},
+      "accounts-meld": {}
     },
     "packages": {
       "dockerode": {
         "git": "https://github.com/ongoworks/meteor-dockerode.git",
         "branch": "master",
         "commit": "0331c9944f86b56d8706cfabc286917f0b9c1e02"
+      },
+      "accounts-docker": {
+        "git": "https://github.com/ongoworks/meteor-accounts-docker.git",
+        "branch": "master",
+        "commit": "277824b6ad35297d6deed56010983ebc21cc35f6"
       },
       "redis": {
         "git": "https://github.com/stevemanuel/meteor-redis.git",
@@ -53,8 +66,8 @@
       },
       "autoform": {
         "git": "https://github.com/aldeed/meteor-autoform.git",
-        "tag": "v0.16.1",
-        "commit": "34a447fd3a1b3164c78f865aabbac3ddc2d033fb"
+        "tag": "v0.17.0",
+        "commit": "c6e49dc0563a827eede2861745d7e42ee094f044"
       },
       "collection-helpers": {
         "git": "https://github.com/dburles/meteor-collection-helpers.git",
@@ -78,8 +91,8 @@
       },
       "accounts-entry": {
         "git": "https://github.com/Differential/accounts-entry.git",
-        "tag": "v0.8.0",
-        "commit": "cf7f7d0ecc285824bc2748e305f5d693df99b4ae"
+        "tag": "v0.8.1",
+        "commit": "3102c0641cab394ce4c3e54b655c85ec1610c092"
       },
       "bootstrap3-less": {
         "git": "https://github.com/simison/bootstrap3-less",
@@ -120,6 +133,11 @@
         "git": "https://github.com/sergeyt/meteor-typeahead.git",
         "tag": "v0.0.11",
         "commit": "b97b4a92edeceb8f76aa8e6eb0f71252b34d4de3"
+      },
+      "accounts-meld": {
+        "git": "https://github.com/splendido/meteor-accounts-meld.git",
+        "tag": "v1.2.0",
+        "commit": "86c6560a0fd1e9a6b62fc99979d76f332811c235"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",

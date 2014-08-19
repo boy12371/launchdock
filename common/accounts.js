@@ -7,12 +7,12 @@ Meteor.startup(function () {
     logo: 'images/signin.png',                  // if set displays logo above sign-in options
     // privacyUrl: '/privacy-policy',     // if set adds link to privacy policy and 'you agree to ...' on sign-up page
     // termsUrl: '/terms-of-use',         // if set adds link to terms  'you agree to ...' on sign-up page
-    homeRoute: '/sign-in',                    // mandatory - path to redirect to after sign-out
+    homeRoute: '/',                    // mandatory - path to redirect to after sign-out
     dashboardRoute: '/',      // mandatory - path to redirect to after successful sign-in
-    // profileRoute: 'profile',
+    profileRoute: 'settings',
     passwordSignupFields: 'USERNAME_AND_OPTIONAL_EMAIL',
     showSignupCode: true,
-    showOtherLoginServices: false,     // Set to false to hide oauth login buttons on the signin/signup pages. Useful if you are using something like accounts-meld or want to oauth for api access
+    showOtherLoginServices: true,     // Set to false to hide oauth login buttons on the signin/signup pages. Useful if you are using something like accounts-meld or want to oauth for api access
     // extraSignUpFields: [{             // Add extra signup fields on the signup page
     //   field: "name",                           // The database property you want to store the data in
     //   name: "This Will Be The Initial Value",  // An initial value for the field, if you want one
@@ -23,9 +23,3 @@ Meteor.startup(function () {
     //  }]
   });
 });
-
-if (Meteor.isClient) {
-	Accounts.ui.config({
-		passwordSignupFields: 'USERNAME_AND_OPTIONAL_EMAIL'
-	});
-}

@@ -15,10 +15,7 @@
 	      <li class="{{#if currentPageIs 'hosts'}}active{{/if}}"><a href="{{pathFor 'hosts'}}">Hosts</a></li>
 	    </ul>
 	    <ul class="nav navbar-nav">
-	      <li class="{{#if currentPageIs 'settings'}}active{{/if}}"><a href="{{pathFor 'settings'}}">Settings</a></li>
-	    </ul>
-	    <ul class="nav navbar-nav">
-	      <li class="{{#if currentPageIs 'addapp'}}active{{/if}}" id="">
+	      <li class="{{#if currentPageIs 'addapp'}}active{{/if}}">
 					<!-- Button trigger modal -->
 					<button class="btn btn-primary btn-lg launch-button" data-toggle="modal" data-target="#appCreateModal">
 					  Launch a new application container
@@ -27,7 +24,7 @@
 	      </li>
 	    </ul>
 	    <ul class="nav navbar-nav navbar-right">
-	      {{> loginButtons}}
+	      {{> accountButtons}}
 	    </ul>
 	    {{/if}}
 	  </div>
