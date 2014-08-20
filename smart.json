@@ -11,8 +11,7 @@
     "redis": {},
     "accounts-ui-bootstrap-3": {},
     "iron-router": {
-        "git": "https://github.com/EventedMind/iron-router.git",
-        "tag": "v0.8.2"
+      "version": "0.8.2"
     },
     "collection2": {},
     "autoform": {},

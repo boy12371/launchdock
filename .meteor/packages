@@ -9,9 +9,8 @@ redis
 less
 iron-router
 accounts-password
-accounts-github
-accounts-docker
 accounts-ui
+accounts-github
 accounts-meteor-developer
 accounts-entry
 bootstrap3-less

@@ -22,7 +22,7 @@ Meteor.publish("hosts", function () {
   if (Roles.userIsInRole(this.userId, ['admin'])) {
     return Hosts.find();
   } else if (this.userId) {
-		return Hosts.find({ $or: [{'userId': this.userId}, {shared: true}]});
+		return Hosts.find({ $or: [{'userId': this.userId}, {shared: {$gt: 1}}]});
 	} else {
     return [];
   }

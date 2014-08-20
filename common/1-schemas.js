@@ -29,9 +29,9 @@ Schemas.Host = new SimpleSchema({
 		type: String
 	},
 	shared: {
-		type: Boolean,
-		label: "Public Shared Host",
-		defaultValue: false
+		type: Number,
+		label: "Shared",
+		defaultValue: 0
 	},
 	metrics: {
 		type: Object,
