@@ -1,3 +1,9 @@
+Template.hosts.helpers({
+  displayControls: function () {
+   if (Meteor.userId() == this.userId || Roles.userIsInRole(Meteor.userId(), ['admin'])) return true
+  }
+});
+
 Template.hosts.events({
   'click #pause-host': function (event, template) {
     Hosts.update(this._id, {$set:{active: false}})
@@ -16,7 +22,7 @@ Template.hosts.events({
                     alertify.log("Migrating "+self.details.Containers+" containers to new hosts, and removing host "+self.tag)
                     Meteor.call("host/remove", self._id, true);
                 } else {
-                    alertify.log("Deactivating "+self.details.Containers+"containers and removing host "+self.tag)
+                    alertify.log("Deactivating "+self.details.Containers+" containers and removing host "+self.tag)
                     Meteor.call("host/remove", self._id, false);
                 }
             });
@@ -44,6 +50,9 @@ Template.hosts.helpers({
   },
   virtualSizeFormatted: function () {
     return numeral(this.virtualSize).format('0.000 b');
+  },
+  chanceTag: function() {
+    return Meteor.user().username +"/"+ chance.city().toLowerCase();
   }
 });
 
@@ -51,7 +60,10 @@ AutoForm.addHooks("hostInsertForm", {
   after: {
     "host/add": function (error, result, template) {
       if (result === false) {
-        alert("Oops! We couldn't connect to Docker on the private address and port that you entered. Make sure that Docker is running on the server, that it has been set up to accept connections on the port you entered, and that that port is open and accessible from the Launch Dock server.");
+        alertify.alert("Oops! We couldn't connect to Docker on the private address and port that you entered. Make sure that Docker is running on the server, that it has been set up to accept connections on the port you entered, and that that port is open and accessible from the Launch Dock server.");
+      } else {
+        Meteor.call("host/refreshDetails");
+        alertify.success("Host is available for use.")
       }
     }
   }

@@ -29,9 +29,9 @@ Schemas.Host = new SimpleSchema({
 		type: String
 	},
 	shared: {
-		type: Boolean,
-		label: "Public Shared Host",
-		defaultValue: false
+		type: Number,
+		label: "Shared",
+		defaultValue: 0
 	},
 	metrics: {
 		type: Object,
@@ -138,6 +138,11 @@ Schemas.DockerImage = new SimpleSchema({
 		type: Boolean,
 		label: "Public Shared Image",
 		defaultValue: false
+	},
+	registryUrl: {
+		type: String,
+		regEx: SimpleSchema.RegEx.Url,
+		optional: true
 	},
 	inRepo: {
 		type: Boolean,

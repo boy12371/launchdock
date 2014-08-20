@@ -102,8 +102,12 @@ HostActions = {
     var hosts = Hosts.find({'status':'Active','active': true},{sort: {'details.Containers': 1} } ).fetch();
     _.each(hosts, function (h) {
        if (bestHost) return;
-       if (h.max > h.details.Containers) {
-        return bestHost = h;
+       if (Meteor.userId() == h.userId) {
+        if (h.max > h.details.Containers) return bestHost = h;
+       } else {
+        //lookup up instances that don't belong to user on this host, decided if there is a shared available
+          shared = Hosts.find({'_id':h._id, userId: {$ne: Meteor.userId()}}).count();
+          if (shared < h.shared && h.max > h.details.containers) return bestHost = h;
        }
     });
     return bestHost;

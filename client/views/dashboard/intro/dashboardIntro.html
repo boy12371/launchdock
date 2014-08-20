@@ -1,0 +1,18 @@
+<template name="dashboardIntro">
+<div class="container-fluid welcome-steps">
+  <h2>Launch preparation</h2>
+  <div class="col-sm-4">
+     <a href="{{pathFor 'hosts'}}"  class="setup-step-first">1</a>
+     <p>Use a shared host, or add your your own Docker <a href="{{pathFor 'hosts'}}">host</a>. Maximize your resources by earning container credits by sponsoring a shared host.</p>
+  </div>
+  <div class="col-sm-4">
+    <a class="newAppInstance setup-step-second">2</a>
+    <p>Launch a <a class="newAppInstance">new application container</a>. It's easy to add <a href="{{pathFor 'images'}}">images</a> from the Docker Hub repositories, or add a tar.gz build URL.</p>
+  </div>
+
+  <div class="col-sm-4">
+   <a href="{{pathFor 'apps'}}" class="setup-step-third">3</a>
+   <p>Finally, control your containers and launch new apps from <a href="{{pathFor 'apps'}}">Containers</a>, or through the remote DDP API</p>
+  </div>
+</div>
+</template>

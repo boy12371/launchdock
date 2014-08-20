@@ -7,6 +7,27 @@ There is a browser interface, but you can also remotely call the launcher API ov
 
 TODO Eventually there will be a small launcher package that simplifies remote calls from a separate Meteor app.
 
+# Local Development Setup
+
+*Note: Local installation*
+
+Install `meteor`,`meteorite` and `boot2docker` .
+
+Configure the VM for Docker port access
+
+  for i in {49000..49900}; do
+   VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port$i,tcp,,$i,,$i";
+   VBoxManage modifyvm "boot2docker-vm" --natpf1 "udp-port$i,udp,,$i,,$i";
+  done
+
+Export your docker host:
+
+`export DOCKER_HOST=tcp://127.0.0.1:4243`
+
+Clone launchdock local, then from the `launchdock` directory `meteor` should be all you need for a local Launch Dock development environment.
+
+
+# Server Configuration
 ## Configure the Launch Dock Server
 
 Before you can run launchdock, you must have a properly configured server instance on which to run it.

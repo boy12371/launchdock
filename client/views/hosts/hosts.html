@@ -10,10 +10,11 @@
             <p>Use the same host for public/private if you aren't using a secure VPC</p>
           </div>
         </div>
-        {{> afQuickField name="shared" placeholder="shared" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+
         {{> afQuickField name="port" placeholder="2375" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         {{> afQuickField name="max" placeholder="100" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
-        {{> afQuickField name="tag" placeholder="tag" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+        {{> afQuickField name="shared" placeholder="0" template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
+        {{> afQuickField name="tag" value=chanceTag template="bootstrap3-horizontal" label-class="col-sm-3" input-col-class="col-sm-9"}}
         <div class="form-group">
           <div class="col-sm-offset-3 col-sm-9">
             <button type="submit" class="btn btn-default">Add to pool</button>
@@ -30,11 +31,13 @@
         {{#each this}}
           <li class="list-group-item list-group-item-info">{{tag}}</li>
           <li class="list-group-item">
-            <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
-            {{#if active}}
-            <span class="pull-right glyphicon glyphicon-pause" id="pause-host"></span>
-            {{else}}
-            <span class="pull-right glyphicon glyphicon-play" id="start-host"></span>
+            {{#if displayControls}}
+              <span class="pull-right glyphicon glyphicon-remove" id="delete-host"></span>
+              {{#if active}}
+              <span class="pull-right glyphicon glyphicon-pause" id="pause-host"></span>
+              {{else}}
+              <span class="pull-right glyphicon glyphicon-play" id="start-host"></span>
+              {{/if}}
             {{/if}}
             <div>{{privateHost}}:{{port}} (<em>Public: {{publicHost}}:{{port}}</em>)</div>
             <div>{{#if active}}<strong style="color: green">Active</strong>{{else}}<strong style="color: gray">Inactive</strong>{{/if}}</div>

@@ -4,9 +4,15 @@
       "git": "https://github.com/ongoworks/meteor-dockerode.git",
       "branch": "master"
     },
+    "accounts-docker": {
+      "git": "https://github.com/ongoworks/meteor-accounts-docker.git",
+      "branch": "master"
+    },
     "redis": {},
     "accounts-ui-bootstrap-3": {},
-    "iron-router": {},
+    "iron-router": {
+      "version": "0.8.2"
+    },
     "collection2": {},
     "autoform": {},
     "collection-helpers": {},
@@ -21,6 +27,7 @@
     "roles": {},
     "alertfy": {},
     "kadira": {},
-    "typeahead": {}
+    "typeahead": {},
+    "accounts-meld": {}
   }
 }

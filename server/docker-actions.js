@@ -8,7 +8,7 @@ DockerActions = {
       host = host.replace("http://", "");
     }
     port = port || 2375;
-    var d = new Docker({host: "http://" + host, port: port});
+    var d = new Docker({host: "http://" + host, port: port, timeout: 500});
 
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.

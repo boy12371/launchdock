@@ -25,10 +25,13 @@ Template.createAppInstance.helpers({
     }
   },
   appTemplateEnvs: function () {
+    var doc = []
     if (!Session.equals("imageSelected")) {
-      return AppTemplates.findOne({'image':Session.get('imageSelected')});
-    } else {
-      return [];
+      templates = AppTemplates.findOne({'image':Session.get('imageSelected')});
+      if (templates) return templates
+      // return tag as a suggested env
+      var tag = Meteor.user().username +"/"+ chance.word().toLowerCase();
+      return {env: [{"name":"tag", "value": tag}] };
     }
   },
   imageStatus: function() {
@@ -68,17 +71,6 @@ AutoForm.addHooks("launchAppInstanceForm", {
   }
 });
 
-//
-//  docker hub autocomplete input template
-//
-Template["afInput_createAppInstance"].hubAutocomplete = function () {
-  return Session.get('hubSearch') || [];
-};
-
-Template["afInput_createAppInstance"].rendered = function() {
-  Meteor.typeahead('.typeahead');
-}
-
 Template.createAppInstance.events({
   'click #btn-launch-close': function(event,template) {
     Session.set('imageSelected');
@@ -97,7 +89,15 @@ Template.createAppInstance.events({
     var image = $(event.currentTarget).val();
     if (image && image.indexOf('/') != -1) {
       var repository = image.split("/");
-      var exists = DockerImages.findOne({'name':image});
+      var exists = false;
+      Meteor.call('image/exists', image, function(error,result) {
+        var record = DockerImages.findOne({'name':image});
+        if (result == true && record) {
+          exists = true;
+        } else {
+          exists = false;
+        }
+      });
       // validate image exists in hub, or locally, provide error
       Meteor.call('hub/getTags',repository[0], repository[1], function (error,results) {
         if (exists && results) {
@@ -115,6 +115,4 @@ Template.createAppInstance.events({
     }
   }
 });
-
-
 
