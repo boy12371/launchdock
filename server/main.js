@@ -15,8 +15,16 @@ if (!serverDir) {
 dockerProxy = DockerActions.get('http://172.17.42.1', 2375);
 
 if (!dockerProxy) {
-  console.log ("failed to connect to docker0. attempting to connect to a 127.0.0.1 docker proxy")
-  dockerProxy = DockerActions.get('http://127.0.0.1', 2375);
+
+  if (process.env.DOCKER_HOST) {
+    var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2);
+    var port = process.env.DOCKER_HOST.split(":",3)[2];
+  } else {
+    var host = 'http://127.0.0.1';
+    var port = '2375';
+  }
+  console.log ("failed to connect to docker daemon on docker0. trying "+host+":"+port)
+  dockerProxy = DockerActions.get(host, port);
 
   if (!dockerProxy)
    throw new Meteor.Error("Could not get dockerProxy server");

@@ -11,19 +11,6 @@ var typewatch = (function(){
 //  createAppinstance
 //
 Template.createAppInstance.helpers({
-  imageSelected: function () {
-    return Session.get('imageSelected');
-  },
-  hubAutocomplete: function () {
-    // initially we'll return local existing images, but typeahead search docker hub
-    if (Session.equals('hubSearch')) {
-      return Session.get('hubSearch') || [];
-    } else {
-      return DockerImages.find().map(function (image) {
-        return {label: image.name, value: image.name};
-      });
-    }
-  },
   appTemplateEnvs: function () {
     var doc = []
     if (!Session.equals("imageSelected")) {
@@ -32,19 +19,6 @@ Template.createAppInstance.helpers({
       // return tag as a suggested env
       var tag = Meteor.user().username +"/"+ chance.word().toLowerCase();
       return {env: [{"name":"tag", "value": tag}] };
-    }
-  },
-  imageStatus: function() {
-    if (!Session.equals("imageSelected")) {
-      var status = DockerImages.findOne({'name':Session.get('imageSelected')}).status;
-      if (status == "Downloaded") {
-        return 100;
-      } else {
-        return status;
-      }
-
-    } else {
-      return false
     }
   }
 });
@@ -90,6 +64,7 @@ Template.createAppInstance.events({
     if (image && image.indexOf('/') != -1) {
       var repository = image.split("/");
       var exists = false;
+      // Determine if the image is on all host or not
       Meteor.call('image/exists', image, function(error,result) {
         var record = DockerImages.findOne({'name':image});
         if (result == true && record) {
@@ -100,16 +75,24 @@ Template.createAppInstance.events({
       });
       // validate image exists in hub, or locally, provide error
       Meteor.call('hub/getTags',repository[0], repository[1], function (error,results) {
+        // If image exists and it is also on hosts, we're good
         if (exists && results) {
           Session.set("imageSelected",image);
           alertify.success("Image exists and is ready to use");
+          return true;
+        // if not on hosts, but valid in registry download it
         } else if (results) {
           Meteor.call("image/add", image, function (error,results) {
-            Session.set("imageSelected",image);
-            Meteor.call('image/status',image);
+            if (results) {
+              Session.set("imageSelected",image);
+            } else {
+              alertify.log("Unknown error with image download.");
+              return false;
+            }
           });
         } else {
           alertify.log("Invalid Docker Hub image.");
+          return false;
         }
       });
     }
