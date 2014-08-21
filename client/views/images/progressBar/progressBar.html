@@ -6,11 +6,18 @@
 <i class="fa fa-check-circle-o check-progress image-download-progress"></i>
 </template>
 
-
 <template name="imageProgress">
 <div class="imageProgress">
   <div class="alert alert-info text-center" role="alert">
-  Download of {{name}} to hosts in progress   <i class="fa fa-circle-o-notch fa-spin"></i>
+  This can take awhile. Downloading {{imageSelected}} to hosts.  <i class="fa fa-circle-o-notch fa-spin"></i>
+  </div>
+</div>
+</template>
+
+<template name="imagePending">
+<div class="imageProgress">
+  <div class="alert alert-danger text-center" role="alert">
+    Please try again later. Download is taking longer than expected  <i class="fa fa-clock-o fa-spin"></i>
   </div>
 </div>
 </template>

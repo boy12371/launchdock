@@ -13,7 +13,7 @@ FROM node
 MAINTAINER Aaron Judd <aaron@ongoworks.com>
 
 #Install required packages first
-RUN apt-get install -qq -y curl git
+RUN apt-get update && apt-get install -qq -y curl git
 
 # Update to latest node
 RUN npm cache clean -f && npm install -g n && n 0.10.29

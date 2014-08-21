@@ -9,17 +9,15 @@ TODO Eventually there will be a small launcher package that simplifies remote ca
 
 # Local Development Setup
 
-*Note: Local installation*
-
 Install `meteor`,`meteorite` and `boot2docker` .
 
 Configure the VM for Docker port access
-
+```bash
   for i in {49000..49900}; do
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port$i,tcp,,$i,,$i";
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "udp-port$i,udp,,$i,,$i";
   done
-
+```
 Export your docker host:
 
 `export DOCKER_HOST=tcp://127.0.0.1:4243`

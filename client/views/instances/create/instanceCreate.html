@@ -10,7 +10,7 @@
         <div class="modal-body">
           {{#autoForm schema=Schemas.LaunchInstance id="launchAppInstanceForm" doc=appTemplateEnvs role="form" type="method" meteormethod="ai/launch"}}
             {{> afQuickField name="dockerImage" template="createAppInstance" placeholder="namespace/image"}}
-            {{> imageProgressBar name=imageSelected}}
+            {{> imageProgressBar}}
             {{> afQuickField name="hostname" placeholder="e.g., domain.com, www.domain.com,  *.domain.com"}}
             {{> afQuickField name="env" template="createAppInstance"}}
           <div class="modal-footer">

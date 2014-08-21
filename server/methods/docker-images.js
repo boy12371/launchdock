@@ -16,11 +16,12 @@ Meteor.methods({
         // TODO: both shared and this registry can be used in future for additional registry
       });
     } catch (e) {
-      throw new Meteor.Error(400, 'Bad Request', 'An image with that name already exists.');
+      imageId = DockerImages.findOne({'name':imageName})._id;
     }
+    if (!imageId) throw new Meteor.Error(400, 'Bad Request', 'Unable to use this image.');
 
     ImageActions.createOnAllHosts(imageId);
-    return true;
+    return imageId;
   },
   //
   // method to just check to that that is image is on all host
@@ -34,6 +35,8 @@ Meteor.methods({
         if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
       });
       if (imageCount >= hostCount) {
+        // If it actually exists but we had a timeout during download
+        DockerImages.update({name:imageName},{$set:{status:"Downloaded"}});
         return true;
       } else {
         return false;
@@ -47,8 +50,7 @@ Meteor.methods({
   //
   'image/status': function (imageName) {
     Utility.checkLoggedIn(Meteor.userId());
-    var existsAll = false;
-    var maxCheck = 350;
+    var maxCheck = 250;
     var statusCheck = 0;
 
     var image = DockerImages.findOne({'name':imageName})
@@ -62,15 +64,19 @@ Meteor.methods({
         if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
       });
       statusCheck ++;
+      console.log("checking image/status: "+imageName)
       if (imageCount >= hostCount) {
-        existsAll = true;
+        console.log("download finished for: "+imageName)
         DockerImages.update(image._id,{$set:{status:"Downloaded"}});
-        Meteor.clearInterval(intervalId)
-        return existsAll;
-      } else if (existsAll == false && statusCheck >= maxCheck) {
+        HostActions.updateAll();
         Meteor.clearInterval(intervalId);
+        return {status:"Downloaded"};
+      } else if (statusCheck >= maxCheck) {
+        console.log("download taking too long: "+imageName)
         DockerImages.update(image._id,{$set:{status:"Pending"}});
-        return existsAll;
+        HostActions.updateAll();
+        Meteor.clearInterval(intervalId);
+        return {status:"Pending"};
       } else {
         // Ideally we'd get the size of the image but api doesn't support yet
         percent = (statusCheck/maxCheck *100).toFixed(0).toString();
@@ -136,9 +142,7 @@ ImageActions = {
   // does not already exist on that host.
   pullOnHost: function pullImageOnHost(host, port, repoTag) {
     var docker = DockerActions.get(host, port);
-
     if (!docker) return false;
-
     try {
       Meteor._wrapAsync(docker.pull.bind(docker))(repoTag);
     } catch (error) {
@@ -177,18 +181,22 @@ ImageActions = {
     var image = DockerImages.findOne(imageId);
     if (!image)
       throw new Meteor.Error(500, 'Internal server error', "Invalid image ID");
-
+    // a tar.gz build
     if (!image.inRepo && image.tarUrl) {
       var imageName = image.name;
       var archiveUrl = image.tarUrl;
       Hosts.find().forEach(function (host) {
         ImageActions.buildOnHost(host.privateHost, host.port, imageName, archiveUrl);
       });
+    // Already been used before, but we're pulling
     } else if (image.inRepo) {
       var repoTag = image.name + ":latest";
       Hosts.find().forEach(function (host) {
+        console.log("Pulling "+image.name+" on: "+ host.privateHost);
         ImageActions.pullOnHost(host.privateHost, host.port, repoTag);
       });
+      // Trigger status update routine (updates status field on image)
+      Meteor.call('image/status',image.name);
     }
   },
   // Remove the docker image from all hosts
@@ -206,7 +214,7 @@ ImageActions = {
       var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
       _.each(images, function (image) {
         if (_.contains(image.RepoTags, imageName + ":latest")) {
-          console.log("deleting image:"+imageName)
+          console.log("Deleted image: "+imageName)
           dockerImage = docker.getImage(image.Id);
           Meteor._wrapAsync(dockerImage.remove.bind(dockerImage))();
         }
