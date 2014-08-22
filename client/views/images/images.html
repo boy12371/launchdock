@@ -58,7 +58,11 @@
 		<td>{{#if inRepo}}Pull From Repo{{else}}Build From {{tarUrl}}{{/if}}</td>
 		<td>
 			<button class="btn btn-default btn-xs create">{{#if inRepo}}Pull{{else}}Build{{/if}} On All Hosts</button>
-			<button class="btn btn-default btn-xs remove">Delete</button>
+			{{#if imageInUse}}
+			<div class="label label-success">In Use</div>
+			{{else}}
+       <button class="btn btn-default btn-xs remove">Delete</button>
+			{{/if}}
 		</td>
 	</tr>
 </template>

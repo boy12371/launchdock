@@ -107,6 +107,8 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
 
+    if (AppInstances.findOne({'image':this.name})) return false;
+
     ImageActions.removeOnAllHosts(imageId);
     DockerImages.remove({_id: imageId});
 
