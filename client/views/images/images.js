@@ -1,3 +1,9 @@
+Template.imageRow.helpers({
+  imageInUse: function () {
+    return AppInstances.findOne({'image':this.name});
+  }
+});
+
 Template.imageRow.events = {
   'click .remove': function (event, template) {
     if (confirm("Really delete this image from this list and from all hosts?")) {
