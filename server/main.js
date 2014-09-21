@@ -91,9 +91,11 @@ if (containerInfo) {
   //
   var intervalId = Meteor.setInterval(function() {
     console.log("Checking download progress of hipache-npm")
-
-    var images = Meteor._wrapAsync(dockerProxy.listImages.bind(dockerProxy))();
-
+    try {
+      var images = Meteor._wrapAsync(dockerProxy.listImages.bind(dockerProxy))();
+    } catch (e) {
+      console.log("Connection error, retrying...");
+    }
     _.each(images, function (image) {
         if (_.contains(image.RepoTags, proxyRepo)) {
           console.log("Docker hipache-npm image downloaded. starting hipache-npm now")
