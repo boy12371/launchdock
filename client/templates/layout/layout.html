@@ -1,7 +1,11 @@
 <template name="layout">
 	<div class="navbar navbar-inverse" role="navigation">
 	  <div class="navbar-header">
+	  {{#if currentUser}}
 	    <a class="navbar-brand" href="{{pathFor 'dashboard'}}">Launch Dock</a>
+	  {{else}}
+	  	<a class="navbar-brand" href="{{pathFor 'index'}}">Launch Dock</a>
+	  {{/if}}
 	  </div>
 	  <div class="navbar-collapse collapse">
 	  	{{#if currentUser}}

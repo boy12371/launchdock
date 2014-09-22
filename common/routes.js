@@ -1,3 +1,4 @@
+// note: problem with redirect after sign-in is an accounts-entry bug
 Router.configure({
   notFoundTemplate: 'notFound',
   loadingTemplate: 'loading',
@@ -6,41 +7,36 @@ Router.configure({
 
 Router.onBeforeAction('loading');
 
-function requireAuthentication(pause) {
-  if (Meteor.loggingIn()) {
-    this.render('loading');
-    pause();
-  } else {
-    if (!Meteor.user()) {
-      if (this.path == "/sign-in")  {
-        this.render('login');
-      } else
-        this.render('signUp');
-      pause();
-    }
-  }
-}
-
-Router.onBeforeAction(requireAuthentication);
-
 Router.map(function() {
+
+  this.route('index', {
+    path: '/'
+  });
+
   this.route('dashboard', {
-    path: '/',
+    path: '/dashboard',
     fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("hosts"),Meteor.subscribe("appInstances")
       ];
+    },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
     }
   });
 
   this.route('apps', {
+    path: '/containers',
     template: 'appInstances',
     fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("appInstances")
       ];
+    },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
     }
   });
 
@@ -54,6 +50,9 @@ Router.map(function() {
     },
     data: function () {
       return AppInstances.findOne(this.params._id);
+    },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
     }
   });
 
@@ -63,6 +62,9 @@ Router.map(function() {
       return [
         Meteor.subscribe("dockerImages")
       ];
+    },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
     }
   });
 
@@ -74,6 +76,9 @@ Router.map(function() {
     },
     data: function () {
       return DockerImages.find({}, {sort: {name: 1}});
+    },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
     }
   });
 
@@ -87,6 +92,9 @@ Router.map(function() {
     data: function () {
       return Hosts.find({}, {sort: {'details.Containers': -1}});
     },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
+    },
     onAfterAction: function () {
       Meteor.call("host/refreshDetails");
     }
@@ -95,6 +103,9 @@ Router.map(function() {
   this.route("settings", {
     waitOn: function() {
       return [ Meteor.subscribe("settings")];
+    },
+    onBeforeAction: function (pause) {
+      AccountsEntry.signInRequired(this, pause);
     }
   });
 

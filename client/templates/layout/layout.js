@@ -28,6 +28,6 @@ Template.layout.helpers({
 
 Template.layout.events({
   'click #login-buttons-logout': function () {
-    Router.go('dashboard');
+    Router.go('/');
   }
 });

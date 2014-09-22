@@ -38,3 +38,5 @@ ovcharik:alertify
 mrt:momentjs
 mrt:redis
 mrt:numeral
+peppelg:on-login-logout
+
