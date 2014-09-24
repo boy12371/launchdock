@@ -1,0 +1,44 @@
+<template name="settings">
+<h2>Settings</h2>
+{{#if isInRole 'admin'}}
+<div class="col-md-5">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">System Settings</h3>
+    </div>
+    <div class="panel-body">
+    {{#autoForm id="settingsAdminForm" collection="Settings" doc=settingsDoc role="form" type="update"}}
+      {{> afQuickField name="activeHeal"}}
+      {{> afQuickField name="mailUrl" placeholder="smtp://USERNAME:PASSWORD@HOST:PORT/"}}
+      {{> afQuickField name="redisUrl"}}
+      {{> afQuickField name="kadira"}}
+      {{> afQuickField name="notifications"}}
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-default pull-right">Update</button>
+          </div>
+        </div>
+    {{/autoForm}}
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<div class="col-md-5">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">User Settings</h3>
+    </div>
+
+    <div class="panel-body">
+      <div class="well login-settings">
+      {{>_loginButtonsChangePassword}}
+      </div>
+      <div class="well">
+        <div class="row">Containers Used: {{containersUsed}}</div>
+        <div class="row">Container Credit: {{containersCredit}}</div>
+      </div>
+    </div>
+  </div>
+</div>
+</template>

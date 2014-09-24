@@ -1,0 +1,227 @@
+// Bootstrap Less, Font Awesome, Google Fonts
+@import "/client/lib/bootstrap3-less/bootstrap.import.less";
+@import "//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css";
+@import url('//fonts.googleapis.com/css?family=Black+Ops+One|Cuprum:400,700,400italic');
+
+// @navbar-inverse-bg: #FF69B4; // needs a fabulous color ;)
+// @navbar-inverse-color: black;
+// @navbar-inverse-link-color: black;
+@font-family-sans-serif: "Cuprum", "Helvetica Neue", Helvetica, Arial, sans-serif;
+@headings-font-family: "Black Ops One";
+@font-size-base: 18px;
+@navbar-border-radius: 0px;
+@navbar-inverse-brand-color: #fff;
+@border-radius-base: 2px;
+
+
+//
+//************** GENERAL ******************//
+//
+
+h2 {
+  margin-top:0px;
+}
+
+.entry-logo {
+  height: 20px;
+  padding-left: 40px;
+  margin-top: 0px;
+}
+
+.entry {
+  background: inherit;
+}
+element.style {
+}
+
+.email-option .line-thru:before {
+  background-color: @gray-lighter;
+}
+.navbar-brand {
+    font-family: "Black Ops One";
+    letter-spacing: 3px;
+}
+.launch-button {
+  border-radius: 0px;
+}
+
+
+//
+//************** APP INSTANCES ******************//
+//
+.reactive-table {
+  margin-top: 20px;
+}
+
+.active-hosts span {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.table-striped > tbody > tr.selected:nth-child(odd) > td,
+.table-striped > tbody > tr.selected:nth-child(odd) > th,
+.table-striped > tbody > tr.selected:nth-child(even) > td,
+.table-striped > tbody > tr.selected:nth-child(even) > th {
+  background-color: #A9B7D1 !important;
+}
+
+.app-detail-icon {
+  // #fa-icon(arrows-alt, @gray);
+  padding-right: 10px;
+}
+
+//
+//************** SETTINGS ******************//
+//
+//
+.login-settings {
+  input {
+    .form-control;
+  }
+  .login-button {
+    margin-top: 10px;
+    .btn;
+    .btn-primary;
+  }
+}
+
+//
+//************** DASHBOARD ******************//
+//
+
+.metric-gauge {
+  min-width: 100%;
+  min-height: 100%;
+}
+.panel-body .metric-wrapper > div:nth-child(odd) {
+   border-right: 3px dashed @gray-lighter;
+}
+
+.metric-container {
+  padding: 40px 20px 40px 20px;
+}
+
+.metric-tag {
+  border-bottom: 1px solid black;
+  margin-bottom: 5px;
+}
+
+.rocker-toolbar {
+  padding-top: 10px;
+}
+
+.welcome-steps {
+  h2 {
+    padding-bottom: 80px;
+  }
+  p {
+    margin-top: 40px;
+    font-size: 3rem;
+  }
+  a:hover {
+    text-decoration: none;
+  }
+}
+
+.setup-step {
+  margin-left: 25%;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  background-color: @gray-lighter;
+  display: block;
+  text-align: center;
+  font-size: 12rem;
+  padding-top: 20px;
+  border: 3px solid @gray;
+}
+
+.setup-step-first {
+  .setup-step;
+  color: @brand-warning;
+}
+.setup-step-second {
+  .setup-step;
+  color: @brand-info;
+}
+.setup-step-third {
+  .setup-step;
+  color: @brand-success;
+  background-image: url('images/signin.png');
+  background-size: cover;
+}
+//
+//************** IMAGES ******************//
+//
+
+#addDockerImageForm .form-group { margin-bottom: 0px;}
+
+
+//
+//************** TYPEAHEAD STYLES ******************//
+//
+
+.typeahead,
+.tt-query,
+.tt-hint {}
+.typeahead {
+  background-color: #fff;
+}
+.twitter-typeahead {
+  width: 100%;
+}
+
+.typeahead:focus {
+  border: 2px solid #0097cf;
+}
+
+.tt-query {
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tt-hint {
+  color: #999
+}
+
+.tt-dropdown-menu {
+  min-width: 422px;
+  width: 100%;
+  margin-top: 2px;
+  padding: 8px 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 8px;
+     -moz-border-radius: 8px;
+          border-radius: 8px;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+     -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+          box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+  padding: 3px 20px;
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.tt-suggestion.tt-cursor {
+  color: #fff;
+  background-color: #0097cf;
+
+}
+
+.tt-suggestion p {
+  margin: 0;
+}
+
+//************** CreateAppInstance ******************//
+#launchAppInstanceForm .image-download-progress {
+  font-size: 4rem;
+  color: green;
+  position: absolute;
+  top: 15px;
+  right: 19px;
+}

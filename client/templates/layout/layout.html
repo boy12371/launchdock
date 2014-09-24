@@ -1,0 +1,44 @@
+<template name="layout">
+	<div class="navbar navbar-inverse" role="navigation">
+	  <div class="navbar-header">
+	  {{#if currentUser}}
+	    <a class="navbar-brand" href="{{pathFor 'dashboard'}}">Launch Dock</a>
+	  {{else}}
+	  	<a class="navbar-brand" href="{{pathFor 'index'}}">Launch Dock</a>
+	  {{/if}}
+	  </div>
+	  <div class="navbar-collapse collapse">
+	  	{{#if currentUser}}
+	    <ul class="nav navbar-nav">
+	      <li class="{{#if currentPageIs 'apps'}}active{{/if}}"><a href="{{pathFor 'apps'}}">Containers</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav">
+	      <li class="{{#if currentPageIs 'images'}}active{{/if}}"><a href="{{pathFor 'images'}}">Images</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav">
+	      <li class="{{#if currentPageIs 'hosts'}}active{{/if}}"><a href="{{pathFor 'hosts'}}">Hosts</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav">
+	      <li class="{{#if currentPageIs 'addapp'}}active{{/if}}">
+					<!-- Button trigger modal -->
+					<button class="btn btn-primary btn-lg launch-button" data-toggle="modal" data-target="#appCreateModal">
+					  Launch a new application container
+					</button>
+					{{>createAppInstance}}
+	      </li>
+	    </ul>
+	    <ul class="nav navbar-nav navbar-right">
+	      {{> accountButtons}}
+	    </ul>
+	    {{/if}}
+	  </div>
+	</div>
+	{{#if currentUser}}
+	<div class="nav pull-right">
+	  <div class="col-md-12">Your Hosts: <span class="badge">{{userHosts}}</span> All Hosts: <span class="badge">{{totalHosts}}</span> Active Hosts: <span class="badge">{{runningHosts.count}}</span> Containers: <span class="badge">{{totalInstances}}</span></div>
+	</div>
+	{{/if}}
+	<div class="container-fluid">
+		{{> yield}}
+	</div>
+</template>

@@ -3,33 +3,40 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
+#meteor core packages
 standard-app-packages
-dockerode
-redis
-less
-iron-router
 accounts-password
 accounts-ui
 accounts-github
 accounts-meteor-developer
-accounts-entry
-bootstrap3-less
-random
-http
-collection2
-autoform
-collection-helpers
-moment
-numeral
-reactive-table
 underscore
-spin
-
-font-awesome-4-less
-collection-hooks
-fast-render
-roles
-alertfy
-kadira
+http
+random
 email
-typeahead
+less
+
+
+#ongoworks packages
+ongoworks:dockerode
+
+
+#community packages
+alanning:roles
+meteorhacks:fast-render
+aslagle:reactive-table
+aldeed:collection2
+aldeed:autoform
+dburles:collection-helpers
+matb33:collection-hooks
+mizzao:bootstrap-3
+sergeyt:typeahead
+sacha:spin
+iron:router
+joshowens:accounts-entry
+ovcharik:alertify
+
+mrt:momentjs
+mrt:redis
+mrt:numeral
+peppelg:on-login-logout
+
