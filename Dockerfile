@@ -16,13 +16,15 @@
 FROM google/debian:wheezy
 MAINTAINER Aaron Judd <aaron@ongoworks.com>
 
-# install node + (optional imagemagick for cfs:graphicsmagick)
-RUN apt-get update -y && apt-get install --no-install-recommends -y -q curl python gcc make build-essential git ca-certificates nano
+# install imagemagick (optional for cfs:graphicsmagick)
+RUN apt-get update -y && apt-get install --no-install-recommends -y -q chrpath libfreetype6 libfreetype6-dev libssl-dev libfontconfig1 imagemagick
+
+# install node + gcc
+RUN apt-get install --no-install-recommends -y -q curl python gcc make build-essential git ca-certificates nano
 RUN mkdir /nodejs && curl http://nodejs.org/dist/v0.10.29/node-v0.10.29-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH $PATH:/nodejs/bin
 
-# install imagemagick (optional for cfs:graphicsmagick)
-RUN apt-get install --no-install-recommends -y -q chrpath libfreetype6 libfreetype6-dev libssl-dev libfontconfig1 imagemagick
+
 
 #install forever and phantomjs (optional for spiderable)
 RUN npm install --silent -g forever phantomjs
@@ -35,6 +37,7 @@ WORKDIR /meteor/src/
 # Bundle meteorsrc to /var/www/app
 RUN meteor build --directory /meteor
 RUN cd /meteor/bundle/programs/server/ && npm install
+RUN cd /meteor/bundle/programs/server/ && npm install request
 WORKDIR /meteor/bundle
 
 #
