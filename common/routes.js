@@ -26,7 +26,7 @@ Router.map(function() {
     }
   });
 
-  this.route('apps', {
+  this.route('containers', {
     path: '/containers',
     template: 'appInstances',
     fastRender: true,
@@ -41,7 +41,7 @@ Router.map(function() {
   });
 
   this.route('appInstanceDetails', {
-    path: 'app/:_id',
+    path: 'container/:_id',
     fastRender: true,
     waitOn: function() {
       return [
@@ -118,3 +118,10 @@ if (Meteor.isClient) {
     return current && current.route.name === name;
   });
 }
+
+
+Accounts.onLogin(function() {
+    if(Meteor.isClient) {
+        Router.go('dashboard');
+    }
+});
