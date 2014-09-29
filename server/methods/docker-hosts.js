@@ -69,8 +69,8 @@ HostActions = {
       });
       return null;
     }
-    var info = Meteor._wrapAsync(docker.info.bind(docker))();
-    var imageList = Meteor._wrapAsync(docker.listImages.bind(docker))();
+    var info = Meteor.wrapAsync(docker.info.bind(docker))();
+    var imageList = Meteor.wrapAsync(docker.listImages.bind(docker))();
     var dockerImages = _.map(imageList, function (image) {
       return {
         name: image.RepoTags && image.RepoTags[0] && image.RepoTags[0].split(":")[0] || "None",

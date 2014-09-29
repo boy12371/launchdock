@@ -6,7 +6,7 @@ accounts-password@1.0.2
 accounts-ui-unstyled@1.1.2
 accounts-ui@1.1.1
 alanning:roles@1.2.13
-aldeed:autoform@2.0.2
+aldeed:autoform@3.0.0
 aldeed:collection2@2.1.0
 aldeed:simple-schema@1.0.3
 anti:i18n@0.4.3
@@ -55,7 +55,7 @@ meteor-platform@1.1.1
 meteor@1.1.1
 meteorhacks:fast-render@1.1.2
 meteorhacks:kadira-binary-deps@1.0.1
-meteorhacks:kadira@2.9.3
+meteorhacks:kadira@2.9.6
 minifiers@1.1.0
 minimongo@1.0.3
 mizzao:bootstrap-3@3.2.0
@@ -83,7 +83,7 @@ reload@1.1.0
 retry@1.0.0
 routepolicy@1.0.1
 sacha:spin@2.0.4
-sergeyt:typeahead@0.1.2
+sergeyt:typeahead@0.10.5_2
 service-configuration@1.0.1
 session@1.0.2
 sha@1.0.0

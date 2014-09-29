@@ -138,7 +138,7 @@ ImageActions = {
 
     // Build image from local path
     // var tarFile = ? // TODO need to bundle local path into tar.gz
-    //Meteor._wrapAsync(docker.buildImage.bind(docker))(tarFile, {t: imageName, rm: 1});
+    //Meteor.wrapAsync(docker.buildImage.bind(docker))(tarFile, {t: imageName, rm: 1});
   },
   // Pull a docker image from repo on a single host, if an image with that name
   // does not already exist on that host.
@@ -146,7 +146,7 @@ ImageActions = {
     var docker = DockerActions.get(host, port);
     if (!docker) return false;
     try {
-      Meteor._wrapAsync(docker.pull.bind(docker))(repoTag);
+      Meteor.wrapAsync(docker.pull.bind(docker))(repoTag);
     } catch (error) {
       throw new Meteor.Error(500, 'Internal server error', "Error pulling image: " + (error && error.message ? error.message : 'Unknown'));
     }
@@ -159,7 +159,7 @@ ImageActions = {
     if (!docker) return false;
 
     // XXX Do we want to build always, even if already present? Could be an updated archive.
-    // var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
+    // var images = Meteor.wrapAsync(docker.listImages.bind(docker))();
     // var exists = _.any(images, function (image) {
     //   return image.RepoTags && _.contains(image.RepoTags, imageName + ":latest");
     // });
@@ -173,7 +173,7 @@ ImageActions = {
 
     try {
       tarStream.on('error', function (error) { throw error; });
-      Meteor._wrapAsync(docker.buildImage.bind(docker))(tarStream, {t: imageName, rm: 1});
+      Meteor.wrapAsync(docker.buildImage.bind(docker))(tarStream, {t: imageName, rm: 1});
     } catch (error) {
       throw new Meteor.Error(500, 'Internal server error', "Error reading " + archiveUrl + ' or building image: ' + (error && error.message ? error.message : 'Unknown'));
     }
@@ -213,12 +213,12 @@ ImageActions = {
       var docker = DockerActions.get(host.privateHost, host.port);
       if (!docker) return;
       var dockerImage;
-      var images = Meteor._wrapAsync(docker.listImages.bind(docker))();
+      var images = Meteor.wrapAsync(docker.listImages.bind(docker))();
       _.each(images, function (image) {
         if (_.contains(image.RepoTags, imageName + ":latest")) {
           console.log("Deleted image: "+imageName)
           dockerImage = docker.getImage(image.Id);
-          Meteor._wrapAsync(dockerImage.remove.bind(dockerImage))();
+          Meteor.wrapAsync(dockerImage.remove.bind(dockerImage))();
         }
       });
     });
