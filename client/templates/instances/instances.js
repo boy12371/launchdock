@@ -41,7 +41,7 @@ Template.appInstances.helpers({
                       var bgcolor = stringToColor(value)
                       var tag = '<span class="label" style="background-color:'+bgcolor+'">'+value+'</span>';
                     }
-                    return new Spacebars.SafeString('<i class="app-detail-icon" data-id="'+item._id+'"></i>'+tag);
+                    return new Spacebars.SafeString('<i class="app-detail-icon fa fa-cog" data-id="'+item._id+'"></i>'+tag);
                 }
               },
               {'key': 'hostnames', 'label': 'Domain',
@@ -72,7 +72,7 @@ Template.appInstances.events({
   'click .reactive-table tbody tr .app-detail-icon': function (event,template) {
     event.stopPropagation();
     id =  $(event.currentTarget).data().id;
-    Router.go("/app/"+id);    //Router.go('app', {_id: id}); //Should work, hmmm?
+    Router.go("/container/"+id);    //Router.go('app', {_id: id}); //Should work, hmmm?
   },
 
   'click .reactive-table tbody tr a': function (event,template) {

@@ -41,7 +41,7 @@ AutoForm.addHooks("launchAppInstanceForm", {
     $('#appCreateModal').modal('toggle');
     $('#launchAppInstanceForm').find("input[type=text]").val(""); // couldn't get resetForm to work. eg: AutoForm.resetForm('launchAppInstanceForm')
     Session.set('imageSelected');
-    Router.go("apps");
+    Router.go("containers");
   }
 });
 

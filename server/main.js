@@ -55,7 +55,7 @@ var proxyRepo = 'ongoworks/hipache-npm:latest'
 var container = dockerProxy.getContainer('hipache-npm'), containerInfo;
 
 try {
-  containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+  containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
 } catch (e) {
  console.log("No existing hipache-npm containers found.");
 }
@@ -66,9 +66,9 @@ try {
 if (containerInfo) {
   if (containerInfo.State.Running === false) {
     console.log("Attempting to restart existing hipache-npm container");
-    Meteor._wrapAsync(container.restart.bind(container))();
+    Meteor.wrapAsync(container.restart.bind(container))();
 
-    containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+    containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
     hipacheConnect(containerInfo);
     return;
   } else {
@@ -92,7 +92,7 @@ if (containerInfo) {
   var intervalId = Meteor.setInterval(function() {
     console.log("Checking download progress of hipache-npm")
     try {
-      var images = Meteor._wrapAsync(dockerProxy.listImages.bind(dockerProxy))();
+      var images = Meteor.wrapAsync(dockerProxy.listImages.bind(dockerProxy))();
     } catch (e) {
       console.log("Connection error, retrying...");
     }
@@ -101,7 +101,7 @@ if (containerInfo) {
           console.log("Docker hipache-npm image downloaded. starting hipache-npm now")
           //if the image exists we'll start it up
           try {
-            container = Meteor._wrapAsync(dockerProxy.createContainer.bind(dockerProxy))({
+            container = Meteor.wrapAsync(dockerProxy.createContainer.bind(dockerProxy))({
               Image: proxyRepo,
               name: 'hipache-npm',
               ExposedPorts: {
@@ -109,8 +109,8 @@ if (containerInfo) {
                 "80/tcp": {}
               }
             });
-            Meteor._wrapAsync(container.start.bind(container))({"PortBindings": { "6379/tcp": [{ "HostIp": "0.0.0.0" }],"80/tcp": [{ "HostIp": "0.0.0.0", "HostPort": "80" }] } });
-            containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+            Meteor.wrapAsync(container.start.bind(container))({"PortBindings": { "6379/tcp": [{ "HostIp": "0.0.0.0" }],"80/tcp": [{ "HostIp": "0.0.0.0", "HostPort": "80" }] } });
+            containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
             Meteor.clearInterval(intervalId);
             hipacheConnect(containerInfo);
           } catch (e) {

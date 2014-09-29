@@ -13,7 +13,7 @@ DockerActions = {
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.
     try {
-      Meteor._wrapAsync(d.info.bind(d))();
+      Meteor.wrapAsync(d.info.bind(d))();
     } catch (error) {
       d = null;
     }

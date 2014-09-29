@@ -15,10 +15,3 @@ Meteor.startup(function () {
     showOtherLoginServices: true     // Set to false to hide oauth login buttons on the signin/signup pages. Useful if you are using something like accounts-meld or want to oauth for api access
   });
 });
-
-Accounts.onLogin(function() {
-    if(Meteor.isClient) {
-        Router.go('dashboard');
-    }
-});
-

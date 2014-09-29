@@ -60,7 +60,7 @@ Meteor.methods({
       return true;
     }
     // Restart container
-    Meteor._wrapAsync(container.restart.bind(container))();
+    Meteor.wrapAsync(container.restart.bind(container))();
     ContainerActions.getInfo(instanceId);
     return true;
   },
@@ -77,7 +77,7 @@ Meteor.methods({
     }
 
     // Start container
-    Meteor._wrapAsync(container.start.bind(container))({
+    Meteor.wrapAsync(container.start.bind(container))({
       "PortBindings": { "8080/tcp": [{ "HostIp": "0.0.0.0" }] }
     });
 
@@ -98,7 +98,7 @@ Meteor.methods({
     }
     // Stop container
     try {
-      Meteor._wrapAsync(container.stop.bind(container))();
+      Meteor.wrapAsync(container.stop.bind(container))();
     } catch (e) {
       AppInstances.update({'_id':instanceId}, {$set:{'status':'stopped'}});
       console.log("Container invalid for "+instanceId+". Marking stopped.")
@@ -123,7 +123,7 @@ Meteor.methods({
 
     // Kill container
     try {
-      Meteor._wrapAsync(container.kill.bind(container))();
+      Meteor.wrapAsync(container.kill.bind(container))();
     } catch (e) {
       AppInstances.update({'_id':instanceId}, {$set:{'status':'stopped'}});
       console.log("Container invalid for "+instanceId+". Marking stopped.")
@@ -262,7 +262,7 @@ ContainerActions = {
     }
 
     // Are there actually any containers on this docker instance with this container ID?
-    var containers = Meteor._wrapAsync(docker.listContainers.bind(docker))({all: 1});
+    var containers = Meteor.wrapAsync(docker.listContainers.bind(docker))({all: 1});
     var exists = _.any(containers, function (container) {
       return container.Id === ai.containerId;
     });
@@ -274,7 +274,7 @@ ContainerActions = {
     if (!container)
       return null;
 
-    var info = Meteor._wrapAsync(container.inspect.bind(container))();
+    var info = Meteor.wrapAsync(container.inspect.bind(container))();
     // Update app instance doc with some actual container info
     AppInstances.update({_id: instanceId}, {$set: {
       actualEnv: info.Config && info.Config.Env,
@@ -308,10 +308,10 @@ ContainerActions = {
       var container = ContainerActions.getForAppInstance(instanceId);
       if (container) {
         // Kill container
-        Meteor._wrapAsync(container.kill.bind(container))();
+        Meteor.wrapAsync(container.kill.bind(container))();
 
         // Remove container
-        Meteor._wrapAsync(container.remove.bind(container))();
+        Meteor.wrapAsync(container.remove.bind(container))();
       }
     }
 
@@ -355,7 +355,7 @@ ContainerActions = {
     });
 
     // Create a new container
-    var container = Meteor._wrapAsync(docker.createContainer.bind(docker))({
+    var container = Meteor.wrapAsync(docker.createContainer.bind(docker))({
       Image: ai.image,
       Env: dockerEnv,
       ExposedPorts: {
@@ -364,12 +364,12 @@ ContainerActions = {
     });
 
     // Start the new container
-    Meteor._wrapAsync(container.start.bind(container))({
+    Meteor.wrapAsync(container.start.bind(container))({
       "PortBindings": { "8080/tcp": [{ "HostIp": "0.0.0.0" }] }
     });
 
     // Get info about the new container
-    var containerInfo = Meteor._wrapAsync(container.inspect.bind(container))();
+    var containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
 
     // Determine what port the new container was mapped to
     var port = containerInfo.NetworkSettings.Ports["8080/tcp"][0].HostPort;
