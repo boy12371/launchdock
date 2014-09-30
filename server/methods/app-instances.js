@@ -246,8 +246,8 @@ ContainerActions = {
   // given app instance
   getForAppInstance: function getForAppInstance(instanceId, docker) {
     var ai = AppInstances.findOne({_id: instanceId});
-    if (!ai.containerId)
-      return null;
+    if (typeof ai === 'undefined') return null;
+    if (!ai.containerId) return null;
 
     docker = docker || DockerActions.getForAppInstance(instanceId);
     if (!docker) {
