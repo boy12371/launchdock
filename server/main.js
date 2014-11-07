@@ -12,7 +12,7 @@ if (!serverDir) {
 
 // dockerProxy = the docker server running the proxy
 // currently, we assume it's on the same server running rocker docker
-dockerProxy = DockerActions.get('http://172.17.42.1', 2375);
+dockerProxy = DockerActions.get('http://127.0.0.1', 2375);
 
 if (!dockerProxy) {
 
