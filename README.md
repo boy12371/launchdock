@@ -39,7 +39,7 @@ Clone launchdock local, then from the `launchdock` directory, run `meteor`. This
 
 There are additional docker host configuration options available in `settings/settings.json`.
 
-You can running with modified settings.json, or meteor options:
+You can execute with modified settings.json, or meteor options:
 
 `meteor --settings settings/settings.json  --port 3003`
 
