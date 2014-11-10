@@ -3,5 +3,12 @@
     "protocol": "http",
     "host": "127.0.0.1",
     "port": 2375
-  }
+  },
+  "dockerSSL": {
+    "path": null,
+    "ca": "ca.pem",
+    "cert": "cert.pem",
+    "key": "key.pem"
+  },
+  "proxyRepo": "ongoworks/hipache-npm:latest"
 }

@@ -6,28 +6,37 @@ os = Npm.require('os');
 
 // Set server dir for use everywhere
 serverDir = __meteor_bootstrap__ && __meteor_bootstrap__.serverDir;
+console.log (serverDir);
 if (!serverDir) {
     throw new Error("Unable to determine the server directory");
 }
-
-// dockerProxy = the docker server running the proxy
+// dockerProxy = the docker server running the hipache-npm proxy
 // currently, we assume it's on the same server running rocker docker
-dockerProxy = DockerActions.get('http://127.0.0.1', 2375);
-
+// you can pass different settings in settings.json
+Meteor.settings.docker = Meteor.settings.docker || {socketPath: '/var/run/docker.sock'};
+// attempt to connect to docker host
+dockerProxy = DockerActions.get(Meteor.settings.docker);
+// or we'll fallback to first DOCKER_HOST if set in ENV
+// and if that fails, we'll try localhost
 if (!dockerProxy) {
-
   if (process.env.DOCKER_HOST) {
     var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2);
     var port = process.env.DOCKER_HOST.split(":",3)[2];
   } else {
-    var host = 'http://127.0.0.1';
+    var host = '127.0.0.1';
     var port = '2375';
   }
-  console.log ("failed to connect to docker daemon on docker0. trying "+host+":"+port)
-  dockerProxy = DockerActions.get(host, port);
-
-  if (!dockerProxy)
-   throw new Meteor.Error("Could not get dockerProxy server");
+  console.log("First connect failed, attempting docker daemon connection on " + host + ":" + port);
+  try {
+    dockerProxy = DockerActions.get( {host: host, port: port} );
+  }
+  catch (e) {
+    console.log("Could not connect to docker daemon on " + host + ":" + port);
+  }
+}
+// well, we failed to connect to any docker daemon.
+if (!dockerProxy) {
+  throw new Meteor.Error("400","Failed to connect to any docker daemon");
 }
 
 //
@@ -40,7 +49,8 @@ function hipacheConnect(containerInfo) {
     var platform = os.platform(), d;
     Meteor.setTimeout(function() {
       if (platform === "darwin") {
-        Hipache = redis.createClient(hostConfig.HostPort, hostConfig.HostIp); //local
+        var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2) || Meteor.settings.docker.host || hostConfig.HostIp;
+        Hipache = redis.createClient(hostConfig.HostPort, host); //local
       } else {
         Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
       }
@@ -51,7 +61,7 @@ function hipacheConnect(containerInfo) {
 //
 // Check to see if hipache is running, paused, or never pulled.
 //
-var proxyRepo = 'ongoworks/hipache-npm:latest'
+var proxyRepo = Meteor.settings.proxyRepo || 'ongoworks/hipache-npm:latest';
 var container = dockerProxy.getContainer('hipache-npm'), containerInfo;
 
 try {

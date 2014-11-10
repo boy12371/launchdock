@@ -17,6 +17,8 @@ Export your docker host (you will see this at the end of `boot2docker` installat
 
 `export DOCKER_HOST=tcp://127.0.0.1:2375`
 
+*Your VM might have a different IP address—use whatever boot2docker up told you to use. You probably want to add that environment variable to your shell config.*
+
 Configure the VirtualBox VM (where Docker is running) for additional container port access to the VM
 ```bash
   for i in {49000..49900}; do

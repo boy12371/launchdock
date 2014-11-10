@@ -1,14 +1,22 @@
 DockerActions = {
   // Get docker connection for host/port or for local server as fallback
-  get: function getDocker(host, port) {
-    if (!host)
-      return null;
+  get: function getDocker(dockerHost) {
+    if (!dockerHost) return null;
+    if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "tcp";
+    if (!dockerHost.timeout) dockerHost.timeout = 500;
 
-    if (host.indexOf("http://") === 0) {
-      host = host.replace("http://", "");
+    if (Meteor.settings.dockerSSL || process.env.DOCKER_TLS_VERIFY == 1 ) {
+      dockerHost.protocol = "https";
+      var certPath = Meteor.settings.dockerSSL.path || process.env.DOCKER_CERT_PATH;
+      var ca = Meteor.settings.dockerSSL.ca || "ca.pem";
+      var cert = Meteor.settings.dockerSSL.cert || "cert.pem";
+      var key = Meteor.settings.dockerSSL.key || "key.pem"
+      dockerHost.ca = fs.readFileSync(certPath + "/" + ca);
+      dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
+      dockerHost.key = fs.readFileSync(certPath + "/" + key);
     }
-    port = port || 2375;
-    var d = new Docker({host: "http://" + host, port: port, timeout: 500});
+
+    var d = new Docker(dockerHost);
 
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.
