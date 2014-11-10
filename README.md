@@ -9,26 +9,35 @@ TODO Eventually there will be a small launcher package that simplifies remote ca
 
 # Local Development Setup
 
-Install [http://meteor.com](meteor)
-Install [http://boot2docker.io/](boot2docker).
+Install (http://meteor.com)[meteor].
 
-Configure the VirtualBox VM (where Docker is running) for container port access to the VM
+Install (http://boot2docker.io/)[boot2docker].
+
+Export your docker host (you will see this at the end of `boot2docker` installation):
+
+`export DOCKER_HOST=tcp://127.0.0.1:2375`
+
+Configure the VirtualBox VM (where Docker is running) for additional container port access to the VM
 ```bash
   for i in {49000..49900}; do
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port$i,tcp,,$i,,$i";
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "udp-port$i,udp,,$i,,$i";
   done
 ```
-Export your docker host (you will see this at the end of `boot2docker` installation):
 
-`export DOCKER_HOST=tcp://127.0.0.1:2375`
+Install the `ongoworks/hipache-npm` docker image:
+
+`docker pull ongoworks/hipache-npm`
 
 Clone launchdock local, then from the `launchdock` directory, run `meteor`. This should be all you need for a local Launch Dock development environment.
 
+```bash
+  git clone https://github.com/ongoworks/launchdock.git
   cd launchdock
   meteor
+```
 
-There are additional configuration options available in `settings/settings.json`.
+There are additional docker host configuration options available in `settings/settings.json`.
 
 You can running with modified settings.json, or meteor options:
 
