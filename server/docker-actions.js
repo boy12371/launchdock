@@ -4,8 +4,8 @@ DockerActions = {
     if (!dockerHost) return null;
     if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "tcp";
     if (!dockerHost.timeout) dockerHost.timeout = 500;
-
-    if (Meteor.settings.dockerSSL || process.env.DOCKER_TLS_VERIFY == 1 ) {
+    // read SSL certificates, path and cert customizable in Meteor.setttings.dockerSSL
+    if (Meteor.settings.dockerSSL && process.env.DOCKER_TLS_VERIFY == 1 ) {
       dockerHost.protocol = "https";
       var certPath = Meteor.settings.dockerSSL.path || process.env.DOCKER_CERT_PATH;
       var ca = Meteor.settings.dockerSSL.ca || "ca.pem";
@@ -15,9 +15,7 @@ DockerActions = {
       dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
       dockerHost.key = fs.readFileSync(certPath + "/" + key);
     }
-
     var d = new Docker(dockerHost);
-
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.
     try {
