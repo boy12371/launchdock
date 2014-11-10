@@ -9,9 +9,9 @@ TODO Eventually there will be a small launcher package that simplifies remote ca
 
 # Local Development Setup
 
-Install (http://meteor.com)[meteor].
+Install [http://meteor.com](meteor).
 
-Install (http://boot2docker.io/)[boot2docker].
+Install [http://boot2docker.io/](boot2docker).
 
 Export your docker host (you will see this at the end of `boot2docker` installation):
 
