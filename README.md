@@ -9,21 +9,30 @@ TODO Eventually there will be a small launcher package that simplifies remote ca
 
 # Local Development Setup
 
-Install `meteor`,`meteorite` and `boot2docker` .
+Install [http://meteor.com](meteor)
+Install [http://boot2docker.io/](boot2docker).
 
-Configure the VM for Docker port access
+Configure the VirtualBox VM (where Docker is running) for container port access to the VM
 ```bash
   for i in {49000..49900}; do
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port$i,tcp,,$i,,$i";
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "udp-port$i,udp,,$i,,$i";
   done
 ```
-Export your docker host:
+Export your docker host (you will see this at the end of `boot2docker` installation):
 
-`export DOCKER_HOST=tcp://127.0.0.1:4243`
+`export DOCKER_HOST=tcp://127.0.0.1:2375`
 
-Clone launchdock local, then from the `launchdock` directory `meteor` should be all you need for a local Launch Dock development environment.
+Clone launchdock local, then from the `launchdock` directory, run `meteor`. This should be all you need for a local Launch Dock development environment.
 
+  cd launchdock
+  meteor
+
+There are additional configuration options available in `settings/settings.json`.
+
+You can running with modified settings.json, or meteor options:
+
+`meteor --settings settings/settings.json  --port 3003`
 
 # Server Configuration
 ## Configure the Launch Dock Server
@@ -168,7 +177,7 @@ Commit the file to source control.
 
 ### (Option 1) Build the Image Automatically
 
-If your project is on github, you can use [Docker.io Trusted Builds](https://index.docker.io/help/docs/#trustedbuilds) to automatically make updated project builds. 
+If your project is on github, you can use [Docker.io Trusted Builds](https://index.docker.io/help/docs/#trustedbuilds) to automatically make updated project builds.
 Go to docker.io, register, and go to Trusted Builds and point to your repo.
 
 ### (Option 2) Build the Image Manually

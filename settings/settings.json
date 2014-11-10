@@ -1,5 +1,7 @@
 {
-  "proxyPort": 80,
-  "proxyFallbackTarget": null,
-  "mode" : "production"
+  "docker": {
+    "protocol": "http",
+    "host": "127.0.0.1",
+    "port": 2375
+  }
 }
