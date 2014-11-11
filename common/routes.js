@@ -118,10 +118,3 @@ if (Meteor.isClient) {
     return current && current.route.name === name;
   });
 }
-
-
-Accounts.onLogin(function() {
-    if(Meteor.isClient) {
-        Router.go('dashboard');
-    }
-});
