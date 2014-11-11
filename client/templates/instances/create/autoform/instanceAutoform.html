@@ -45,8 +45,8 @@
 
 <template name="afFormGroup_createAppInstance">
   <div class="form-group {{#if afFieldIsInvalid name=this.atts.name}}has-error{{/if}}">
-    {{#unless this.skipLabel}}
-    {{> afFieldLabel this.afFieldLabelAtts}}
+    {{#unless skipLabel}}
+    <label {{bsFieldLabelAtts}}>{{#if this.labelText}}{{this.labelText}}{{else}}{{afFieldLabelText name=this.atts.name}}{{/if}}</label>
     {{/unless}}
     {{> afFieldInput this.afFieldInputAtts}}
     <span class="help-block">{{{afFieldMessage name=this.atts.name}}}</span>
@@ -55,15 +55,10 @@
 
 <template name="afQuickField_createAppInstance">
   <div class="form-group {{#if afFieldIsInvalid name=this.atts.name autoform=this.atts.autoform}}has-error{{/if}}">
-    {{#unless this.skipLabel}}
-    {{> afFieldLabel this.afFieldLabelAtts}}
+    {{#unless skipLabel}}
+    <label {{bsFieldLabelAtts}}>{{#if this.labelText}}{{this.labelText}}{{else}}{{afFieldLabelText name=this.atts.name}}{{/if}}</label>
     {{/unless}}
     {{> afFieldInput this.afFieldInputAtts}}
     <span class="help-block">{{{afFieldMessage name=this.atts.name autoform=this.atts.autoform}}}</span>
   </div>
-</template>
-
-
-<template name="afFieldLabel_createAppInstance">
-  {{!-- <label {{atts}}>{{afFieldLabelText name=this.atts.name}}</label> --}}
 </template>

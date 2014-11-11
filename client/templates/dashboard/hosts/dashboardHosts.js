@@ -75,7 +75,7 @@ Template.dashboardHosts.rendered = function () {
     _.each(gaugeData, function (gauge) {
       reactiveGauge(gauge.id,gauge.currVal,gauge.maxValue);
     });
-  Deps.autorun(function(){
+  Tracker.autorun(function(){
       data = Session.get('gaugeData')
       if (data) {
         if (!gauge[data.id]) reactiveGauge(data.id,data.currVal,data.maxValue);
