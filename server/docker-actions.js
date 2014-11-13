@@ -30,7 +30,7 @@ DockerActions = {
     var target = Hosts.findOne(hostId);
     if (!target)
       throw new Meteor.Error(400, 'Bad request', "No defined docker host has ID " + hostId);
-    return DockerActions.get(target.privateHost, target.port);
+    return DockerActions.get({host: target.privateHost, port: target.port});
   },
   // Returns a docker object for the server that is running the
   // given app instance's container
@@ -47,7 +47,6 @@ DockerActions = {
       // Host ID listed in AI doesn't exist
       return null;
     }
-
     // Currently each app instance runs on only one host
     return DockerActions.getForHost(dockerHosts[0]);
   }

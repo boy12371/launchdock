@@ -299,7 +299,7 @@ ContainerActions = {
     // Unregister all hostnames from the proxy server since
     // they point to the container being removed.
     _.each(ai.hostnames, function (hostname) {
-      console.log("Removing hipache entry:",hostname);
+      console.log("Removing hipache entry:" + hostname);
       Hipache.del("frontend:"+hostname)
     });
 
@@ -345,7 +345,7 @@ ContainerActions = {
     if (!hostDoc)
       return false;
 
-    var docker = DockerActions.get(hostDoc.privateHost, hostDoc.port);
+    var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
     if (!docker)
       return false;
 
