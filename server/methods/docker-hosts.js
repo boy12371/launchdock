@@ -9,7 +9,7 @@ Meteor.methods({
     Schemas.Host.clean(doc);
     check(doc, Schemas.Host);
 
-    var d = DockerActions.get(doc.privateHost, doc.port);
+    var d = DockerActions.get({host:doc.privateHost, port: doc.port});
 
     if (!d) {
       return false;
@@ -59,7 +59,7 @@ Meteor.methods({
 
 HostActions = {
   getInfo: function getInfo(host) {
-    var docker = DockerActions.get(host.privateHost, host.port);
+    var docker = DockerActions.get({host:host.privateHost, port: host.port});
     // if we can't reach the host, mark it, and stop using it.
     if (!docker) {
       Hosts.update(host._id, {

@@ -143,7 +143,7 @@ ImageActions = {
   // Pull a docker image from repo on a single host, if an image with that name
   // does not already exist on that host.
   pullOnHost: function pullImageOnHost(host, port, repoTag) {
-    var docker = DockerActions.get(host, port);
+    var docker = DockerActions.get({host: host, port: port});
     if (!docker) return false;
     try {
       Meteor.wrapAsync(docker.pull.bind(docker))(repoTag);
@@ -154,7 +154,7 @@ ImageActions = {
 
   // Build a docker image from a tar on a single host
   buildOnHost: function buildImageOnHost(host, port, imageName, archiveUrl) {
-    var docker = DockerActions.get(host, port);
+    var docker = DockerActions.get({host: host, port: port});
 
     if (!docker) return false;
 
@@ -210,7 +210,7 @@ ImageActions = {
     var imageName = image.name;
     console.log("deleting image:"+imageName)
     Hosts.find().forEach(function (host) {
-      var docker = DockerActions.get(host.privateHost, host.port);
+      var docker = DockerActions.get({host: host.privateHost, port: host.port});
       if (!docker) return;
       var dockerImage;
       var images = Meteor.wrapAsync(docker.listImages.bind(docker))();
