@@ -52,16 +52,10 @@
       <tr>
         <th>Environment Variables</th>
         <td>
-        <div><strong>Defined:</strong></div>
+        <div><strong>User Defined:</strong></div>
         {{#each envAsArray}}
           <div>{{this}}</div>
         {{/each}}
-        {{#with actualEnv}}
-        <div><strong>Actual:</strong></div>
-        {{#each this}}
-          <div>{{this}}</div>
-        {{/each}}
-        {{/with}}
         </td>
       </tr>
       <tr>
