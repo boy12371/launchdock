@@ -120,6 +120,12 @@ Schemas.AppInstance = new SimpleSchema({
 		type: [String],
 		label: "Hosts running this instance",
 		optional: true
+	},
+	config: {
+		type: Object,
+		label: "Docker Options",
+		blackbox: true,
+		optional: true
 	}
 });
 
@@ -200,12 +206,6 @@ Schemas.LaunchInstance = new SimpleSchema({
 	},
 	'env.$.value': {
 		type: String
-	},
-	config: {
-		type: Object,
-		label: "Docker Options",
-		blackbox: true,
-		optional: true
 	}
 });
 

@@ -10,11 +10,9 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     options = options || {};
-
     if (typeof options.appImage !== "string") {
       throw new Meteor.Error(400, 'Bad request', "You must pass the appImage option set to the string name of the docker image to use.");
     }
-
     // Create a new app instance record
     var newInstanceId = AppInstances.insert({
       image: options.appImage,
@@ -364,10 +362,12 @@ ContainerActions = {
 
     // config can be passed into launch option.config and will add/override to defaults
     config = ai.config || {};
+    if (!config.name && config.Hostname) config.name = config.Hostname;
     if (!config.HostConfig) config.HostConfig = {};
     if (!config.Image) config.Image = ai.image;
     if (!config.Env) config.Env = dockerEnv;
     if (!config.ExposedPorts && !config.HostConfig.PublishAllPorts) config.HostConfig.PublishAllPorts = true;
+
     // Create a new container
     var container = Meteor.wrapAsync(docker.createContainer.bind(docker))(config);
     // Start container
@@ -385,13 +385,12 @@ ContainerActions = {
     // Update proxy server host records
     if (ai.hostnames) {
       if (ai.hostnames[0]) Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
-      console.log("Adding Hostname");
       // If hostname is provided, add domain to hipache as a group.
       Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
     } else if (ai.env.ROOT_URL) {
       Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3));
     }
-    // ContainerActions.getInfo(instanceId);
+    ContainerActions.getInfo(instanceId);
     return true;
   }
 };
