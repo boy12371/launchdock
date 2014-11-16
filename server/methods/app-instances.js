@@ -20,10 +20,22 @@ Meteor.methods({
       env: options.env || {},
       config: options.config || {}
     });
-
-    // Run and attach a new docker container for it
-    ContainerActions.addForAppInstance(newInstanceId);
-
+    // check that image exists, and if not pull it
+    // this is not the best approach, as we're not waiting for it.
+    // but will at least fix second attempts.
+    Meteor.call('image/exists', options.appImage, function(error,result) {
+      console.log(options.appImage);
+      var record = DockerImages.findOne({'name': options.appImage});
+      if (result == true && record) {
+        // Run and attach a new docker container for it
+        ContainerActions.addForAppInstance(newInstanceId);
+      } else {
+        Meteor.call('image/add', options.appImage, function (error,result) {
+          // Run and attach a new docker container for it
+          ContainerActions.addForAppInstance(newInstanceId);
+        });
+      }
+    });
     // Return the app instance ID for use in future calls; calling app should store this somewhere
     return newInstanceId;
   },
@@ -367,7 +379,6 @@ ContainerActions = {
     if (!config.Image) config.Image = ai.image;
     if (!config.Env) config.Env = dockerEnv;
     if (!config.ExposedPorts && !config.HostConfig.PublishAllPorts) config.HostConfig.PublishAllPorts = true;
-
     // Create a new container
     var container = Meteor.wrapAsync(docker.createContainer.bind(docker))(config);
     // Start container
