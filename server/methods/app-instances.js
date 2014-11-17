@@ -23,18 +23,20 @@ Meteor.methods({
     // check that image exists, and if not pull it
     // this is not the best approach, as we're not waiting for it.
     // but will at least fix second attempts.
-    Meteor.call('image/exists', options.appImage, function(error,result) {
-      var record = DockerImages.findOne({'name': options.appImage});
+    image =  options.appImage;
+    Meteor.call('image/exists', image, function(error,result) {
+      var record = DockerImages.findOne({'name': image});
       if (result == true && record) {
         // Run and attach a new docker container for it
         ContainerActions.addForAppInstance(newInstanceId);
       } else {
-        Meteor.call('image/add', options.appImage, function (error,result) {
+        Meteor.call('image/add', image, function (error,result) {
           // Run and attach a new docker container for it
           ContainerActions.addForAppInstance(newInstanceId);
         });
       }
     });
+    console.log("launching new " + options.appImage + " instance "+ newInstanceId);
     // Return the app instance ID for use in future calls; calling app should store this somewhere
     return newInstanceId;
   },
@@ -262,8 +264,6 @@ ContainerActions = {
   getForAppInstance: function getForAppInstance(instanceId, docker) {
     var ai = AppInstances.findOne({_id: instanceId});
     if (typeof ai === 'undefined') return null;
-    if (!ai.info.Id && ai.containerId) ai.info.Id = ai.containerId; //backwards compat, we now store all info.
-    if (!ai.info.Id) return null;
 
     docker = docker || DockerActions.getForAppInstance(instanceId);
 
@@ -280,10 +280,10 @@ ContainerActions = {
     // Are there actually any containers on this docker instance with this container ID?
     var containers = Meteor.wrapAsync(docker.listContainers.bind(docker))({all: 1});
     var exists = _.any(containers, function (container) {
-      return container.Id === ai.info.Id;
+      return container.Id === ai.containerId;
     });
 
-    return exists ? docker.getContainer(ai.info.Id) : null;
+    return exists ? docker.getContainer(ai.containerId) : null;
   },
   //***
   //  return container info
@@ -396,7 +396,9 @@ ContainerActions = {
     if (!config.Env) config.Env = dockerEnv;
     if (!config.ExposedPorts && !config.HostConfig.PublishAllPorts) config.HostConfig.PublishAllPorts = true;
     // Create a new container
+
     var container = Meteor.wrapAsync(docker.createContainer.bind(docker))(config);
+
     // Start container
     Meteor.wrapAsync(container.start.bind(container))();
     // Get info about the new container
@@ -410,14 +412,7 @@ ContainerActions = {
       }
     });
     // Update proxy server host records
-    if (ai.hostnames) {
-      if (ai.hostnames[0]) Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
-      // If hostname is provided, add domain to hipache as a group.
-      Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
-    } else if (ai.env.ROOT_URL) {
-      Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3));
-    }
-    ContainerActions.getInfo(instanceId);
-    return true;
+    ContainerActions.updateProxy(instanceId);
+    return ContainerActions.getInfo(instanceId);
   }
 };
