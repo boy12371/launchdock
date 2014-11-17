@@ -5,6 +5,7 @@
 Meteor.methods({
   'image/add': function (imageName) {
     this.unblock();
+    check(imageName, String);
     Utility.checkLoggedIn(Meteor.userId());
 
     try {
@@ -27,20 +28,21 @@ Meteor.methods({
   // method to just check to that that is image is on all host
   //
   'image/exists': function (imageName) {
-      var hostCount = 0;
-      var imageCount = 0;
-      // console.log("checking status"+imageName)
-      Hosts.find({'status':'Active','active': true}).forEach(function (host) {
-        hostCount ++;
-        if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
-      });
-      if (imageCount >= hostCount) {
-        // If it actually exists but we had a timeout during download
-        DockerImages.update({name:imageName},{$set:{status:"Downloaded"}});
-        return true;
-      } else {
-        return false;
-      }
+    check(imageName, String);
+    var hostCount = 0;
+    var imageCount = 0;
+    // console.log("checking status"+imageName)
+    Hosts.find({'status':'Active','active': true}).forEach(function (host) {
+      hostCount ++;
+      if ((_.where(host.dockerImages, {name:imageName}).length) > 0) imageCount++;
+    });
+    if (imageCount >= hostCount) {
+      // If it actually exists but we had a timeout during download
+      DockerImages.update({name:imageName},{$set:{status:"Downloaded"}});
+      return true;
+    } else {
+      return false;
+    }
   },
   //
   // method check all hosts to check download progress and existance on all hosts
@@ -49,6 +51,7 @@ Meteor.methods({
   // however, this is prone to misreporting as we're not filtering for latest
   //
   'image/status': function (imageName) {
+    check(imageName,String);
     Utility.checkLoggedIn(Meteor.userId());
     var maxCheck = 250;
     var statusCheck = 0;
@@ -88,6 +91,7 @@ Meteor.methods({
   },
   'image/addFromArchive': function (imageName, archiveUrl) {
     this.unblock();
+    check(imageName, String);
     Utility.checkLoggedIn(Meteor.userId());
 
     try {
@@ -105,6 +109,7 @@ Meteor.methods({
   },
   'image/remove': function (imageId) {
     this.unblock();
+    check(imageId, String);
     Utility.checkLoggedIn(Meteor.userId());
 
     if (AppInstances.findOne({'image':this.name})) return false;
@@ -116,6 +121,7 @@ Meteor.methods({
   },
   'image/createOnAllHosts': function (imageId) {
     this.unblock();
+    check(imageId, String);
     Utility.checkLoggedIn(Meteor.userId());
 
     ImageActions.createOnAllHosts(imageId);

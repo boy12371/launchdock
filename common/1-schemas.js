@@ -104,12 +104,13 @@ Schemas.AppInstance = new SimpleSchema({
 	env: {
 		type: Object,
 		blackbox: true,
-		label: "Defined environment variables"
+		label: "User defined environment variables"
 	},
-	actualEnv: {
-		type: [String],
-		optional: true,
-		label: "Actual environment variables"
+	info: {
+		type: Object,
+		blackbox: true,
+		label: "Docker Info",
+		optional: true
 	},
 	hostnames: {
 		type: [String],
@@ -118,6 +119,12 @@ Schemas.AppInstance = new SimpleSchema({
 	dockerHosts: {
 		type: [String],
 		label: "Hosts running this instance",
+		optional: true
+	},
+	config: {
+		type: Object,
+		label: "Docker Options",
+		blackbox: true,
 		optional: true
 	}
 });
