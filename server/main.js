@@ -38,7 +38,8 @@ try {
   dockerProxy = DockerActions.get( {host: host, port: port} );
 }
 catch (e) {
-  console.log("Could not connect to docker daemon on " + host + ":" + port);
+  console.log("Could not connect to docker daemon on " + host + ":" + port + ",attempting socketPath connect.");
+  dockerProxy = DockerActions.get({socketPath: '/var/run/docker.sock'});
 }
 
 // well, we failed to connect to any docker daemon.
