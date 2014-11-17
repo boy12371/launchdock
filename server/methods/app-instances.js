@@ -24,7 +24,6 @@ Meteor.methods({
     // this is not the best approach, as we're not waiting for it.
     // but will at least fix second attempts.
     Meteor.call('image/exists', options.appImage, function(error,result) {
-      console.log(options.appImage);
       var record = DockerImages.findOne({'name': options.appImage});
       if (result == true && record) {
         // Run and attach a new docker container for it

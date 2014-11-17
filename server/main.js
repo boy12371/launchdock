@@ -23,8 +23,8 @@ if (!Meteor.settings.dockerSSL) {
 // otherwise fallback to first DOCKER_HOST if set in ENV
 // and if neither of those existing, we'll use localhost defaults
 if (Meteor.settings.docker) {
-  var host = Meteor.settings.docker.host
-  var port = Meteor.settings.docker.port
+  var host = Meteor.settings.docker.host;
+  var port = Meteor.settings.docker.port;
 } else if (process.env.DOCKER_HOST) {
   var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2);
   var port = process.env.DOCKER_HOST.split(":",3)[2];
@@ -50,18 +50,26 @@ if (!dockerProxy) {
 //  establish connection to hipache redis after we have hipache-npm container
 //
 function hipacheConnect(containerInfo) {
-  console.log("Connect to hipache-npm redis instance")
+  console.log("Connect to hipache-npm redis instance");
   if (containerInfo) {
     var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
     var platform = os.platform(), d;
     Meteor.setTimeout(function() {
       if (platform === "darwin") {
         var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2) || Meteor.settings.docker.host || hostConfig.HostIp;
-        Hipache = redis.createClient(hostConfig.HostPort, host); //local
+        try {
+          Hipache = redis.createClient(hostConfig.HostPort, host); //local
+        } catch (e) {
+          console.log ("Unable to connect to hipache redis. Checking hipach-npm installation.")
+        }
       } else {
-        Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //docker instances
+        try {
+          Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //running as docker instances
+        } catch (e) {
+          console.log ("Unable to connect to hipache redis. Checking hipach-npm installation.")
+        }
       }
-    }, 2000); // give redis time to start on container
+    }, 2500); // give redis time to start on container
   }
 }
 
@@ -94,12 +102,11 @@ if (containerInfo) {
   }
 } else { // we're going to pull the latest, regardless if it exists
   try {
+    dockerProxy.pull(proxyRepo, function (err, stream) {
       console.log("Pulling the ongoworks/hipache-npm image.");
-      dockerProxy.pull(proxyRepo, function (err, stream) {
-        stream.pipe(process.stdout);
-      });
+    });
   } catch (error) {
-    console.log("Error pulling hipache-npm, suggest manual docker pull ongoworks/hipache-npm")
+    console.log("Error pulling hipache-npm, suggest manual docker pull ongoworks/hipache-npm");
     return;
   }
   //
@@ -107,7 +114,7 @@ if (containerInfo) {
   // this might go on forever if network/download issues
   //
   var intervalId = Meteor.setInterval(function() {
-    console.log("Checking download progress of hipache-npm")
+    console.log("Checking download progress of hipache-npm");
     try {
       var images = Meteor.wrapAsync(dockerProxy.listImages.bind(dockerProxy))();
     } catch (e) {
@@ -115,7 +122,7 @@ if (containerInfo) {
     }
     _.each(images, function (image) {
         if (_.contains(image.RepoTags, proxyRepo)) {
-          console.log("Docker hipache-npm image downloaded. starting hipache-npm now")
+          console.log("Docker hipache-npm image downloaded. spinning up hipache-npm now");
           //if the image exists we'll start it up
           try {
             container = Meteor.wrapAsync(dockerProxy.createContainer.bind(dockerProxy))({
@@ -131,9 +138,9 @@ if (containerInfo) {
             Meteor.clearInterval(intervalId);
             hipacheConnect(containerInfo);
           } catch (e) {
-            console.log("Failed to start hipache-npm container.")
+            console.log("Failed to start hipache-npm container. Retrying...");
           }
         }
      });
-  }, 3000);
+  }, 4500);
 }
