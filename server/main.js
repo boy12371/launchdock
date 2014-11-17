@@ -36,10 +36,9 @@ if (Meteor.settings.docker) {
 console.log("Attempting docker daemon connection on " + host + ":" + port);
 try {
   dockerProxy = DockerActions.get( {host: host, port: port} );
-}
-catch (e) {
+} catch (e) {
   console.log("Could not connect to docker daemon on " + host + ":" + port + ",attempting socketPath connect.");
-  dockerProxy = DockerActions.get({socketPath: '/var/run/docker.sock'});
+  dockerProxy = new Docker({socketPath: '/var/run/docker.sock'});
 }
 
 // well, we failed to connect to any docker daemon.

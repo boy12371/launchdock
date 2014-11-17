@@ -15,12 +15,7 @@ DockerActions = {
       dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
       dockerHost.key = fs.readFileSync(certPath + "/" + key);
     }
-    // if socketPath then we'll ignore all of the above
-    if (dockerHost.socketPath == "/var/run/docker.sock") {
-      dockerHost = {};
-      dockerHost = {'socketPath': '/var/run/docker.sock'}
-    }
-
+    
     var d = new Docker(dockerHost);
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.
