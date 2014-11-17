@@ -22,6 +22,7 @@ if (!Meteor.settings.dockerSSL) {
 // you can pass different settings in settings.json
 // otherwise fallback to first DOCKER_HOST if set in ENV
 // and if neither of those existing, we'll use localhost defaults
+// lastly we'll use socketPath connection.
 if (Meteor.settings.docker) {
   var host = Meteor.settings.docker.host;
   var port = Meteor.settings.docker.port;
@@ -32,20 +33,17 @@ if (Meteor.settings.docker) {
   var host = '127.0.0.1';
   var port = '2375';
 }
-
 console.log("Attempting docker daemon connection on " + host + ":" + port);
-try {
-  dockerProxy = DockerActions.get( {host: host, port: port} );
-} catch (e) {
+dockerProxy = DockerActions.get( {host: host, port: port} );
+// we'll fallback to socketPath if we couldn't connect.
+if (!dockerProxy) {
   console.log("Could not connect to docker daemon on " + host + ":" + port + ",attempting socketPath connect.");
   dockerProxy = new Docker({socketPath: '/var/run/docker.sock'});
 }
-
 // well, we failed to connect to any docker daemon.
 if (!dockerProxy) {
   throw new Meteor.Error("400","Failed to connect to any docker daemon");
 }
-
 //
 //  establish connection to hipache redis after we have hipache-npm container
 //
