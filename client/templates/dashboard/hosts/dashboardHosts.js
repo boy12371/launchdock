@@ -43,7 +43,7 @@ Template.dashboardHosts.helpers({
     }
   },
   totalInstances: function () {
-    return AppInstances.find().count();
+    return AppInstancesCount.find().count();
   },
   runningInstances: function () {
     return AppInstances.find({'status':'running','dockerHosts':this._id}).count() || 0;

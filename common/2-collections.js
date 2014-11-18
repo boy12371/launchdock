@@ -1,16 +1,16 @@
-AppInstances = new Meteor.Collection("AppInstances");
+AppInstances = new Mongo.Collection("AppInstances");
 AppInstances.attachSchema(Schemas.AppInstance);
 
-DockerImages = new Meteor.Collection("DockerImages");
+DockerImages = new Mongo.Collection("DockerImages");
 DockerImages.attachSchema(Schemas.DockerImage);
 
-Hosts = new Meteor.Collection("Hosts");
+Hosts = new Mongo.Collection("Hosts");
 Hosts.attachSchema(Schemas.Host);
 
-Settings = new Meteor.Collection("Settings");
+Settings = new Mongo.Collection("Settings");
 Settings.attachSchema(Schemas.Settings);
 
-AppTemplates = new Meteor.Collection("AppTemplates");
+AppTemplates = new Mongo.Collection("AppTemplates");
 AppTemplates.attachSchema(Schemas.AppTemplate);
 
 //

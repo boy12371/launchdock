@@ -35,7 +35,7 @@
 	</div>
 	{{#if currentUser}}
 	<div class="nav pull-right">
-	  <div class="col-md-12">Your Hosts: <span class="badge">{{userHosts}}</span> All Hosts: <span class="badge">{{totalHosts}}</span> Active Hosts: <span class="badge">{{runningHosts.count}}</span> Containers: <span class="badge">{{totalInstances}}</span></div>
+	  <div class="col-md-12">Your Hosts: <span class="badge">{{getPublishedCount 'userHostCounter'}}</span> All Hosts: <span class="badge">{{getPublishedCount 'totalHostCounter'}}</span> Active Hosts: <span class="badge">{{getPublishedCount 'runningHostCounter'}}</span> Containers: <span class="badge">{{getPublishedCount 'appInstanceCounter'}} </span></div>
 	</div>
 	{{/if}}
 	<div class="container-fluid">

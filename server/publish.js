@@ -8,6 +8,27 @@ Meteor.publish("appInstance", function (id) {
   }
 });
 
+Meteor.publish("appInstancesTable", function () {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return AppInstances.find({},{fields:{hostnames:1,status:1,createdAt:1,image:1, 'env.tag': 1, 'env.METEOR_EMAIL':1 }});
+  } else if (this.userId) {
+    return AppInstances.find({'userId': this.userId},{fields:{hostnames:1,status:1,createdAt:1,image:1,'env.tag': 1, 'env.METEOR_EMAIL':1 }});
+  } else {
+    return [];
+  }
+});
+
+
+Meteor.publish("appInstances", function () {
+  if (Roles.userIsInRole(this.userId, ['admin'])) {
+    return AppInstances.find();
+  } else if (this.userId) {
+    return AppInstances.find({'userId': this.userId});
+  } else {
+    return [];
+  }
+});
+
 Meteor.publish("dockerImages", function () {
   if (Roles.userIsInRole(this.userId, ['admin'])) {
     return DockerImages.find();
@@ -28,16 +49,6 @@ Meteor.publish("hosts", function () {
   }
 });
 
-Meteor.publish("appInstances", function () {
-  if (Roles.userIsInRole(this.userId, ['admin'])) {
-    return AppInstances.find();
-  } else if (this.userId) {
-    return AppInstances.find({'userId': this.userId});
-  } else {
-    return [];
-  }
-});
-
 Meteor.publish("settings", function () {
   if (Roles.userIsInRole(this.userId, ['admin'])) {
     return Settings.find();
@@ -51,6 +62,24 @@ Meteor.publish("settings", function () {
 Meteor.publish("appTemplates", function () {
   return AppTemplates.find();
 });
+
+// counters
+Meteor.publish('appInstanceCount', function() {
+  Counts.publish(this, 'appInstanceCounter', AppInstances.find());
+});
+
+Meteor.publish('runningHostCount', function() {
+  Counts.publish(this, 'runningHostCounter', Hosts.find({'active':true}));
+});
+
+Meteor.publish('userHostCount', function() {
+  Counts.publish(this, 'userHostCounter',Hosts.find({'userId':this.userId}));
+});
+
+Meteor.publish('totalHostCount', function() {
+  Counts.publish(this, 'totalHostCounter', Hosts.find());
+});
+
 
 
 Settings.allow({
