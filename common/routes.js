@@ -18,7 +18,7 @@ Router.map(function() {
     fastRender: true,
     waitOn: function() {
       return [
-        Meteor.subscribe("hosts"),Meteor.subscribe("appInstances")
+        Meteor.subscribe("hosts")
       ];
     },
     onBeforeAction: function (pause) {
@@ -32,7 +32,7 @@ Router.map(function() {
     fastRender: true,
     waitOn: function() {
       return [
-        Meteor.subscribe("appInstances")
+        Meteor.subscribe("appInstancesTable")
       ];
     },
     onBeforeAction: function (pause) {

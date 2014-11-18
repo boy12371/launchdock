@@ -46,7 +46,7 @@ Template.appInstances.helpers({
               },
               {'key': 'hostnames', 'label': 'Domain',
                 fn: function (value,item ) {
-                    return new Spacebars.SafeString('<a href="http://'+value+'" class="domain-link" target="_blank">'+value+'</a>');
+                    return new Spacebars.SafeString('<a href="//'+value+'" class="domain-link" target="_blank">'+value+'</a>');
                 }
               },
               {'key': 'status', 'label': 'Status'},
