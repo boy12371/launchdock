@@ -36,6 +36,7 @@ Meteor.methods({
         });
       }
     });
+
     console.log("launching new " + options.appImage + " instance "+ newInstanceId);
     // Return the app instance ID for use in future calls; calling app should store this somewhere
     return newInstanceId;
@@ -259,8 +260,9 @@ Meteor.methods({
 });
 
 ContainerActions = {
-  // Returns a docker container object for the container that is running the
-  // given app instance
+  //
+  // Returns a docker container object for the container that is running the given app instance
+  //
   getForAppInstance: function getForAppInstance(instanceId, docker) {
     var ai = AppInstances.findOne({_id: instanceId});
     if (typeof ai === 'undefined') return null;
@@ -286,9 +288,9 @@ ContainerActions = {
 
     return exists ? docker.getContainer(ai.containerId) : null;
   },
-  //***
-  //  return container info
-  //***
+  //
+  //  return container info, update AppInstances
+  //
   getInfo: function getInfo(instanceId) {
     var container = ContainerActions.getForAppInstance(instanceId);
     if (!container)
@@ -305,11 +307,17 @@ ContainerActions = {
     // Return container info
     return info;
   },
+  //
+  // will loop through all AppInstance and update their info
+  //
   updateInfoForAll: function updateContainerInfoForAllAppInstances() {
     AppInstances.find({'info.Id': {$exists: true, $ne: null}}).forEach(function (appInstance) {
       ContainerActions.getInfo(appInstance._id);
     });
   },
+  //
+  // update hipache proxy entries
+  //
   updateProxy: function updateProxy(instanceId) {
     // make sure info is current first.
     ContainerActions.getInfo(instanceId);
@@ -325,6 +333,9 @@ ContainerActions = {
     // Make sure all info is refreshed.
     ContainerActions.getInfo(instanceId);
   },
+  //
+  // remove container and unset AppInstance info
+  //
   removeForAppInstance: function removeForAppInstance(instanceId, skipDocker) {
     var ai = AppInstances.findOne({_id: instanceId});
 
@@ -361,34 +372,43 @@ ContainerActions = {
       }
     });
   },
+  //
+  // add new container for defined instance
+  // save configuration to AppInstances collection
+  // update proxy
+  //
   addForAppInstance: function addForAppInstance(instanceId) {
     var ai = AppInstances.findOne({_id: instanceId});
-
+    // Bad instanceId
     if (!ai) {
-      // Bad instanceId
       return false;
     }
-
+    // Already has a container running
     if (ai.containerId) {
-      // Already has a container running
       return true;
     }
-
-    // Determine the best host and get a Docker instance for it
-    var hostDoc = HostActions.getBest();
-
-    if (!hostDoc)
-      return false;
-
-    var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
-    if (!docker)
-      return false;
-
     // Prep env variables
     var dockerEnv = _.map(ai.env, function (val, key) {
       return key + '=' + val;
     });
-
+    // Determine the best host and get a Docker instance for it
+    var hostDoc = HostActions.getBest();
+    if (!hostDoc) {
+      console.log("No valid docker hosts found. Cannot add for instance: " + instanceId);
+      return false;
+    }
+    // connect to docker host
+    var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
+    if (!docker) {
+      console.log("Unable to connect to docker host on" + hostDoc.privateHost + ":" + hostDoc.port);
+      return false;
+    }
+    // Update info in AI document
+    AppInstances.update({_id: instanceId}, {
+      $set: {
+        dockerHosts: [hostDoc._id]
+      }
+    });
     // config can be passed into launch option.config and will add/override to defaults
     config = ai.config || {};
     if (!config.name && config.Hostname) config.name = config.Hostname;
@@ -396,19 +416,17 @@ ContainerActions = {
     if (!config.Image) config.Image = ai.image;
     if (!config.Env) config.Env = dockerEnv;
     if (!config.ExposedPorts && !config.HostConfig.PublishAllPorts) config.HostConfig.PublishAllPorts = true;
+
     // Create a new container
-
     var container = Meteor.wrapAsync(docker.createContainer.bind(docker))(config);
-
     // Start container
     Meteor.wrapAsync(container.start.bind(container))();
     // Get info about the new container
     var containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
-    // Update info in AI document
+    // Final Update info in AI document
     AppInstances.update({_id: instanceId}, {
       $set: {
         containerId: containerInfo.Id,
-        dockerHosts: [hostDoc._id],
         info: containerInfo
       }
     });

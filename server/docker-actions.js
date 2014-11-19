@@ -15,7 +15,6 @@ DockerActions = {
       dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
       dockerHost.key = fs.readFileSync(certPath + "/" + key);
     }
-    
     var d = new Docker(dockerHost);
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.
@@ -24,7 +23,6 @@ DockerActions = {
     } catch (error) {
       d = null;
     }
-
     return d;
   },
   getForHost: function getDockerForHost(hostId) {
@@ -40,12 +38,29 @@ DockerActions = {
     if (!ai)
       throw new Meteor.Error(400, 'Bad request', "No app instance has ID " + instanceId);
     var dockerHosts = ai.dockerHosts;
+    // if there isn't a dockerHost assigned let's find and assign
     if (!dockerHosts || !dockerHosts.length) {
-      return null;
+      var hostDoc = HostActions.getBest();
+      if (!hostDoc) {
+        console.log("No valid docker hosts found. Cannot add for instance: " + instanceId);
+        return null;
+      }
+      // connect to docker host
+      var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
+      if (!docker) {
+        console.log("Unable to connect to docker host on" + hostDoc.privateHost + ":" + hostDoc.port);
+        return null;
+      }
+      // Update info in AI document
+      AppInstances.update({_id: instanceId}, {
+        $set: {
+          dockerHosts: [hostDoc._id]
+        }
+      });
+      dockerHosts = [hostDoc._id];
     }
-
+    // Check that hosts are valid and exist
     if (Hosts.find({_id: dockerHosts[0]}, {limit: 1}).count() !== 1) {
-      // Host ID listed in AI doesn't exist
       return null;
     }
     // Currently each app instance runs on only one host

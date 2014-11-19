@@ -98,16 +98,15 @@ HostActions = {
   // Return the doc for the host that has the fewest containers; TODO check defined max, too
   getBest: function getBest() {
     HostActions.updateAll();
-    var userId = this.userId || Meteor.userId()
     var bestHost = '';
     var hosts = Hosts.find({'status':'Active','active': true},{sort: {'details.Containers': 1} } ).fetch();
     _.each(hosts, function (h) {
        if (bestHost) return;
-       if (userId == h.userId) {
+       if (h.userId == Meteor.userId() ) {
         if (h.max > h.details.Containers) return bestHost = h;
        } else {
         //lookup up instances that don't belong to user on this host, decided if there is a shared available
-          shared = Hosts.find({'_id':h._id, userId: {$ne: userId }}).count();
+          shared = Hosts.find({'_id':h._id, userId: {$ne: Meteor.userId() }}).count();
           if (shared < h.shared && h.max > h.details.containers) return bestHost = h;
        }
     });
