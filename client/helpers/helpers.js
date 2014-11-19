@@ -12,5 +12,4 @@ UI.body.helpers({
   pausedInstances: function () {
     return AppInstances.find({'status':'stopped','dockerHosts':this._id}).count() || 0;
   }
-
 });

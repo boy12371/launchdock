@@ -47,7 +47,7 @@ WORKDIR /meteor/bundle
 ENV PORT 8080
 ENV ROOT_URL "http://127.0.0.1"
 ENV MONGO_URL "mongodb://127.0.0.1:3001/meteor"
-#ENV DISABLE_WEBSOCKETS "1"
+ENV DISABLE_WEBSOCKETS "1"
 
 # Expose container port 8080 to the host (outside the container)
 EXPOSE 8080
