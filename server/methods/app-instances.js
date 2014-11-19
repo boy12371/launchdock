@@ -268,6 +268,7 @@ ContainerActions = {
     docker = docker || DockerActions.getForAppInstance(instanceId);
 
     if (!docker) {
+      console.log("Failed to find host for: " + instanceId);
       // Down or deleted? Move app elsewhere
       ContainerActions.removeForAppInstance(instanceId, true);
       if (ContainerActions.addForAppInstance(instanceId)) {

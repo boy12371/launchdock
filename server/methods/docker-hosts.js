@@ -33,7 +33,7 @@ Meteor.methods({
   'host/remove': function removeHost(hostId, keepAppsActive) {
     this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
-
+    console.log("Removing host: " + hostId);
     var cursor = AppInstances.find({dockerHosts: hostId});
 
     // Deactivate all app instances on the host we're going to remove
