@@ -44,17 +44,17 @@ WORKDIR /meteor/bundle
 # Default Meteor ENV settings for meteor app
 # either change these or pass as --env in the docker run
 #
-ENV PORT 8080
+ENV PORT 8282
 ENV ROOT_URL "http://127.0.0.1"
 ENV MONGO_URL "mongodb://127.0.0.1:3001/meteor"
 ENV DISABLE_WEBSOCKETS "1"
 
 # Expose container port 8080 to the host (outside the container)
-EXPOSE 8080
+EXPOSE 8282
 
 RUN touch .foreverignore
 
-# Define default command that runs the node app on container port 8080
+# Define default command that runs the node app on container port 8282
 CMD forever -w ./main.js
 
 
