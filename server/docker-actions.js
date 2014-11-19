@@ -2,7 +2,7 @@ DockerActions = {
   // Get docker connection for host/port or for local server as fallback
   get: function getDocker(dockerHost) {
     if (!dockerHost) return null;
-    if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "tcp";
+    if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "http";
     if (!dockerHost.timeout) dockerHost.timeout = 2000;
     // read SSL certificates, path and cert customizable in Meteor.setttings.dockerSSL
     if (Meteor.settings.dockerSSL && process.env.DOCKER_TLS_VERIFY == 1 ) {
@@ -38,6 +38,11 @@ DockerActions = {
     if (!ai)
       throw new Meteor.Error(400, 'Bad request', "No app instance has ID " + instanceId);
     var dockerHosts = ai.dockerHosts;
+    // Check that hosts are valid and exist
+    // if the host isn't valid we'll give a new host to the instance
+    if (Hosts.find({_id: dockerHosts[0]}, {limit: 1}).count() !== 1) {
+      dockerHosts = null;
+    }
     // if there isn't a dockerHost assigned let's find and assign
     if (!dockerHosts || !dockerHosts.length) {
       var hostDoc = HostActions.getBest();
@@ -59,11 +64,8 @@ DockerActions = {
       });
       dockerHosts = [hostDoc._id];
     }
-    // Check that hosts are valid and exist
-    if (Hosts.find({_id: dockerHosts[0]}, {limit: 1}).count() !== 1) {
-      return null;
-    }
     // Currently each app instance runs on only one host
+    // TODO: support multiple hosts
     return DockerActions.getForHost(dockerHosts[0]);
   }
 };
