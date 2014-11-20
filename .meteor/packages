@@ -22,7 +22,6 @@ ongoworks:dockerode
 
 #community packages
 alanning:roles
-meteorhacks:fast-render
 aslagle:reactive-table
 aldeed:collection2
 aldeed:autoform
@@ -40,4 +39,6 @@ mrt:numeral
 peppelg:on-login-logout
 meteorhacks:kadira
 tmeasday:publish-counts
+mrt:moment
+mrt:moment-timezone
 
