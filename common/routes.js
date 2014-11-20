@@ -15,7 +15,6 @@ Router.map(function() {
 
   this.route('dashboard', {
     path: '/dashboard',
-    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("hosts")
@@ -29,7 +28,6 @@ Router.map(function() {
   this.route('containers', {
     path: '/containers',
     template: 'appInstances',
-    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("appInstancesTable")
@@ -42,7 +40,6 @@ Router.map(function() {
 
   this.route('appInstanceDetails', {
     path: 'container/:_id',
-    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("appInstance", this.params._id)
@@ -83,7 +80,6 @@ Router.map(function() {
   });
 
   this.route('hosts', {
-    fastRender: true,
     waitOn: function() {
       return [
         Meteor.subscribe("hosts")

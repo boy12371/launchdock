@@ -25,10 +25,9 @@ function stringToColor(str) {
 
 Template.appInstances.helpers({
     AppInstances: function(){
-      return AppInstances.find();
+      return AppInstances.find({},{fields:{hostnames:1,status:1,createdAt:1,image:1, 'env.tag': 1, 'env.METEOR_EMAIL':1 }});
     },
     settings: function () {
-      var selectedAppInstances = Session.get('selectedAppInstances') || [];
         return {
             rowsPerPage: 20,
             showFilter: true,
@@ -50,12 +49,17 @@ Template.appInstances.helpers({
                 }
               },
               {'key': 'status', 'label': 'Status'},
-              {'key': 'createdAt', 'label': 'Created', 'sort': 'descending'},
+              {'key': 'createdAt', 'label': 'Created', 'sort': 'descending',
+                fn: function(value,item) {
+                  return moment(value).tz("America/Los_Angeles").format('MM/DD/YY h:mm a');
+                }
+              },
               {'key': 'env.METEOR_EMAIL', 'label': 'Contact'},
               {'key': 'image', 'label': 'Docker Image' }
 
             ],
             rowClass: function(item) {
+              var selectedAppInstances = Session.get('selectedAppInstances') || [];
               if (containsObject({'_id':item._id},selectedAppInstances) ) {
                 return "selected"
               }
