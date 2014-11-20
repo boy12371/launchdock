@@ -33,15 +33,17 @@ DockerActions = {
   },
   // Returns a docker object for the server that is running the
   // given app instance's container
-  getForAppInstance: function getDockerForAppInstance(instanceId) {
+  getForAppInstance: function getForAppInstance(instanceId) {
     var ai = AppInstances.findOne({_id: instanceId});
     if (!ai)
       throw new Meteor.Error(400, 'Bad request', "No app instance has ID " + instanceId);
     var dockerHosts = ai.dockerHosts;
     // Check that hosts are valid and exist
     // if the host isn't valid we'll give a new host to the instance
-    if (Hosts.find({_id: dockerHosts[0]}, {limit: 1}).count() !== 1) {
-      dockerHosts = null;
+    if (dockerHosts) {
+      if (Hosts.find({_id: dockerHosts[0]}, {limit: 1}).count() !== 1) {
+        dockerHosts = null;
+      }
     }
     // if there isn't a dockerHost assigned let's find and assign
     if (!dockerHosts || !dockerHosts.length) {

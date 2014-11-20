@@ -272,7 +272,7 @@ ContainerActions = {
     if (!docker) {
       console.log("Failed to find host for: " + instanceId);
       // Down or deleted? Move app elsewhere
-      ContainerActions.removeForAppInstance(instanceId, true);
+      // ContainerActions.removeForAppInstance(instanceId, true);
       if (ContainerActions.addForAppInstance(instanceId)) {
         // XXX: danger of infinite looping here?
         return ContainerActions.getForAppInstance(instanceId);
@@ -292,9 +292,10 @@ ContainerActions = {
   //  return container info, update AppInstances
   //
   getInfo: function getInfo(instanceId) {
+
     var container = ContainerActions.getForAppInstance(instanceId);
-    if (!container)
-      return null;
+    // if (!container)
+    //   return null;
 
     var info = Meteor.wrapAsync(container.inspect.bind(container))();
     // Update app instance doc with some actual container info
