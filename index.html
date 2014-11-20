@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Launchdock : Meteor + Docker Launcher">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Launchdock</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ongoworks/launchdock">View on GitHub</a>
+
+          <h1 id="project_title">Launchdock</h1>
+          <h2 id="project_tagline">Meteor + Docker Launcher</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ongoworks/launchdock/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ongoworks/launchdock/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Launchdock is a Meteor app (not a package) PaaS solution that allows you to manage multiple instances of other Meteor app/Docker containers, either on a single server or multiple. In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the docker servers in DNS.</p>
+
+<p>There is a browser interface, but you can also remotely call the launcher API over DDP from another Meteor app (or anything that can use DDP).</p>
+
+<p>TODO Eventually there will be a small launcher package that simplifies remote calls from a separate Meteor app.</p>
+
+<h1>
+<a id="local-development-setup" class="anchor" href="#local-development-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Local Development Setup</h1>
+
+<p>Install <a href="http://meteor.com">meteor</a>.</p>
+
+<p>Install <a href="http://boot2docker.io/">boot2docker</a>.</p>
+
+<p>Export your docker host (you will see this at the end of <code>boot2docker</code> installation):</p>
+
+<p><code>export DOCKER_HOST=tcp://127.0.0.1:2375</code></p>
+
+<p><em>Your VM might have a different IP address—use whatever boot2docker up told you to use. You probably want to add that environment variable to your shell config.</em></p>
+
+<p>Configure the VirtualBox VM (where Docker is running) for additional container port access to the VM</p>
+
+<div class="highlight highlight-bash"><pre>  <span class="pl-k">for</span> <span class="pl-vo">i</span> <span class="pl-k">in</span> {49000..49900}<span class="pl-k">;</span> <span class="pl-k">do</span>
+   VBoxManage modifyvm <span class="pl-s1"><span class="pl-pds">"</span>boot2docker-vm<span class="pl-pds">"</span></span> --natpf1 <span class="pl-s1"><span class="pl-pds">"</span>tcp-port<span class="pl-vo">$i</span>,tcp,,<span class="pl-vo">$i</span>,,<span class="pl-vo">$i</span><span class="pl-pds">"</span></span><span class="pl-k">;</span>
+   VBoxManage modifyvm <span class="pl-s1"><span class="pl-pds">"</span>boot2docker-vm<span class="pl-pds">"</span></span> --natpf1 <span class="pl-s1"><span class="pl-pds">"</span>udp-port<span class="pl-vo">$i</span>,udp,,<span class="pl-vo">$i</span>,,<span class="pl-vo">$i</span><span class="pl-pds">"</span></span><span class="pl-k">;</span>
+  <span class="pl-k">done</span></pre></div>
+
+<p>Install the <code>ongoworks/hipache-npm</code> docker image:</p>
+
+<p><code>docker pull ongoworks/hipache-npm</code></p>
+
+<p>Clone launchdock local, then from the <code>launchdock</code> directory, run <code>meteor</code>. This should be all you need for a local Launch Dock development environment.</p>
+
+<div class="highlight highlight-bash"><pre>  git clone https://github.com/ongoworks/launchdock.git
+  <span class="pl-s3">cd</span> launchdock
+  meteor</pre></div>
+
+<p>There are additional docker host configuration options available in <code>settings/settings.json</code>.</p>
+
+<p>You can execute with modified settings.json, or meteor options:</p>
+
+<p><code>meteor --settings settings/settings.json  --port 3003</code></p>
+
+<h1>
+<a id="server-configuration" class="anchor" href="#server-configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Server Configuration</h1>
+
+<h2>
+<a id="configure-the-launch-dock-server" class="anchor" href="#configure-the-launch-dock-server" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configure the Launch Dock Server</h2>
+
+<p>Before you can run launchdock, you must have a properly configured server instance on which to run it.</p>
+
+<h3>
+<a id="general-instructions" class="anchor" href="#general-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>General Instructions</h3>
+
+<p>First install docker. Refer to the instructions on the Docker website. For example, for an Ubuntu server, you should be able to install the latest docker release with this command:</p>
+
+<div class="highlight highlight-bash"><pre>$ curl -s https://get.docker.io/ubuntu/ <span class="pl-k">|</span> sudo sh</pre></div>
+
+<p>To prevent having to <code>sudo</code> when using docker as your OS user, add your user to the "docker" group:</p>
+
+<div class="highlight highlight-bash"><pre>$ sudo usermod -aG docker <span class="pl-k">&lt;</span>username<span class="pl-k">&gt;</span>
+$ newgrp docker</pre></div>
+
+<p>(The first command adds your user to the "docker" group. The second command applies that permission change to the current shell so that you don't have to log out and log back in.)</p>
+
+<p>Now allow connections to the Docker daemon on port 2375:</p>
+
+<div class="highlight highlight-bash"><pre>$ <span class="pl-s3">echo</span> <span class="pl-s1"><span class="pl-pds">"</span>DOCKER_OPTS=<span class="pl-cce">\"</span>-H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock<span class="pl-cce">\"</span><span class="pl-pds">"</span></span> <span class="pl-k">|</span> sudo tee -a /etc/default/docker</pre></div>
+
+<p>This requires restarting the Docker daemon, for example:</p>
+
+<div class="highlight highlight-bash"><pre>$ sudo service docker restart</pre></div>
+
+<p>Or:</p>
+
+<div class="highlight highlight-bash"><pre>$ sudo reboot</pre></div>
+
+<p>Finally, you must make sure ports 80 and 8080 are open for TCP traffic.</p>
+
+<h3>
+<a id="amazon-web-services-instructions" class="anchor" href="#amazon-web-services-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Amazon Web Services Instructions</h3>
+
+<p>Here are instructions for creating an EC2 server with AWS. This is essentially the same as the "General Instructions", but there is a user data script that makes it a bit easier.</p>
+
+<ol>
+<li>In AWS Management Console, launch a new EC2 instance.</li>
+<li>Choose 64-bit Ubuntu.</li>
+<li>Choose micro or whatever size you want. Should be powerful enough to serve all the Meteor apps and the launcher app. (NEXT-CONFIGURE INSTANCE DETAILS)</li>
+<li>Open Advanced Details -&gt; User Data -&gt; As text</li>
+<li>In the text box, enter <code>#include https://raw.githubusercontent.com/ongoworks/launchdock/master/ec2-ubuntu-data-script.sh</code> (REVIEW AND LAUNCH)</li>
+<li>Click "Edit security groups" in the warning message.</li>
+<li>Select or create a security group with TCP access on port 80 and port 8080, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8080 should be limited to be accessible only from the IP address of the app or users that will control the launcher.</li>
+<li>Review and click Launch.</li>
+<li>Create a .pem or select one you already have on your workstation. If you create one, be sure to save it, and to <code>chmod 400</code> it locally.</li>
+</ol>
+
+<p>We have now launched the server instance and installed Docker on it. To connect to the server, <code>ssh -i ~/key.pem ubuntu@54.187.229.4</code> (replace correct key file path and correct IP address of new EC2 instance).</p>
+
+<h2>
+<a id="install-the-launch-dock-app" class="anchor" href="#install-the-launch-dock-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install the Launch Dock App</h2>
+
+<div class="highlight highlight-bash"><pre>$ docker pull ongoworks/hipache-npm
+$ docker pull ongoworks/launchdock</pre></div>
+
+<p>It may take awhile for the images to finish pulling. Use <code>docker images</code> command to check.</p>
+
+<h2>
+<a id="set-up-additional-docker-hosts-optional" class="anchor" href="#set-up-additional-docker-hosts-optional" aria-hidden="true"><span class="octicon octicon-link"></span></a>Set Up Additional Docker Hosts (Optional)</h2>
+
+<p>If you need to be able to launch hundreds of app containers, or if you prefer to run the app instances on servers that are separate from the server running launchdock, you can set up additional servers running Docker, and launchdock will distribute your app instances across all of them. (See Step 1: Add Docker Hosts)</p>
+
+<p>If you're just getting started with launchdock, you might want to skip this for now and get things working on a single server first.</p>
+
+<p>The steps for this are actually the same as for setting up the Launch Dock server. See "Configure the Launch Dock Server", except that you do not need to open port 80 or 8080.</p>
+
+<h3>
+<a id="firewall-considerations" class="anchor" href="#firewall-considerations" aria-hidden="true"><span class="octicon octicon-link"></span></a>Firewall Considerations</h3>
+
+<p>Check to see if you have a firewall enabled:</p>
+
+<div class="highlight highlight-bash"><pre>$ sudo ufw status verbose</pre></div>
+
+<p>If the firewall is active, you'll need to allow port 2375 through. First edit <code>/etc/default/ufw</code> and change <code>DEFAULT_FORWARD_POLICY</code> from "DROP" to "ACCEPT". Then:</p>
+
+<div class="highlight highlight-bash"><pre>$ sudo ufw reload
+$ sudo ufw allow 2375/tcp</pre></div>
+
+<p><strong>Note that connections on 2375 will have root access, so you should limit access to the server running Launch Dock, ideally within a VPC.</strong></p>
+
+<h2>
+<a id="create-a-mongodb-database-for-the-launch-dock-app" class="anchor" href="#create-a-mongodb-database-for-the-launch-dock-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>Create a MongoDB Database For the Launch Dock App</h2>
+
+<p>Create it wherever you like, so long as you have a MongoDB connection URL that you can use in the next step.</p>
+
+<h2>
+<a id="start-the-launch-dock-app" class="anchor" href="#start-the-launch-dock-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>Start the Launch Dock App</h2>
+
+<p>Run two commands. In the second command, be sure to replace the placeholder text with the correct values. The <code>-e ROOT_URL=""</code> can be omitted from that command if you are accessing the Launch Dock admin site by IP address rather than a domain name.</p>
+
+<div class="highlight highlight-bash"><pre>$ docker run --name hipache-npm -p ::6379 -p :80:80 -d ongoworks/hipache-npm
+$ docker run --name launchdock --link hipache-npm:hipache-npm -e MONGO_URL=<span class="pl-s1"><span class="pl-pds">"</span>&lt;launcher db connect string&gt;<span class="pl-pds">"</span></span> -e ROOT_URL=<span class="pl-s1"><span class="pl-pds">"</span>http://&lt;domain.name&gt;<span class="pl-pds">"</span></span> -p :8080:8080 -d ongoworks/launchdock</pre></div>
+
+<p>If the commands are successful, you can see the Launch Dock administrator app in your browser by going to:</p>
+
+<pre><code>http://&lt;your server address&gt;:8080
+</code></pre>
+
+<p>Log in with username "admin" and password "admin". Once logged in, change the admin password.</p>
+
+<p>Troubleshooting: If you don't see anything when accessing that address in your browser, verify that port 8080 is open and check the container logs using <code>docker logs launchdock</code>.</p>
+
+<h2>
+<a id="step-1-add-docker-hosts" class="anchor" href="#step-1-add-docker-hosts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 1: Add Docker Hosts</h2>
+
+<p>On the Hosts screen, you can manage docker hosts. These are the servers on which your app instances will run, within docker containers. You must first set up the server and install Docker on it (see "Set Up Additional Docker Hosts". Then you can add it to the hosts list here.</p>
+
+<p>If you are running app instances on the same docker server that is running launchdock, you can add:</p>
+
+<pre><code>private host: http://127.0.0.1
+public host: http://127.0.0.1
+port: 2375
+max containers: 100
+</code></pre>
+
+<p>The private host is the address of the docker server you wish to launch apps on. The public host is the publicly accessible address that will be used by the proxy server. You should always lock down port 2375 on your servers. On AWS, with security groups you can do this by adding the security group IP to the custom IP field of a tcp/2375 entry.</p>
+
+<h2>
+<a id="step-2-add-an-app-image" class="anchor" href="#step-2-add-an-app-image" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 2: Add an App Image</h2>
+
+<p>The launcher runs the other Meteor apps in docker containers as well. You'll need a docker image for each release of each app that you want to run.</p>
+
+<h3>
+<a id="get-the-dockerfile" class="anchor" href="#get-the-dockerfile" aria-hidden="true"><span class="octicon octicon-link"></span></a>Get the Dockerfile</h3>
+
+<div class="highlight highlight-bash"><pre><span class="pl-s3">cd</span> <span class="pl-k">&lt;</span>yourprojectroot<span class="pl-k">&gt;</span>
+curl -O https://raw.githubusercontent.com/ongoworks/launchdock/master/Dockerfile</pre></div>
+
+<p>Commit the file to source control.</p>
+
+<h3>
+<a id="option-1-build-the-image-automatically" class="anchor" href="#option-1-build-the-image-automatically" aria-hidden="true"><span class="octicon octicon-link"></span></a>(Option 1) Build the Image Automatically</h3>
+
+<p>If your project is on github, you can use <a href="https://index.docker.io/help/docs/#trustedbuilds">Docker.io Trusted Builds</a> to automatically make updated project builds.
+Go to docker.io, register, and go to Trusted Builds and point to your repo.</p>
+
+<h3>
+<a id="option-2-build-the-image-manually" class="anchor" href="#option-2-build-the-image-manually" aria-hidden="true"><span class="octicon octicon-link"></span></a>(Option 2) Build the Image Manually</h3>
+
+<p>Install Docker. See <a href="https://www.docker.io/gettingstarted/">Getting started with Docker</a></p>
+
+<p>First build the docker image:</p>
+
+<div class="highlight highlight-bash"><pre><span class="pl-s3">cd</span> <span class="pl-k">&lt;</span>yourprojectroot<span class="pl-k">&gt;</span>
+docker build --tag=<span class="pl-s1"><span class="pl-pds">"</span>&lt;reponame&gt;/&lt;app&gt;<span class="pl-pds">"</span></span> <span class="pl-s3">.</span></pre></div>
+
+<p>Then push to docker.io or a private docker repo:</p>
+
+<div class="highlight highlight-bash"><pre>docker push <span class="pl-k">&lt;</span>reponame<span class="pl-k">&gt;</span>/<span class="pl-k">&lt;</span>app<span class="pl-k">&gt;</span></pre></div>
+
+<h3>
+<a id="add-the-image-to-rocker-docker" class="anchor" href="#add-the-image-to-rocker-docker" aria-hidden="true"><span class="octicon octicon-link"></span></a>Add the Image to Rocker-Docker</h3>
+
+<p>On the Images screen, enter into the Name field the "/" tag you used when building the image, leave "In Repo" selected, and then click Add. Your app image will be pulled on every defined host.</p>
+
+<h2>
+<a id="step-3-manage-app-instances" class="anchor" href="#step-3-manage-app-instances" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 3: Manage App Instances</h2>
+
+<p>On the App Instances screen, fill out the "Launch a New Instance" form and submit it. You should see the app instance launch almost immediately. At this point you can select it in the list and view additional information about it, start/stop/restart it, remove it, etc.</p>
+
+<h2>
+<a id="updating-launch-dock" class="anchor" href="#updating-launch-dock" aria-hidden="true"><span class="octicon octicon-link"></span></a>Updating Launch Dock</h2>
+
+<div class="highlight highlight-bash"><pre>$ docker pull ongoworks/launchdock
+$ docker stop launchdock
+$ docker rm launchdock
+$ docker run -v /var/run/docker.sock:/var/run/docker.sock --name launchdock --link hipache-npm:hipache-npm -e MONGO_URL=<span class="pl-s1"><span class="pl-pds">"</span>&lt;launcher db connect string&gt;<span class="pl-pds">"</span></span> -e ROOT_URL=<span class="pl-s1"><span class="pl-pds">"</span>http://&lt;domain.name&gt;<span class="pl-pds">"</span></span> -p :8080:8080 -d ongoworks/launchdock</pre></div>
+
+<p>The <code>-e ROOT_URL=""</code> can be omitted from the run command if you are accessing the Launch Dock admin site by IP address rather than a domain name.</p>
+
+<h2>
+<a id="advanced-usage-from-another-app" class="anchor" href="#advanced-usage-from-another-app" aria-hidden="true"><span class="octicon octicon-link"></span></a>Advanced Usage: From Another App</h2>
+
+<p>If you have another Meteor app (or any program that supports DDP) that needs to launch app instances or do anything else, it can connect directly to the Rocker-Docker app and call API methods.</p>
+
+<h3>
+<a id="log-in" class="anchor" href="#log-in" aria-hidden="true"><span class="octicon octicon-link"></span></a>Log In</h3>
+
+<p>You will need to log in as "admin" on the DDP connection before you can call any of the API methods. You can add the ddp-login package to your app to do this. Add your connection in a <code>Meteor.startup</code> method, so that you only are connecting once.</p>
+
+<h3>
+<a id="launch-example" class="anchor" href="#launch-example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Launch Example</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s">var</span> conn <span class="pl-k">=</span> DDP.connect(<span class="pl-s1"><span class="pl-pds">"</span>http://&lt;launchdock-address&gt;:8080<span class="pl-pds">"</span></span>);
+<span class="pl-s">var</span> mongoUrl <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>&lt;app mongo url&gt;<span class="pl-pds">"</span></span>;
+<span class="pl-s">var</span> hostname <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>&lt;site url&gt;<span class="pl-pds">"</span></span>;
+<span class="pl-s">var</span> appImage <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>&lt;reponame&gt;/&lt;app&gt;<span class="pl-pds">"</span></span>;
+<span class="pl-s">var</span> mailUrl <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>&lt;smtp credentials&gt;<span class="pl-pds">"</span></span>;
+<span class="pl-s">var</span> rootUrl <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>&lt;site absoluteUrl&gt;<span class="pl-pds">"</span></span>;
+
+<span class="pl-st">function</span> <span class="pl-en">doLaunch</span>() {
+    conn.<span class="pl-s3">call</span>(<span class="pl-s1"><span class="pl-pds">"</span>ai/launch<span class="pl-pds">"</span></span>, {
+      appImage<span class="pl-k">:</span> appImage,
+      hostname<span class="pl-k">:</span> hostname,
+      env<span class="pl-k">:</span> {
+        MAIL_URL<span class="pl-k">:</span> mailUrl,
+        MONGO_URL<span class="pl-k">:</span> mongoUrl,
+        ROOT_URL<span class="pl-k">:</span> rootUrl
+      }
+    }, <span class="pl-st">function</span> (<span class="pl-vpf">error</span>, <span class="pl-vpf">result</span>) {
+      <span class="pl-k">if</span> (error)
+        <span class="pl-en">console</span><span class="pl-s3">.log</span>(<span class="pl-s1"><span class="pl-pds">"</span>Error in ai/launch: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> error);
+      <span class="pl-k">else</span>
+        <span class="pl-en">console</span><span class="pl-s3">.log</span>(<span class="pl-s1"><span class="pl-pds">"</span>New app instance ID is <span class="pl-pds">"</span></span> <span class="pl-k">+</span> result);
+    });
+}
+
+DDP.loginWithPassword(conn, {username<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>admin<span class="pl-pds">'</span></span>}, <span class="pl-s1"><span class="pl-pds">'</span>admin<span class="pl-pds">'</span></span>, <span class="pl-st">function</span> (<span class="pl-vpf">error</span>) {
+    <span class="pl-k">if</span> (error) {
+      <span class="pl-en">console</span><span class="pl-s3">.log</span>(error);
+    } <span class="pl-k">else</span> {
+      doLaunch();
+    }
+});</pre></div>
+
+<p>The new app instance's ID is returned by "ai/launch". You will want to save this somewhere within the calling app and use it whenever calling any of the other available methods.</p>
+
+<h3>
+<a id="other-app-instance-api-methods" class="anchor" href="#other-app-instance-api-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Other App Instance API Methods</h3>
+
+<ul>
+<li>
+<code>conn.call("ai/rebuild", instanceId, callback)</code>: Kill this app instance after cloning it to a new docker container.</li>
+<li>
+<code>conn.call("ai/restart", instanceId, callback)</code>: Restart the docker container for this instance</li>
+<li>
+<code>conn.call("ai/start", instanceId, callback)</code>: Start the docker container for this instance</li>
+<li>
+<code>conn.call("ai/stop", instanceId, callback)</code>: Stop (gracefully) the docker container for this instance</li>
+<li>
+<code>conn.call("ai/kill", instanceId, callback)</code>: Kill the docker container for this instance</li>
+<li>
+<code>conn.call("ai/remove", instanceId, callback)</code>: Remove this instance</li>
+<li>
+<code>conn.call("ai/getEnvironmentVariables", instanceId, callback)</code>: Returns the defined environment variables for this instance. These are those provided when launching but may not be the actual environment variables in the container if they were changed after launch for some reason.</li>
+<li>
+<code>conn.call("ai/addHostname", instanceId, hostname, callback)</code>: Add a hostname to be routed to this instance.</li>
+<li>
+<code>conn.call("ai/removeHostname", instanceId, hostname, callback)</code>: No longer route the given hostname to this instance.</li>
+<li>
+<code>conn.call("ai/getContainerInfo", instanceId, callback)</code>: Returns information about the docker container in which this app instance is running.</li>
+</ul>
+
+<h3>
+<a id="host-api-methods" class="anchor" href="#host-api-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Host API Methods</h3>
+
+<ul>
+<li>
+<code>conn.call("host/add", {privateHost, publicHost, port, max, active}, callback)</code>: Add a docker host.</li>
+<li>
+<code>conn.call("host/refreshDetails", hostId, callback)</code>: If a <code>hostId</code> is provided, refreshes the docker information for that host and returns it. If no <code>hostId</code> is provided, refreshes the docker information for all defined hosts.</li>
+</ul>
+
+<h3>
+<a id="image-api-methods" class="anchor" href="#image-api-methods" aria-hidden="true"><span class="octicon octicon-link"></span></a>Image API Methods</h3>
+
+<ul>
+<li>
+<code>conn.call("image/add", imageName, callback)</code>: Add an image to all hosts by pulling the image with the given name.</li>
+<li>
+<code>conn.call("image/addFromArchive", imageName, archiveUrl, callback)</code>: Add an image to all hosts by downloading the tarfile and building it with the given image name.</li>
+<li>
+<code>conn.call("image/remove", imageId, callback)</code>: Remove the image from the list of images and from all docker hosts.</li>
+<li>
+<code>conn.call("image/createOnAllHosts", imageId, callback)</code>: Re-create (pull or build) the given image on all defined docker hosts.</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Launchdock maintained by <a href="https://github.com/ongoworks">ongoworks</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-44704216-6");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
