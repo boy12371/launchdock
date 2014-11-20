@@ -1,6 +1,6 @@
 settings = Settings.findOne();
 if (settings) {
-  if (settings.kadira) {
+  if (settings.kadira && !Meteor.settings.kadira) {
     Kadira.connect(settings.kadira.appId, settings.kadira.appSecret)
   }
 

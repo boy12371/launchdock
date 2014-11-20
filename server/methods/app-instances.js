@@ -292,10 +292,8 @@ ContainerActions = {
   //  return container info, update AppInstances
   //
   getInfo: function getInfo(instanceId) {
-
     var container = ContainerActions.getForAppInstance(instanceId);
-    // if (!container)
-    //   return null;
+    if (!container) return null;
 
     var info = Meteor.wrapAsync(container.inspect.bind(container))();
     // Update app instance doc with some actual container info
