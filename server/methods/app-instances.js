@@ -67,11 +67,10 @@ Meteor.methods({
     this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
-    console.log("Restarting: ",instanceId);
+    console.log("Restarting: " + instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
     if (!container) {
-      Meteor.call('ai/rebuild', instanceId)
-      return true;
+      return Meteor.call('ai/rebuild', instanceId)
     }
     // Restart container
     result = Meteor.wrapAsync(container.restart.bind(container))();
@@ -266,19 +265,10 @@ ContainerActions = {
   getForAppInstance: function getForAppInstance(instanceId, docker) {
     var ai = AppInstances.findOne({_id: instanceId});
     if (typeof ai === 'undefined') return null;
-
-    docker = docker || DockerActions.getForAppInstance(instanceId);
-
+    if (!ai.dockerHosts) return null;
+    var docker = docker || DockerActions.getForHost(ai.dockerHosts[0]);
     if (!docker) {
-      console.log("Failed to find host for: " + instanceId);
-      // Down or deleted? Move app elsewhere
-      // ContainerActions.removeForAppInstance(instanceId, true);
-      if (ContainerActions.addForAppInstance(instanceId)) {
-        // XXX: danger of infinite looping here?
-        return ContainerActions.getForAppInstance(instanceId);
-      } else {
-        return null;
-      }
+      return null;
     }
     // Are there actually any containers on this docker instance with this container ID?
     var containers = Meteor.wrapAsync(docker.listContainers.bind(docker))({all: 1});
@@ -293,16 +283,21 @@ ContainerActions = {
   //
   getInfo: function getInfo(instanceId) {
     var container = ContainerActions.getForAppInstance(instanceId);
-    if (!container) return null;
-
+    if (!container) {
+      AppInstances.update({_id: instanceId}, {$set: {
+        info: "",
+        status: "stopped",
+        'container.pid': ""
+      }});
+      return null
+    };
     var info = Meteor.wrapAsync(container.inspect.bind(container))();
     // Update app instance doc with some actual container info
     AppInstances.update({_id: instanceId}, {$set: {
-      info: info,
-      status: (info.State && info.State.Running) ? "running" : "stopped",
+      'info': info,
+      'status': (info.State && info.State.Running) ? "running" : "stopped",
       'container.pid': info.State && info.State.Pid
     }});
-
     // Return container info
     return info;
   },
@@ -319,7 +314,7 @@ ContainerActions = {
   //
   updateProxy: function updateProxy(instanceId) {
     // make sure info is current first.
-    ContainerActions.getInfo(instanceId);
+    // ContainerActions.getInfo(instanceId);
     var ai = AppInstances.findOne({_id: instanceId});
     // Update proxy server host records
     if (ai.hostnames) {
@@ -330,7 +325,7 @@ ContainerActions = {
       Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3));
     }
     // Make sure all info is refreshed.
-    ContainerActions.getInfo(instanceId);
+
   },
   //
   // remove container and unset AppInstance info
@@ -390,24 +385,8 @@ ContainerActions = {
     var dockerEnv = _.map(ai.env, function (val, key) {
       return key + '=' + val;
     });
-    // Determine the best host and get a Docker instance for it
-    var hostDoc = HostActions.getBest();
-    if (!hostDoc) {
-      console.log("No valid docker hosts found. Cannot add for instance: " + instanceId);
-      return false;
-    }
-    // connect to docker host
-    var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
-    if (!docker) {
-      console.log("Unable to connect to docker host on" + hostDoc.privateHost + ":" + hostDoc.port);
-      return false;
-    }
-    // Update info in AI document
-    AppInstances.update({_id: instanceId}, {
-      $set: {
-        dockerHosts: [hostDoc._id]
-      }
-    });
+    // get new docker host (will assign ai.dockerHosts and return docker host)
+    var docker = DockerActions.getForAppInstance(instanceId);
     // config can be passed into launch option.config and will add/override to defaults
     config = ai.config || {};
     if (!config.name && config.Hostname) config.name = config.Hostname;
@@ -421,16 +400,18 @@ ContainerActions = {
     // Start container
     Meteor.wrapAsync(container.start.bind(container))();
     // Get info about the new container
-    var containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
+    var info = Meteor.wrapAsync(container.inspect.bind(container))();
     // Final Update info in AI document
     AppInstances.update({_id: instanceId}, {
       $set: {
-        containerId: containerInfo.Id,
-        info: containerInfo
+        'containerId': info.Id,
+        'info': info,
+        'container.pid': info.State.Pid,
+        'status': (info.State && info.State.Running) ? "running" : "stopped"
       }
     });
     // Update proxy server host records
     ContainerActions.updateProxy(instanceId);
-    return ContainerActions.getInfo(instanceId);
+    return info;
   }
 };

@@ -46,23 +46,27 @@ if (!dockerProxy) {
 }
 //
 //  establish connection to hipache redis after we have hipache-npm container
+//  you can pass REDIS_HOST and REDIS_PORT in as env variables if you want to use
+//  a different REDIS backend for Hipache
+//  used locally on OSX we'll use DOCKER_HOST or docker.host from settings.json
 //
 function hipacheConnect(containerInfo) {
   console.log("Connect to hipache-npm redis instance");
   if (containerInfo) {
-    var hostConfig = containerInfo.NetworkSettings.Ports["6379/tcp"][0];
+    var host = process.env.REDIS_HOST || containerInfo.NetworkSettings.IPAddress || "127.0.0.1";
+    var port = process.env.REDIS_PORT || containerInfo.NetworkSettings.Ports["6379/tcp"][0].HostPort || 6379;
     var platform = os.platform(), d;
     Meteor.setTimeout(function() {
       if (platform === "darwin") {
-        var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2) || Meteor.settings.docker.host || hostConfig.HostIp;
+        var host = process.env.DOCKER_HOST.split(":",2)[1].slice(2) || Meteor.settings.docker.host || host;
         try {
-          Hipache = redis.createClient(hostConfig.HostPort, host); //local
+          Hipache = redis.createClient(port, host); //local
         } catch (e) {
           console.log ("Unable to connect to hipache redis. Checking hipach-npm installation.")
         }
       } else {
         try {
-          Hipache = redis.createClient(6379, containerInfo.NetworkSettings.IPAddress); //running as docker instances
+          Hipache = redis.createClient(port, host); //running as docker instances
         } catch (e) {
           console.log ("Unable to connect to hipache redis. Checking hipach-npm installation.")
         }

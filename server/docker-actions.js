@@ -33,6 +33,7 @@ DockerActions = {
   },
   // Returns a docker object for the server that is running the
   // given app instance's container
+  // sets the dockerHost value in instance record
   getForAppInstance: function getForAppInstance(instanceId) {
     var ai = AppInstances.findOne({_id: instanceId});
     if (!ai)
@@ -49,13 +50,13 @@ DockerActions = {
     if (!dockerHosts || !dockerHosts.length) {
       var hostDoc = HostActions.getBest();
       if (!hostDoc) {
-        console.log("No valid docker hosts found. Cannot add for instance: " + instanceId);
+        console.log("DockerActions: No valid docker hosts found. Cannot add for instance: " + instanceId);
         return null;
       }
       // connect to docker host
       var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
       if (!docker) {
-        console.log("Unable to connect to docker host on" + hostDoc.privateHost + ":" + hostDoc.port);
+        console.log("DockerActions: Unable to connect to docker host on" + hostDoc.privateHost + ":" + hostDoc.port);
         return null;
       }
       // Update info in AI document
