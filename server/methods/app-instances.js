@@ -7,7 +7,6 @@ Meteor.methods({
   * launch app instance
   */
   'ai/launch': function (options) {
-    this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     options = options || {};
     if (typeof options.appImage !== "string") {
@@ -58,13 +57,14 @@ Meteor.methods({
     return true;
   },
   'ai/restart': function (instanceId) {
-    this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Restarting: " + instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
     if (!container) {
-      return Meteor.call('ai/rebuild', instanceId)
+      ContainerActions.removeForAppInstance(instanceId);
+      ContainerActions.addForAppInstance(instanceId);
+      return true;
     }
     // Restart container
     Meteor.wrapAsync(container.restart.bind(container))();
@@ -73,7 +73,6 @@ Meteor.methods({
     return true;
   },
   'ai/start': function (instanceId) {
-    this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Starting: ",instanceId);
@@ -138,7 +137,6 @@ Meteor.methods({
     return true;
   },
   'ai/remove': function (instanceId) {
-    this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Removing: ",instanceId);
@@ -148,7 +146,6 @@ Meteor.methods({
     if (AppInstances.remove({_id: instanceId}) === 0) {
       throw new Meteor.Error(500, 'Internal server error', "Failed to remove app instance with ID " + instanceId);
     }
-
     HostActions.updateAll();
     return instanceId;
   },
@@ -186,7 +183,6 @@ Meteor.methods({
     return ai && ai.env;
   },
   'ai/addHostname': function (instanceId, hostname) {
-    this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     check(hostname, String);
@@ -226,7 +222,6 @@ Meteor.methods({
     return true;
   },
   'ai/removeHostname': function (instanceId, hostname) {
-    this.unblock();
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     check(hostname, String);
@@ -240,10 +235,9 @@ Meteor.methods({
     return true;
   },
   'ai/getContainerInfo': function (instanceId) {
-    this.unblock();
+
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
-
     return ContainerActions.getInfo(instanceId);
   }
 });
@@ -303,13 +297,11 @@ ContainerActions = {
   // update hipache proxy entries
   //
   updateProxy: function updateProxy(instanceId) {
-    // make sure info is current first.
-    // ContainerActions.getInfo(instanceId);
     var ai = AppInstances.findOne({_id: instanceId});
     // Update proxy server host records
     if (ai.hostnames) {
-      if (ai.hostnames[0]) Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
       // If hostname is provided, add domain to hipache as a group.
+      if (ai.hostnames[0]) Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
       return Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
     } else if (ai.env.ROOT_URL) {
       return Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3));
@@ -349,6 +341,8 @@ ContainerActions = {
         dockerHosts: ""
       }
     });
+    // refresh info
+    ContainerActions.getInfo(instanceId);
     return true;
   },
   //

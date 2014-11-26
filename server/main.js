@@ -95,8 +95,8 @@ if (containerInfo) {
     console.log("Attempting to restart existing hipache-npm container");
     Meteor.wrapAsync(container.restart.bind(container))();
 
-    containerInfo = Meteor.wrapAsync(container.inspect.bind(container))();
-    hipacheConnect(containerInfo);
+    var info = Meteor.wrapAsync(container.inspect.bind(container))();
+    hipacheConnect(info);
     return;
   } else {
     // container already running, just connect

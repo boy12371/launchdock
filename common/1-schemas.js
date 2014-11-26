@@ -79,7 +79,8 @@ Schemas.AppInstance = new SimpleSchema({
 	containerId: {
 		type: String,
 		label: "Container ID",
-		optional: true
+		optional: true,
+		index: 1
 	},
 	container: {
 		type: Object,
@@ -99,7 +100,8 @@ Schemas.AppInstance = new SimpleSchema({
 	},
 	status: {
 		type: String,
-		optional: true
+		optional: true,
+		index: 1
 	},
 	env: {
 		type: Object,
@@ -119,13 +121,18 @@ Schemas.AppInstance = new SimpleSchema({
 	dockerHosts: {
 		type: [String],
 		label: "Hosts running this instance",
-		optional: true
+		optional: true,
+		index: 1
 	},
 	config: {
 		type: Object,
 		label: "Docker Options",
 		blackbox: true,
 		optional: true
+	},
+	userId: {
+		type: String,
+		index: 1
 	}
 });
 
