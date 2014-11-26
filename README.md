@@ -208,7 +208,7 @@ Then push to docker.io or a private docker repo:
 docker push <reponame>/<app>
 ```
 
-### Add the Image to Rocker-Docker
+### Add the Image to Launchdock
 
 On the Images screen, enter into the Name field the "<reponame>/<app>" tag you used when building the image, leave "In Repo" selected, and then click Add. Your app image will be pulled on every defined host.
 
@@ -229,7 +229,7 @@ The `-e ROOT_URL=""` can be omitted from the run command if you are accessing th
 
 ## Advanced Usage: From Another App
 
-If you have another Meteor app (or any program that supports DDP) that needs to launch app instances or do anything else, it can connect directly to the Rocker-Docker app and call API methods.
+If you have another Meteor app (or any program that supports DDP) that needs to launch app instances or do anything else, it can connect directly to the Launchdock app and call API methods.
 
 ### Log In
 

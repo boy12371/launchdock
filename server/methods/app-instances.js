@@ -280,7 +280,7 @@ ContainerActions = {
     AppInstances.update({_id: instanceId}, {$set: {
       'info': info,
       'status': (info.State && info.State.Running) ? "running" : "stopped",
-      'container.pid': info.State.Pid
+      'container.pid': info.State && info.State.Pid
     }});
     // Return container info
     return info;
@@ -385,7 +385,7 @@ ContainerActions = {
       $set: {
         'containerId': info.Id,
         'info': info,
-        'container.pid': info.State.Pid,
+        'container.pid': info.State && info.State.Pid,
         'status': (info.State && info.State.Running) ? "running" : "stopped"
       }
     });
