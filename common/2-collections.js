@@ -35,6 +35,9 @@ AppInstances.helpers({
   createdAtLong: function () {
   	return moment(this.createdAt).format("LLLL");
   },
+  createdAtShort: function () {
+    return moment(this.createdAt).tz("America/Los_Angeles").format('MM/DD/YY h:mm a');
+  },
   shortContainerId: function () {
     return (this.containerId || "").slice(0, 10) + '...';
   }

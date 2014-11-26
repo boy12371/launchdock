@@ -221,7 +221,7 @@ Meteor.methods({
     } else {
       var domainId = Random.id(8);
     }
-
+    // collection helper to get hosts
     var dockerHosts = ai.hosts();
     if (!dockerHosts.length) {
       console.log("Can't add hostname because app instance " + instanceId + " does not have dockerHosts listed.");
