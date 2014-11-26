@@ -69,7 +69,7 @@ Meteor.methods({
     // Restart container
     Meteor.wrapAsync(container.restart.bind(container))();
     ContainerActions.getInfo(instanceId);
-    ContainerActions.updateProxy(instanceId);
+    Meteor.call("ai/addHostname", instanceId);
     return true;
   },
   'ai/start': function (instanceId) {
@@ -185,21 +185,37 @@ Meteor.methods({
   'ai/addHostname': function (instanceId, hostname) {
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
-    check(hostname, String);
+    // get the appinstance
+    var ai = AppInstances.findOne({_id: instanceId});
+    // if host is passed as a param, we'll add it
+    // if host has been assigned, let's remove it from hipache
+    // if a host hasn't been assigned we'll get one.
+    // pass ROOT_URL has a env variable or
+    // we'll get from Docker container settings (domainName, Hostname, Name)
+    if (!hostname) {
+      if (ai.hostnames) {
+        hostname = ai.hostnames[0];
+      }
+      if(!hostname) {
+        if (ai.env.ROOT_URL) {
+          hostname = ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3);
+        } else {
+          hostname = ai.config.domainName || ai.config.Domainname || ai.config.Hostname || ai.config.Name;
+        }
+      }
+    }
     console.log("Add hostname: ",instanceId, hostname);
     // A hostname may only be mapped to one app instance
-    var existing = AppInstances.findOne({hostnames: hostname}, {_id: 1})
-    if (existing) {
-      throw new Meteor.Error(400, 'Bad request', '"' + hostname + '" is already listed as a hostname for the app instance with ID ' + existing._id);
-    }
-
-    // Get app instance document
-    var ai = AppInstances.findOne({_id: instanceId});
     // Note this hostname in the AppInstance info
-    AppInstances.update({_id: instanceId}, {$push: {hostnames: hostname}});
+    var existing = AppInstances.findOne({hostnames: { $ne: hostname}, _id: instanceId});
+    if (existing) {
+      console.log("Adding additonal hostname for the app instance with ID :" + existing._id);
+      AppInstances.update({_id: instanceId}, {$push: {hostnames: hostname}});
+    } else {
+      AppInstances.update({_id: instanceId}, {$set: {hostnames: [hostname]}});
+    }
     // Inform the proxy server that it needs to route the provided hostname to the provided instance
-
-    // use domain prefix as unique identifier
+    // use domain prefix as unique identifier for the proxy server
     if (hostname.split(".").length > 2) {
       var domainId = hostname.split(".")[0];
     } else {
@@ -212,11 +228,11 @@ Meteor.methods({
       return false;
     }
     var dockerHost = dockerHosts[0];
-    Hipache.rpush('frontend:'+hostname, domainId );
+    Meteor.wrapAsync(Hipache.rpush.bind(Hipache))('frontend:'+hostname, domainId );
     // Map all exposed ports to hipache entry
     _.each(ai.info.NetworkSettings.Ports, function (exposedPort) {
       _.each(exposedPort, function(port) {
-        Hipache.rpush('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
+        Meteor.wrapAsync(Hipache.rpush.bind(Hipache))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
       });
     });
     return true;
@@ -230,7 +246,7 @@ Meteor.methods({
     AppInstances.update({_id: instanceId}, {$pull: {hostnames: hostname}});
 
     // Inform the proxy server that it no longer needs to route the provided hostname to the provided instance
-    Hipache.del("frontend:"+hostname)
+    Meteor.wrapAsync(Hipache.del.bind(Hipache))("frontend:"+hostname)
 
     return true;
   },
@@ -292,21 +308,6 @@ ContainerActions = {
     AppInstances.find({'info.Id': {$exists: true, $ne: null}}).forEach(function (appInstance) {
       ContainerActions.getInfo(appInstance._id);
     });
-  },
-  //
-  // update hipache proxy entries
-  //
-  updateProxy: function updateProxy(instanceId) {
-    var ai = AppInstances.findOne({_id: instanceId});
-    // Update proxy server host records
-    if (ai.hostnames) {
-      // If hostname is provided, add domain to hipache as a group.
-      if (ai.hostnames[0]) Meteor.call("ai/removeHostname", ai._id, ai.hostnames[0]);
-      return Meteor.call("ai/addHostname", ai._id, ai.hostnames[0]);
-    } else if (ai.env.ROOT_URL) {
-      return Meteor.call("ai/addHostname", ai._id, ai.env.ROOT_URL.substr(ai.env.ROOT_URL.indexOf('://')+3));
-    }
-    return true;
   },
   //
   // remove container and unset AppInstance info
@@ -390,7 +391,7 @@ ContainerActions = {
       }
     });
     // Update proxy server host records
-    ContainerActions.updateProxy(instanceId);
+    Meteor.call("ai/addHostname", instanceId);
     return info;
   }
 };

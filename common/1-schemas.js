@@ -132,6 +132,7 @@ Schemas.AppInstance = new SimpleSchema({
 	},
 	userId: {
 		type: String,
+		optional: true,
 		index: 1
 	}
 });

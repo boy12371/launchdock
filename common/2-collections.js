@@ -27,6 +27,11 @@ AppInstances.helpers({
   		return key + "=" + val;
   	});
   },
+  portsAsArray: function () {
+    return _.map(this.info.NetworkSettings.Ports, function (val, key) {
+      return key + " => " + val[0].HostPort;
+    });
+  },
   createdAtLong: function () {
   	return moment(this.createdAt).format("LLLL");
   },
