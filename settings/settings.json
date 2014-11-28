@@ -9,12 +9,20 @@
     "port": 2375
   },
   "dockerSSL": {
+    "verify": true,
     "path": null,
     "ca": "ca.pem",
     "cert": "cert.pem",
     "key": "key.pem"
   },
-  "proxyRepo": "ongoworks/hipache-npm:latest",
+  "redis": {
+    "host": "",
+    "port": ""
+  },
+  "hipache": {
+    "image": "ongoworks/hipache-npm:latest",
+    "name": "hipache-npm"
+  },
   "public": {
     "isDebug": true
   }

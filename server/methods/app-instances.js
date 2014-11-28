@@ -228,11 +228,11 @@ Meteor.methods({
       return false;
     }
     var dockerHost = dockerHosts[0];
-    Meteor.wrapAsync(Hipache.rpush.bind(Hipache))('frontend:'+hostname, domainId );
+    Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, domainId );
     // Map all exposed ports to hipache entry
     _.each(ai.info.NetworkSettings.Ports, function (exposedPort) {
       _.each(exposedPort, function(port) {
-        Meteor.wrapAsync(Hipache.rpush.bind(Hipache))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
+        Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
       });
     });
     return true;
@@ -246,7 +246,7 @@ Meteor.methods({
     AppInstances.update({_id: instanceId}, {$pull: {hostnames: hostname}});
 
     // Inform the proxy server that it no longer needs to route the provided hostname to the provided instance
-    Meteor.wrapAsync(Hipache.del.bind(Hipache))("frontend:"+hostname)
+    Meteor.wrapAsync(Redis.del.bind(Redis))("frontend:"+hostname)
 
     return true;
   },
@@ -319,7 +319,7 @@ ContainerActions = {
     // they point to the container being removed.
     _.each(ai.hostnames, function (hostname) {
       console.log("Removing hipache entry:" + hostname);
-      Hipache.del("frontend:"+hostname)
+      Redis.del("frontend:"+hostname)
     });
     // We remove the docker container if we have one, otherwise ignore it
     if (skipDocker !== true) {

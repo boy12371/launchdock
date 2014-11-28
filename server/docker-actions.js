@@ -1,12 +1,11 @@
 DockerActions = {
-  // Get docker connection for host/port or for local server as fallback
+  // Get docker connection for host/port/protocol or for local server as fallback
+  // read in docker certificates
   get: function getDocker(dockerHost) {
     if (!dockerHost) return null;
-    if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "http";
-    if (!dockerHost.timeout) dockerHost.timeout = 2000;
     // read SSL certificates, path and cert customizable in Meteor.setttings.dockerSSL
-    if (Meteor.settings.dockerSSL && process.env.DOCKER_TLS_VERIFY == 1 ) {
-      dockerHost.protocol = "https";
+    if ((Meteor.settings.dockerSSL || process.env.DOCKER_TLS_VERIFY == 1) && !dockerHost.socketPath) {
+      if (!dockerHost.protocol) dockerHost.protocol = "https";
       var certPath = Meteor.settings.dockerSSL.path || process.env.DOCKER_CERT_PATH;
       var ca = Meteor.settings.dockerSSL.ca || "ca.pem";
       var cert = Meteor.settings.dockerSSL.cert || "cert.pem";
@@ -15,12 +14,16 @@ DockerActions = {
       dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
       dockerHost.key = fs.readFileSync(certPath + "/" + key);
     }
+    if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "http";
+    if (!dockerHost.timeout) dockerHost.timeout = 2000;
+
     var d = new Docker(dockerHost);
     // Make sure the instance is up; TODO should probably do something
     // simple like a ping instead. Not sure if docker has connection test endpoint.
     try {
       Meteor.wrapAsync(d.info.bind(d))();
     } catch (error) {
+      console.log("Error connection to docker: " + error);
       d = null;
     }
     return d;
