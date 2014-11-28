@@ -27,8 +27,16 @@ AppInstances.helpers({
   		return key + "=" + val;
   	});
   },
+  portsAsArray: function () {
+    return _.map(this.info.NetworkSettings.Ports, function (val, key) {
+      return key + " => " + val[0].HostPort;
+    });
+  },
   createdAtLong: function () {
   	return moment(this.createdAt).format("LLLL");
+  },
+  createdAtShort: function () {
+    return moment(this.createdAt).tz("America/Los_Angeles").format('MM/DD/YY h:mm a');
   },
   shortContainerId: function () {
     return (this.containerId || "").slice(0, 10) + '...';

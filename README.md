@@ -15,11 +15,13 @@ Install [boot2docker](http://boot2docker.io/).
 
 Export your docker host (you will see this at the end of `boot2docker` installation):
 
-`export DOCKER_HOST=tcp://127.0.0.1:2375`
+  ```export DOCKER_HOST=tcp://192.168.59.103:2376
+  export DOCKER_CERT_PATH=/Users/<username>/.boot2docker/certs/boot2docker-vm
+  export DOCKER_TLS_VERIFY=1```
 
-*Your VM might have a different IP address—use whatever boot2docker up told you to use. You probably want to add that environment variable to your shell config.*
+*Your VM might have a different DOCKER_HOST IP address and DOCKER_CERT_PATH. Use whatever boot2docker up told you to use. You probably want to add those environment variables to your shell config.*
 
-Configure the VirtualBox VM (where Docker is running) for additional container port access to the VM
+Optionally, you might also want to configure the VirtualBox VM (where Docker is running) for additional container port access to the VM.
 ```bash
   for i in {49000..49900}; do
    VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port$i,tcp,,$i,,$i";
@@ -27,7 +29,7 @@ Configure the VirtualBox VM (where Docker is running) for additional container p
   done
 ```
 
-Install the `ongoworks/hipache-npm` docker image:
+Optionally, install the `ongoworks/hipache-npm` docker image (if you don't we'll pull one when you run Launchdock):
 
 `docker pull ongoworks/hipache-npm`
 
@@ -39,6 +41,8 @@ Clone launchdock local, then from the `launchdock` directory, run `meteor`. This
   meteor
 ```
 
+*Note: If you have an SSL connection error connecting to Docker, copy files from `DOCKER_CERT_PATH` to `private/docker/`*
+
 There are additional docker host configuration options available in `settings/settings.json`.
 
 You can execute with modified settings.json, or meteor options:
@@ -48,7 +52,7 @@ You can execute with modified settings.json, or meteor options:
 # Server Configuration
 ## Configure the Launch Dock Server
 
-Before you can run launchdock, you must have a properly configured server instance on which to run it.
+For production server deployment, before you can run launchdock, you must have a properly configured server instance on which to run it.
 
 ### General Instructions
 
@@ -85,7 +89,7 @@ Or:
 $ sudo reboot
 ```
 
-Finally, you must make sure ports 80 and 8080 are open for TCP traffic.
+Finally, you must make sure port 80 is open for TCP traffic, hipache will use this to route requests the assigned container ports..
 
 ### Amazon Web Services Instructions
 
@@ -95,7 +99,7 @@ Here are instructions for creating an EC2 server with AWS. This is essentially t
 2. Choose 64-bit Ubuntu.
 3. Choose micro or whatever size you want. Should be powerful enough to serve all the Meteor apps and the launcher app. (NEXT-CONFIGURE INSTANCE DETAILS)
 4. Open Advanced Details -> User Data -> As text
-5. In the text box, enter `#include https://raw.githubusercontent.com/ongoworks/launchdock/master/ec2-ubuntu-data-script.sh` (REVIEW AND LAUNCH)
+5. In the text box, enter `#include https://raw.githubusercontent.com/ongoworks/launchdock/master/install/ubuntu/ec2-ubuntu-init-data.sh` (REVIEW AND LAUNCH)
 6. Click "Edit security groups" in the warning message.
 7. Select or create a security group with TCP access on port 80 and port 8080, and SSH access on port 22. For now, accepting from any source is fine, but in production, port 8080 should be limited to be accessible only from the IP address of the app or users that will control the launcher.
 8. Review and click Launch.
@@ -128,14 +132,15 @@ Check to see if you have a firewall enabled:
 $ sudo ufw status verbose
 ```
 
-If the firewall is active, you'll need to allow port 2375 through. First edit `/etc/default/ufw` and change `DEFAULT_FORWARD_POLICY` from "DROP" to "ACCEPT". Then:
+If the firewall is active, you'll need to allow ports 2375 and 2376 through. First edit `/etc/default/ufw` and change `DEFAULT_FORWARD_POLICY` from "DROP" to "ACCEPT". Then:
 
 ```bash
 $ sudo ufw reload
 $ sudo ufw allow 2375/tcp
+$ sudo ufw allow 2376/tcp
 ```
 
-**Note that connections on 2375 will have root access, so you should limit access to the server running Launch Dock, ideally within a VPC.**
+**Note that connections on 2375/2376 will have root access, so you should limit access to the server running Launch Dock, ideally within a VPC.**
 
 ## Create a MongoDB Database For the Launch Dock App
 
@@ -208,7 +213,7 @@ Then push to docker.io or a private docker repo:
 docker push <reponame>/<app>
 ```
 
-### Add the Image to Rocker-Docker
+### Add the Image to Launchdock
 
 On the Images screen, enter into the Name field the "<reponame>/<app>" tag you used when building the image, leave "In Repo" selected, and then click Add. Your app image will be pulled on every defined host.
 
@@ -229,7 +234,7 @@ The `-e ROOT_URL=""` can be omitted from the run command if you are accessing th
 
 ## Advanced Usage: From Another App
 
-If you have another Meteor app (or any program that supports DDP) that needs to launch app instances or do anything else, it can connect directly to the Rocker-Docker app and call API methods.
+If you have another Meteor app (or any program that supports DDP) that needs to launch app instances or do anything else, it can connect directly to the Launchdock app and call API methods.
 
 ### Log In
 

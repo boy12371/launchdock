@@ -22,8 +22,20 @@
         <td>{{image}}</td>
       </tr>
       <tr>
+        <th>Hosts</th>
+        <td>
+          {{#each hosts}}
+          <div>
+            <a href="http://{{this.publicHost}}" target="_blank">{{this.publicHost}}</a>
+          </div>
+          {{/each}}
+        </td>
+      </tr>
+      <tr>
         <th>Port</th>
-        <td>{{#with port}}{{this}}{{else}}DEACTIVATED{{/with}}</td>
+        <td>{{#each portsAsArray}}
+            {{this}}
+            {{else}}DEACTIVATED{{/each}}</td>
       </tr>
       <tr>
         <th>Available At</th>
@@ -36,11 +48,6 @@
           {{#unless containerId}}
           NOWHERE
           {{else}}
-          {{#each hosts}}
-          <div>
-            <a href="http://{{this.privateHost}}:{{../port}}" target="_blank">{{this.privateHost}}:{{../port}}</a>
-          </div>
-          {{/each}}
           {{#each hostnames}}
           <div>
             <a href="http://{{this}}" target="_blank">{{this}}</a>

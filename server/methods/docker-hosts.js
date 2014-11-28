@@ -56,8 +56,10 @@ Meteor.methods({
 /*
  * Private support functions
  */
-
 HostActions = {
+  // Get host status, and update status in Hosts collection
+  // active = enabled by user (true/false)
+  // status = docker connection status (Active/Error)
   getInfo: function getInfo(host) {
     var docker = DockerActions.get({host:host.privateHost, port: host.port});
     // if we can't reach the host, mark it, and stop using it.
@@ -65,9 +67,10 @@ HostActions = {
       Hosts.update(host._id, {
           $set: {
             status: "Error",
+            active: false
           }
       });
-      return null;
+      return false;
     }
     var info = Meteor.wrapAsync(docker.info.bind(docker))();
     var imageList = Meteor.wrapAsync(docker.listImages.bind(docker))();
@@ -90,8 +93,9 @@ HostActions = {
     return info;
   },
   // Check live docker host information and save to hosts db
+  // if a host goes down, you need to manually start it
   updateAll: function updateAll() {
-    Hosts.find().forEach(function (host) {
+    Hosts.find({'active': true}).forEach(function (host) {
       HostActions.getInfo(host);
     });
   },
