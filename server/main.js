@@ -44,6 +44,7 @@ if (!dockerProxy) {
 if (!dockerProxy) {
   console.log("Attempting docker daemon connection with socketPath.");
   dockerProxy = DockerActions.get({socketPath: '/var/run/docker.sock'});
+  if (dockerProxy) console.log("Connected to docker via socketPath");
 }
 
 // well, we failed to connect to any docker daemon.
