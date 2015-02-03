@@ -1,6 +1,5 @@
 // Node Requires
 fs = Npm.require('fs');
-request = Npm.require('request');
 os = Npm.require('os');
 // dockerProxy = the docker server running the hipache-npm proxy as a docker container
 // you can pass different settings in settings.json

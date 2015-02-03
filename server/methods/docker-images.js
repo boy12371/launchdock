@@ -172,7 +172,7 @@ ImageActions = {
     // if (exists) return;
 
     // stream tar file to buildImage
-    var tarStream = request(archiveUrl);
+    var tarStream = Meteor.get(archiveUrl);
     if (!tarStream) {
       throw new Meteor.Error(500, 'Internal server error', "Unable to get build context archive from " + archiveUrl);
     }
