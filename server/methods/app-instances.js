@@ -26,6 +26,7 @@ Meteor.methods({
     var exists = Meteor.call('image/exists', image);
     var record = DockerImages.findOne({'name': image});
     if (exists != true || !record) {
+      console.log("Image not found:" + image);
       Meteor.call('image/add', image);
     }
     // Run and attach a new docker container for it
