@@ -66,12 +66,12 @@ function hipacheConnect(containerInfo) {
     Meteor.setTimeout(function() {
       // OSX DEVELOPMENT
       if (platform === "darwin") {
-        var host = Meteor.settings.redis.host  || process.env.REDIS_HOST  || process.env.DOCKER_HOST.split(":",2)[1].slice(2) || host;
+        var localhost = Meteor.settings.redis.host  || process.env.REDIS_HOST  || process.env.DOCKER_HOST.split(":",2)[1].slice(2) || host;
         try {
-          Redis = redis.createClient(port, host, {no_ready_check: true}); //local
-          console.log("Connection established to redis instance: " + host + ":" + port);
+          Redis = redis.createClient(port, localhost, {no_ready_check: true}); //local
+          console.log("Connection established to redis instance: " + localhost + ":" + port);
         } catch (err) {
-          throw new Meteor.Error( 500, "HIPACHE: Unable to connect to redis. Checking hipach-npm installation.", err);
+          throw new Meteor.Error( 500, "HIPACHE: Unable to connect to redis. Checking hipache-npm installation.", err);
         }
       // LINUX PRODUCTION
       } else {
@@ -79,7 +79,7 @@ function hipacheConnect(containerInfo) {
           Redis = redis.createClient(port, host); //running as docker instances
           console.log("Connection established to redis instance: " + host + ":" + port);
         } catch (err) {
-          throw new Meteor.Error( 500, "HIPACHE: Unable to connect to redis. Checking hipach-npm installation.", err);
+          throw new Meteor.Error( 500, "HIPACHE: Unable to connect to redis. Checking hipache-npm installation.", err);
         }
       }
     }, 2500); // give redis time to start on container
