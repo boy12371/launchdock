@@ -12,6 +12,11 @@ Schemas.Host = new SimpleSchema({
 		type: Number,
 		defaultValue: 2375
 	},
+  protocol: {
+    type: String,
+    allowedValues: ['http','https'],
+    defaultValue: 'http'
+  },
 	max: {
 		type: Number,
 		defaultValue: 200,
