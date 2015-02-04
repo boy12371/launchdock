@@ -1,20 +1,22 @@
 // Set up variables used throughout
 // Set server dir for use everywhere
-serverDir = __meteor_bootstrap__ && __meteor_bootstrap__.serverDir;
-if (!serverDir) {
-    throw new Error("Unable to determine the server directory");
-}
+if (Meteor.isServer) {
+  serverDir = __meteor_bootstrap__ && __meteor_bootstrap__.serverDir;
+  if (!serverDir) {
+      throw new Error("Unable to determine the server directory");
+  }
 
-// DOCKER SSL DEFAULTS
-// TODO throw a warning if the cert read is the same as the github repo test cert.
-// Boot2docker generates new certs on install, so you'll need to copy your own from DOCKER_CERT_PATH
-if (!Meteor.settings.dockerSSL) {
-  Meteor.settings.dockerSSL = {
-    "path": serverDir  + "/assets/app/docker",
-    "ca": "ca.pem",
-    "cert": "cert.pem",
-    "key": "key.pem"
-  };
+  // DOCKER SSL DEFAULTS
+  // TODO throw a warning if the cert read is the same as the github repo test cert.
+  // Boot2docker generates new certs on install, so you'll need to copy your own from DOCKER_CERT_PATH
+  if (!Meteor.settings.dockerSSL) {
+    Meteor.settings.dockerSSL = {
+      "path": serverDir  + "/assets/app/docker",
+      "ca": "ca.pem",
+      "cert": "cert.pem",
+      "key": "key.pem"
+    };
+  }
 }
 // HIPACHE DEFAULTS
 if (!Meteor.settings.hipache) Meteor.settings.hipache = {};

@@ -6,13 +6,15 @@ DockerActions = {
     // read SSL certificates, path and cert customizable in Meteor.setttings.dockerSSL
     if ((Meteor.settings.dockerSSL || process.env.DOCKER_TLS_VERIFY == 1) && !dockerHost.socketPath) {
       if (!dockerHost.protocol) dockerHost.protocol = "https";
-      var certPath = Meteor.settings.dockerSSL.path || process.env.DOCKER_CERT_PATH;
-      var ca = Meteor.settings.dockerSSL.ca || "ca.pem";
-      var cert = Meteor.settings.dockerSSL.cert || "cert.pem";
-      var key = Meteor.settings.dockerSSL.key || "key.pem"
-      dockerHost.ca = fs.readFileSync(certPath + "/" + ca);
-      dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
-      dockerHost.key = fs.readFileSync(certPath + "/" + key);
+      if (dockerHost.protocol == "https") {
+        var certPath = Meteor.settings.dockerSSL.path || process.env.DOCKER_CERT_PATH;
+        var ca = Meteor.settings.dockerSSL.ca || "ca.pem";
+        var cert = Meteor.settings.dockerSSL.cert || "cert.pem";
+        var key = Meteor.settings.dockerSSL.key || "key.pem"
+        dockerHost.ca = fs.readFileSync(certPath + "/" + ca);
+        dockerHost.cert = fs.readFileSync(certPath + "/" + cert);
+        dockerHost.key = fs.readFileSync(certPath + "/" + key);
+      }
     }
     if (!dockerHost.protocol && !dockerHost.socketPath) dockerHost.protocol = "http";
     if (!dockerHost.timeout) dockerHost.timeout = 2000;
@@ -32,7 +34,7 @@ DockerActions = {
     var target = Hosts.findOne(hostId);
     if (!target)
       throw new Meteor.Error(400, 'Bad request', "No defined docker host has ID " + hostId);
-    return DockerActions.get({host: target.privateHost, port: target.port});
+    return DockerActions.get({host: target.privateHost, port: target.port, protocol: target.protocol});
   },
   // Returns a docker object for the server that is running the
   // given app instance's container
