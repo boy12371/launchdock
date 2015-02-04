@@ -105,6 +105,10 @@ Router.map(function() {
     }
   });
 
+  this.route('notFound', {
+    path: "/(.*)"
+  });
+
 });
 
 // Active pages
