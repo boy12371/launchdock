@@ -59,9 +59,9 @@ DockerActions = {
         return null;
       }
       // connect to docker host
-      var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port});
+      var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port, protocol: hostDoc.protocol});
       if (!docker) {
-        console.log("DockerActions: Unable to connect to docker host on " + hostDoc.privateHost + ":" + hostDoc.port);
+        console.log("DockerActions: Unable to connect to docker host on " + hostDoc.protocol + "://" + hostDoc.privateHost + ":" + hostDoc.port);
         return null;
       }
       // Update info in AI document

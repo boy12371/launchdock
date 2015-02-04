@@ -148,8 +148,8 @@ ImageActions = {
   },
   // Pull a docker image from repo on a single host, if an image with that name
   // does not already exist on that host.
-  pullOnHost: function pullImageOnHost(host, port, repoTag) {
-    var docker = DockerActions.get({host: host, port: port});
+  pullOnHost: function pullImageOnHost(dockerHost, repoTag) {
+    var docker = DockerActions.get(dockerHost);
     if (!docker) return false;
     try {
       Meteor.wrapAsync(docker.pull.bind(docker))(repoTag);
@@ -159,8 +159,8 @@ ImageActions = {
   },
 
   // Build a docker image from a tar on a single host
-  buildOnHost: function buildImageOnHost(host, port, imageName, archiveUrl) {
-    var docker = DockerActions.get({host: host, port: port});
+  buildOnHost: function buildImageOnHost(dockerHost, imageName, archiveUrl) {
+    var docker = DockerActions.get(dockerHost);
 
     if (!docker) return false;
 
@@ -194,14 +194,14 @@ ImageActions = {
       var imageName = image.name;
       var archiveUrl = image.tarUrl;
       Hosts.find().forEach(function (host) {
-        ImageActions.buildOnHost(host.privateHost, host.port, imageName, archiveUrl);
+        ImageActions.buildOnHost({'host': host.privateHost, 'port': host.port, 'protocol': host.protocol}, imageName, archiveUrl);
       });
     // Already been used before, but we're pulling
     } else if (image.inRepo) {
       var repoTag = image.name + ":latest";
       Hosts.find().forEach(function (host) {
         console.log("Pulling "+image.name+" on: "+ host.privateHost);
-        ImageActions.pullOnHost(host.privateHost, host.port, repoTag);
+        ImageActions.pullOnHost({'host': host.privateHost, 'port': host.port, 'protocol': host.protocol}, repoTag);
       });
       // Trigger status update routine (updates status field on image)
       Meteor.call('image/status',image.name);
@@ -216,7 +216,7 @@ ImageActions = {
     var imageName = image.name;
     console.log("deleting image:"+imageName)
     Hosts.find().forEach(function (host) {
-      var docker = DockerActions.get({host: host.privateHost, port: host.port});
+      var docker = DockerActions.get({'host': host.privateHost, 'port': host.port,'protocol': host.protocol });
       if (!docker) return;
       var dockerImage;
       var images = Meteor.wrapAsync(docker.listImages.bind(docker))();
