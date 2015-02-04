@@ -22,7 +22,7 @@ Meteor.startup(function () {
 		var host = Hosts.findOne({privateHost: ai.host});
 		var hostId;
 		if (!host) {
-			hostId = Hosts.insert({privateHost: ai.host, publicHost: ai.host, port: 2375, max: 100, active: true});
+			hostId = Hosts.insert({privateHost: ai.host, publicHost: ai.host, protocol: ai.protocol, port: 2375, max: 200, active: true});
 		} else {
 			hostId = host._id;
 		}

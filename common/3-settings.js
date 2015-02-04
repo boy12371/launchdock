@@ -18,20 +18,25 @@ if (Meteor.isServer) {
     };
   }
 }
-// HIPACHE DEFAULTS
-if (!Meteor.settings.hipache) Meteor.settings.hipache = {};
-// REDIS DEFAULTS
-if (!Meteor.settings.redis) Meteor.settings.redis = {};
 
-// SETTINGS COLLECTION
-settings = Settings.findOne();
-if (settings) {
-  // KADIRA DEFAULTS
-  if (settings.kadira && !Meteor.settings.kadira) {
-    Kadira.connect(settings.kadira.appId, settings.kadira.appSecret);
-  }
-  // MAIL URL
-  if (settings.mailURL) {
-      Meteor.settings.MAIL_URL = settings.mailUrl;
+if (Meteor.settings) {
+  // HIPACHE DEFAULTS
+  if (!Meteor.settings.hipache) Meteor.settings.hipache = {};
+  // REDIS DEFAULTS
+  if (!Meteor.settings.redis) Meteor.settings.redis = {};
+  // DOCKER DEFAULTS
+  if (!Meteor.settings.docker) Meteor.settings.docker = {};
+
+  // SETTINGS COLLECTION
+  settings = Settings.findOne();
+  if (settings) {
+    // KADIRA DEFAULTS
+    if (settings.kadira && !Meteor.settings.kadira) {
+      Kadira.connect(settings.kadira.appId, settings.kadira.appSecret);
+    }
+    // MAIL URL
+    if (settings.mailURL) {
+        Meteor.settings.MAIL_URL = settings.mailUrl;
+    }
   }
 }
