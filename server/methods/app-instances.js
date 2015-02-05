@@ -230,8 +230,18 @@ Meteor.methods({
     }
     var dockerHost = dockerHosts[0];
     Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, domainId );
-    // Map all exposed ports to hipache entry
-    _.each(ai.info.NetworkSettings.Ports, function (exposedPort) {
+    // Map all exposed ports to hipache entry,
+    // PORT set as ENV variable in container
+    // will make that the only port mapped.
+    if (ai.env.PORT) {
+      console.log("Mapping ENV Port:" + ai.env.PORT);
+      appPort = ai.env.PORT+"/tcp"; // map to tcp
+      networkPorts = ai.info.NetworkSettings.Ports[appPort];
+    } else {
+      networkPorts = ai.info.NetworkSettings.Ports;
+    }
+    // Map ports
+    _.each(networkPorts, function (exposedPort) {
       _.each(exposedPort, function(port) {
         Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
       });

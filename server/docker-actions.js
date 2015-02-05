@@ -56,7 +56,7 @@ DockerActions = {
       var hostDoc = HostActions.getBest();
       if (!hostDoc) {
         console.log("DockerActions: No valid docker hosts found. Cannot add for instance: " + instanceId);
-        return null;
+        throw new Meteor.error(400, 'No valid hosts. Cannot add for instance: ' + instanceId);
       }
       // connect to docker host
       var docker = DockerActions.get({host: hostDoc.privateHost, port: hostDoc.port, protocol: hostDoc.protocol});
