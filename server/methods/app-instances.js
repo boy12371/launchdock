@@ -230,22 +230,26 @@ Meteor.methods({
     }
     var dockerHost = dockerHosts[0];
     Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, domainId );
-    // Map all exposed ports to hipache entry,
     // PORT set as ENV variable in container
     // will make that the only port mapped.
     if (ai.env.PORT) {
-      console.log("Mapping ENV Port:" + ai.env.PORT);
-      appPort = ai.env.PORT+"/tcp"; // map to tcp
-      networkPorts = ai.info.NetworkSettings.Ports[appPort];
+      var portKey = ai.env.PORT+"/tcp"; // map to tcp
+      var port = ai.info.NetworkSettings.Ports[portKey][0];
+
+      console.log("frontend:"+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort)
+      Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
+
     } else {
-      networkPorts = ai.info.NetworkSettings.Ports;
-    }
-    // Map ports
-    _.each(networkPorts, function (exposedPort) {
-      _.each(exposedPort, function(port) {
-        Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
+      // else map all exposed ports to hipache entry,
+      console.log("Mapping Port(s):" + networkPorts);
+      _.each(ai.info.NetworkSettings.Ports, function (exposedPort) {
+        _.each(exposedPort, function(port) {
+          console.log("frontend:"+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort)
+          Meteor.wrapAsync(Redis.rpush.bind(Redis))('frontend:'+hostname, "http://"+dockerHost.publicHost+":"+port.HostPort);
+        });
       });
-    });
+    }
+
     return true;
   },
   'ai/removeHostname': function (instanceId, hostname) {

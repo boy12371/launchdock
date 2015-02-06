@@ -13,7 +13,7 @@ if (Meteor.settings.docker) {
   var host = Meteor.settings.docker.host || '127.0.0.1';
   var port = Meteor.settings.docker.port || '2375';
   var protocol = Meteor.settings.docker.protocol || 'http';
-  console.log("Attempting docker daemon connection on " + host + ":" + port);
+  console.log("Attempting " + protocol + " docker daemon connection on " + host + ":" + port);
   dockerProxy = DockerActions.get( {host: host, port: port, protocol: protocol} );
   if (dockerProxy) console.log("Connected to docker "+ host + ":" + port);
 }
@@ -26,7 +26,7 @@ if (!dockerProxy && process.env.DOCKER_HOST) {
   } else {
     var protocol = process.env.DOCKER_HOST.split(":",3)[0];
   }
-  console.log("Attempting docker daemon connection on " + host + ":" + port);
+  console.log("Attempting " + protocol + " docker daemon connection on " + host + ":" + port);
   dockerProxy = DockerActions.get( {host: host, port: port, protocol: protocol} );
   if (dockerProxy) console.log("Connected to docker "+ host + ":" + port);
 }
@@ -35,7 +35,7 @@ if (!dockerProxy) {
   var host = '127.0.0.1';
   var port = '2375';
   var protocol = 'http';
-  console.log("Attempting docker daemon connection on " + host + ":" + port);
+  console.log("Attempting " + protocol + " docker daemon connection on " + host + ":" + port);
   dockerProxy = DockerActions.get( {host: host, port: port, protocol: protocol} );
   if (dockerProxy) console.log("Connected to docker "+ host + ":" + port);
 }
