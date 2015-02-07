@@ -13,20 +13,12 @@ Install [meteor](http://meteor.com).
 
 Install [boot2docker](http://boot2docker.io/).
 
-Export your docker host (you will see this at the end of `boot2docker` installation):
-
-  ```export DOCKER_HOST=tcp://192.168.59.103:2376
-  export DOCKER_CERT_PATH=/Users/<username>/.boot2docker/certs/boot2docker-vm
-  export DOCKER_TLS_VERIFY=1```
-
 *Your VM might have a different DOCKER_HOST IP address and DOCKER_CERT_PATH. Use whatever boot2docker up told you to use. You probably want to add those environment variables to your shell config.*
 
-Optionally, you might also want to configure the VirtualBox VM (where Docker is running) for additional container port access to the VM.
+Or add this to your shell profile, or run:
+
 ```bash
-  for i in {49000..49900}; do
-   VBoxManage modifyvm "boot2docker-vm" --natpf1 "tcp-port$i,tcp,,$i,,$i";
-   VBoxManage modifyvm "boot2docker-vm" --natpf1 "udp-port$i,udp,,$i,,$i";
-  done
+   $(boot2docker shellinit)
 ```
 
 Optionally, install the `ongoworks/hipache-npm` docker image (if you don't we'll pull one when you run Launchdock):
