@@ -43,8 +43,15 @@ Meteor.methods({
     Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
     console.log("Rebuilding: ",instanceId);
-    ContainerActions.removeForAppInstance(instanceId);
-    ContainerActions.addForAppInstance(instanceId);
+
+    try {
+      ContainerActions.removeForAppInstance(instanceId);
+      ContainerActions.addForAppInstance(instanceId);
+    }
+    catch(err) {
+      console.log("No application instance record found.");
+      return false
+    }
     return true;
   },
   'ai/rebuildAll': function () {
@@ -63,8 +70,15 @@ Meteor.methods({
     console.log("Restarting: " + instanceId);
     var container = ContainerActions.getForAppInstance(instanceId);
     if (!container) {
-      ContainerActions.removeForAppInstance(instanceId);
-      ContainerActions.addForAppInstance(instanceId);
+      console.log("No container found, attempting rebuild:  " + instanceId);
+      try {
+        ContainerActions.removeForAppInstance(instanceId);
+        ContainerActions.addForAppInstance(instanceId);
+      }
+      catch(err) {
+        console.log("No application instance record found.");
+        return false, err
+      }
       return true;
     }
     // Restart container
@@ -262,10 +276,16 @@ Meteor.methods({
     return true;
   },
   'ai/getContainerInfo': function (instanceId) {
-
-    Utility.checkLoggedIn(Meteor.userId());
     check(instanceId, String);
-    return ContainerActions.getInfo(instanceId);
+    try {
+      Utility.checkLoggedIn(Meteor.userId());
+      return ContainerActions.getInfo(instanceId);
+    }
+    catch (error) {
+      console.log("Error getting container info: ", instanceId);
+      return null
+    }
+
   }
 });
 
@@ -363,12 +383,17 @@ ContainerActions = {
   // update proxy
   //
   addForAppInstance: function addForAppInstance(instanceId) {
+    check(instanceId, String);
     var ai = AppInstances.findOne({_id: instanceId});
-    // Bad instanceId
+    console.log(ai)
+    console.log("Add container for app instance: "+ ai.instanceId);
+    //Bad instanceId
+
     if (!ai) {
+      console.log("addForAppInstance failed: no existing app instance.")
       return false;
     }
-    // Already has a container running
+    //Already has a container running (but we need this to get a new one)
     if (ai.containerId) {
       return true;
     }
