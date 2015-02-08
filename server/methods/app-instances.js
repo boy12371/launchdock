@@ -276,6 +276,8 @@ Meteor.methods({
     return true;
   },
   'ai/getContainerInfo': function (instanceId) {
+    this.unblock();
+    // console.log("checking status: " + instanceId)
     check(instanceId, String);
     try {
       Utility.checkLoggedIn(Meteor.userId());
@@ -385,7 +387,6 @@ ContainerActions = {
   addForAppInstance: function addForAppInstance(instanceId) {
     check(instanceId, String);
     var ai = AppInstances.findOne({_id: instanceId});
-    console.log(ai)
     console.log("Add container for app instance: "+ ai.instanceId);
     //Bad instanceId
 

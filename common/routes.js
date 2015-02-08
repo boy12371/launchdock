@@ -1,12 +1,29 @@
-// note: problem with redirect after sign-in is an accounts-entry bug
+// Patch for broken accounts-entry AccountsEntry.signInRequired(this);
+// https://github.com/Differential/accounts-entry/issues/341
+signInRequired = function(router, extraCondition) {
+  if (extraCondition == null) {
+    extraCondition = true;
+  }
+  if (!Meteor.loggingIn()) {
+    if (!Meteor.user() || !extraCondition) {
+      Session.set('fromWhere', router.url);
+      Router.go('/sign-in');
+      return Session.set('entryError', t9n('error.signInRequired'));
+    } else {
+      Meteor.call("host/refreshDetails");
+      return router.next();
+    }
+  }
+}
+
+// Declare Route Defaults
 Router.configure({
   notFoundTemplate: 'notFound',
   loadingTemplate: 'loading',
   layoutTemplate: 'layout'
 });
 
-Router.onBeforeAction('loading');
-
+// Create Router Mapping
 Router.map(function() {
 
   this.route('index', {
@@ -16,12 +33,10 @@ Router.map(function() {
   this.route('dashboard', {
     path: '/dashboard',
     waitOn: function() {
-      return [
-        Meteor.subscribe("hosts")
-      ];
+      return  Meteor.subscribe("hosts")
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
@@ -29,79 +44,66 @@ Router.map(function() {
     path: '/containers',
     template: 'appInstances',
     waitOn: function() {
-      return [
-        Meteor.subscribe("appInstancesTable")
-      ];
+      return Meteor.subscribe("appInstancesTable");
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
   this.route('appInstanceDetails', {
     path: 'container/:_id',
     waitOn: function() {
-      return [
-        Meteor.subscribe("appInstance", this.params._id)
-      ];
+      Meteor.subscribe("appInstance", this.params._id)
     },
     data: function () {
       return AppInstances.findOne(this.params._id);
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
   this.route("createAppInstance", {
     path: "create_app",
     waitOn: function() {
-      return [
-        Meteor.subscribe("dockerImages")
-      ];
+      Meteor.subscribe("dockerImages");
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
   this.route('images', {
     waitOn: function() {
-      return [
-        Meteor.subscribe("dockerImages")
-      ];
+      Meteor.subscribe("dockerImages");
     },
     data: function () {
       return DockerImages.find({}, {sort: {name: 1}});
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
   this.route('hosts', {
     waitOn: function() {
-      return [
-        Meteor.subscribe("hosts")
-      ];
+      Meteor.subscribe("hosts");
     },
     data: function () {
       return Hosts.find({}, {sort: {'details.Containers': -1}});
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
-    },
-    onAfterAction: function () {
-      Meteor.call("host/refreshDetails");
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
   this.route("settings", {
     waitOn: function() {
-      return [ Meteor.subscribe("settings")];
+      return Meteor.subscribe("settings");
     },
-    onBeforeAction: function (pause) {
-      AccountsEntry.signInRequired(this, pause);
+    onBeforeAction: function () {
+      signInRequired(this);
     }
   });
 
