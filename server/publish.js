@@ -10,9 +10,9 @@ Meteor.publish("appInstance", function (id) {
 
 Meteor.publish("appInstancesTable", function () {
   if (Roles.userIsInRole(this.userId, ['admin'])) {
-    return AppInstances.find({},{fields:{hostnames:1,status:1,createdAt:1,image:1, 'env.tag': 1, 'env.METEOR_EMAIL':1 }});
+    return AppInstances.find({},{fields:{hostnames:1,status:1,createdAt:1,image:1, 'env.tag': 1, 'env.METEOR_EMAIL':1,'dockerHosts':1 }});
   } else if (this.userId) {
-    return AppInstances.find({'userId': this.userId},{fields:{hostnames:1,status:1,createdAt:1,image:1,'env.tag': 1, 'env.METEOR_EMAIL':1 }});
+    return AppInstances.find({'userId': this.userId},{fields:{hostnames:1,status:1,createdAt:1,image:1,'env.tag': 1, 'env.METEOR_EMAIL':1,'dockerHosts':1 }});
   } else {
     return [];
   }
@@ -81,7 +81,7 @@ Meteor.publish('totalHostCount', function() {
 });
 
 
-
+// security settings
 Settings.allow({
   update: function (userId, doc) {
     if (Roles.userIsInRole(Meteor.userId(), ['admin'])) {

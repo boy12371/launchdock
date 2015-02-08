@@ -35,7 +35,7 @@
 }
 
 Template.dashboardHosts.helpers({
-  totalInstances: function () {
+  tag: function () {
     if (this.tag) {
       return this.tag;
     } else {

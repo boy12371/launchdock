@@ -33,7 +33,10 @@ Router.map(function() {
   this.route('dashboard', {
     path: '/dashboard',
     waitOn: function() {
-      return  Meteor.subscribe("hosts")
+      return Meteor.subscribe("hosts")
+    },
+    subscriptions: function () {
+      return Meteor.subscribe("appInstancesTable")
     },
     onBeforeAction: function () {
       signInRequired(this);
