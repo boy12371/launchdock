@@ -120,7 +120,6 @@ Meteor.methods({
     return true;
   },
   'image/createOnAllHosts': function (imageId) {
-    this.unblock();
     check(imageId, String);
     Utility.checkLoggedIn(Meteor.userId());
 

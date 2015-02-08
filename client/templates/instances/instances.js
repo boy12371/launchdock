@@ -24,16 +24,13 @@ function stringToColor(str) {
 // ************************************************************
 
 Template.appInstances.helpers({
-    AppInstances: function(){
-      return AppInstances.find({},{fields:{hostnames:1,status:1,createdAt:1,image:1, 'env.tag': 1, 'env.METEOR_EMAIL':1 }});
-    },
     settings: function () {
         return {
+            collection: AppInstances,
             rowsPerPage: 20,
             showFilter: true,
-            useFontAwesome: true,
             fields: [
-              {'key': 'env.tag', 'label': 'Env/Tag',
+              {'key': 'env.tag', 'label': 'Env/Tag', 'sortByValue': true,
                 fn: function (value,item ) {
                     var tag = "";
                     if (value) {
@@ -43,13 +40,13 @@ Template.appInstances.helpers({
                     return new Spacebars.SafeString('<i class="app-detail-icon fa fa-cog" data-id="'+item._id+'"></i>'+tag);
                 }
               },
-              {'key': 'hostnames', 'label': 'Domain',
+              {'key': 'hostnames', 'label': 'Domain','sortByValue': true,
                 fn: function (value,item ) {
                     return new Spacebars.SafeString('<a href="//'+value+'" class="domain-link" target="_blank">'+value+'</a>');
                 }
               },
               {'key': 'status', 'label': 'Status'},
-              {'key': 'createdAt', 'label': 'Created', 'sort': 'descending',
+              {'key': 'createdAt', 'label': 'Created','sortByValue': true, 'sort': 'descending',
                 fn: function(value,item) {
                   return moment(value).tz("America/Los_Angeles").format('MM/DD/YY h:mm a');
                 }
