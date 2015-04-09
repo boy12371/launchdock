@@ -7,8 +7,6 @@
 standard-app-packages
 accounts-password
 accounts-ui
-#accounts-github
-#accounts-meteor-developer
 underscore
 http
 random
@@ -24,7 +22,7 @@ ongoworks:dockerode
 alanning:roles
 aslagle:reactive-table
 aldeed:collection2
-aldeed:autoform
+aldeed:autoform@4.2.2
 dburles:collection-helpers
 matb33:collection-hooks
 sergeyt:typeahead
