@@ -1,6 +1,8 @@
 launchdock
 ===============
 
+>This repo and application is deprecated.  It's been replaced by the completely rewritten `Launchdock` released at https://github.com/reactioncommerce/launchdock/
+
 This is a Meteor app (not a package) that allows you to manage multiple instances of other Meteor app/Docker containers, either on a single server or multiple. In addition to managing the app instances, you can dynamically control proxy routing based on hostname, allowing you to simply map all relevant hostnames to the docker servers in DNS.
 
 There is a browser interface, but you can also remotely call the launcher API over DDP from another Meteor app (or anything that can use DDP).
